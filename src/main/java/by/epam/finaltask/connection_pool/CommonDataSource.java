@@ -9,9 +9,9 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -21,7 +21,7 @@ public class CommonDataSource implements DataSource {
     private final static String DEREGISTER_DRIVER_MCG = "deregistering jdbc driver: %s";
     private final static String ERROR_DEREGISTER_DRIVER_MCG = "Error deregistering driver %s";
 
-    private final static int INITIAL_SIZE = 6;
+    private final static int SIZE = 8;
 
     private final ReentrantLock lock = new ReentrantLock();
 
@@ -43,9 +43,9 @@ public class CommonDataSource implements DataSource {
         this.driverName = driverName;
         try {
             registerDriver(driverName);
-            availableConnections = new LinkedBlockingQueue<>();
+            availableConnections = new ArrayBlockingQueue<>(SIZE, true);
             usingConnections = new ConcurrentLinkedQueue<>();
-            for (int i = 0; i < INITIAL_SIZE; i++) {
+            for (int i = 0; i < SIZE; i++) {
                 availableConnections.add(new PooledConnection(DriverManager.
                         getConnection(databaseUrl, login, password), this));
             }
@@ -88,19 +88,20 @@ public class CommonDataSource implements DataSource {
 
     @Override
     public void close() throws Exception {
-        dataSourceClosed.set(true);
-        try {
-            Driver driver = DriverManager.getDriver(driverName);
-            DriverManager.deregisterDriver(driver);
-            LOG.info(String.format(DEREGISTER_DRIVER_MCG, driverName));
-        } catch (SQLException e) {
-            LOG.error(String.format(ERROR_DEREGISTER_DRIVER_MCG, driverName), e);
-        }
-        for (PooledConnection availableConnection : availableConnections) {
-            availableConnection.realClose();
-        }
-        for (PooledConnection usingConnection : usingConnections) {
-            usingConnection.realClose();
+        if(dataSourceClosed.compareAndSet(false, true)) {
+            try {
+                Driver driver = DriverManager.getDriver(driverName);
+                DriverManager.deregisterDriver(driver);
+                LOG.info(String.format(DEREGISTER_DRIVER_MCG, driverName));
+            } catch (SQLException e) {
+                LOG.error(String.format(ERROR_DEREGISTER_DRIVER_MCG, driverName), e);
+            }
+            for (PooledConnection availableConnection : availableConnections) {
+                availableConnection.realClose();
+            }
+            for (PooledConnection usingConnection : usingConnections) {
+                usingConnection.realClose();
+            }
         }
     }
 }
