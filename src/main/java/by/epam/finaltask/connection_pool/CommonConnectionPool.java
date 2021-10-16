@@ -13,7 +13,7 @@ public class CommonConnectionPool implements ConnectionPool {
     private final static String DATABASE_URL = "jdbc:mariadb://localhost:3306/racingSite";
     private final static String LOGIN = System.getenv("MYSQL_RACING_SITE_USER");
     private final static String PASSWORD = System.getenv("MYSQL_RACING_SITE_PASSWORD");
-    private final static String DRIVER_NAME = "com.mysql.jdbc.Driver";
+    private final static String DRIVER_NAME = "org.mariadb.jdbc.Driver";
 
     private volatile static CommonConnectionPool instance;
 
