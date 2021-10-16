@@ -1,14 +1,10 @@
 package by.epam.finaltask.connection_pool;
 
 import by.epam.finaltask.exception.DataSourceDownException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 
 public class CommonConnectionPool implements ConnectionPool {
-
-    private final static Logger LOG = LoggerFactory.getLogger(CommonConnectionPool.class);
 
     private final static String DATABASE_URL = "jdbc:mariadb://localhost:3306/racingSite";
     private final static String LOGIN = System.getenv("MYSQL_RACING_SITE_USER");
