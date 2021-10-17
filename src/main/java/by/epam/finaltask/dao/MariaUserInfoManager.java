@@ -16,34 +16,34 @@ public class MariaUserInfoManager implements UserInfoManager{
     private final static String FIRST_NAME_COLUMN = "first_name";
     private final static String LAST_NAME_COLUMN = "last_name";
     private final static String ADDRESS_NAME_COLUMN = "address_name";
-    private final static String CITY_NAME_COLUMN = "city_name";
+    private final static String CITY_OR_DISTRICT_NAME_COLUMN = "city_or_district_name";
     private final static String REGION_NAME_COLUMN = "region_name";
     private final static String POSTAL_CODE_NAME_COLUMN = "postal_code_name";
     private final static String INSERT_USER_INFO_QUERY =
             "INSERT INTO user_info(user_id, phone_number, first_name, last_name," +
-                    " address_id, city_id, region_id, postal_code_id)" +
+                    " address_id, city_or_district_id, region_id, postal_code_id)" +
                     "VALUES(?,?,?,?," +
                     "insertAddressIfNotExistAndSelectId(?)," +
-                    "insertCityIfNotExistAndSelectId(?)," +
-                    "insertRegionIfNotExistAndSelectId(?)," +
+                    "findCityOrDistrictId(?)," +
+                    "findRegionId(?)," +
                     "insertPostalCodeIfNotExistAndSelectId(?))";
     private final static String IS_USER_INFO_EXIST_QUERY =
             "SELECT EXISTS(SELECT 1 FROM user_info WHERE user_id=?) AS user_info_existence";
     private final static String FIND_USER_INFO_QUERY =
             "SELECT phone_number AS phone_number, first_name AS first_name, last_name AS last_name," +
-                    " address_name AS address_name, city_name AS city_name, region_name AS region_name," +
+                    " address_name AS address_name, city_or_district_name AS city_name, region_name AS region_name," +
                     " postal_code_name AS postal_code_name" +
                     " FROM user_info" +
                     " INNER JOIN address a on user_info.address_id = a.address_id" +
-                    " INNER JOIN city c on user_info.city_id = c.city_id" +
+                    " INNER JOIN city_or_district c on user_info.city_or_district_id = c.city_or_district_id" +
                     " INNER JOIN region r on user_info.region_id = r.region_id" +
                     " INNER JOIN postal_code pc on user_info.postal_code_id = pc.postal_code_id" +
                     " WHERE user_id=?";
     private final static String UPDATE_USER_INFO_QUERY =
             "UPDATE user_info SET phone_number = ?, first_name = ?, last_name = ?," +
                     " address_id = insertAddressIfNotExistAndSelectId(?)," +
-                    " city_id = insertCityIfNotExistAndSelectId(?)," +
-                    " region_id = insertRegionIfNotExistAndSelectId(?)," +
+                    " city_or_district_id = findCityOrDistrictId(?)," +
+                    " region_id = findRegionId(?)," +
                     " postal_code_id = insertPostalCodeIfNotExistAndSelectId(?)" +
                     " WHERE user_id = ?";
     private final static String DELETE_USER_INFO_QUERY =
@@ -106,7 +106,7 @@ public class MariaUserInfoManager implements UserInfoManager{
                 resultSet.next();
                 return new UserInfo(userId, resultSet.getString(PHONE_NUMBER_COLUMN),
                         resultSet.getString(FIRST_NAME_COLUMN), resultSet.getString(LAST_NAME_COLUMN),
-                        resultSet.getString(ADDRESS_NAME_COLUMN), resultSet.getString(CITY_NAME_COLUMN),
+                        resultSet.getString(ADDRESS_NAME_COLUMN), resultSet.getString(CITY_OR_DISTRICT_NAME_COLUMN),
                         resultSet.getString(REGION_NAME_COLUMN), resultSet.getString(POSTAL_CODE_NAME_COLUMN));
             }
         }

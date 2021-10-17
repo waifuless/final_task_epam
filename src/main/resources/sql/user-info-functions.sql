@@ -22,35 +22,39 @@ DELIMITER ;
 
 DELIMITER //
 
-CREATE FUNCTION insertCityIfNotExistAndSelectId(new_city_name VARCHAR(60)) RETURNS INT
+CREATE FUNCTION findRegionId(searching_region_name VARCHAR(60)) RETURNS INT
 
 BEGIN
 
-    IF NOT EXISTS(SELECT 1 FROM city WHERE city_name = new_city_name) THEN
-        INSERT INTO city(city_name) VALUE (new_city_name);
-    END IF;
-    RETURN (SELECT city_id FROM city WHERE city_name = new_city_name);
+    RETURN (SELECT region_id FROM region WHERE region_name = searching_region_name);
 
 END //
 
 DELIMITER ;
+
+
+
+
 
 
 
 DELIMITER //
 
-CREATE FUNCTION insertRegionIfNotExistAndSelectId(new_region_name VARCHAR(60)) RETURNS INT
+CREATE FUNCTION findCityOrDistrictId(searching_city_or_district_name VARCHAR(60)) RETURNS INT
 
 BEGIN
 
-    IF NOT EXISTS(SELECT 1 FROM region WHERE region_name = new_region_name) THEN
-        INSERT INTO region(region_name) VALUE (new_region_name);
-    END IF;
-    RETURN (SELECT region_id FROM region WHERE region_name = new_region_name);
+    RETURN (SELECT city_or_district_id FROM city_or_district WHERE city_or_district_name =
+                                                                   searching_city_or_district_name);
 
 END //
 
 DELIMITER ;
+
+
+
+
+
 
 
 
