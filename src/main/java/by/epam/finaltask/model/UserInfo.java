@@ -2,41 +2,41 @@ package by.epam.finaltask.model;
 
 public class UserInfo {
 
-    private final int user_id;
-    private final String phone_number;
-    private final String first_name;
-    private final String last_name;
+    private final int userId;
+    private final String phoneNumber;
+    private final String firstName;
+    private final String lastName;
     private final String address;
     private final String city;
     private final String region;
     private final String postalCode;
 
-    public UserInfo(int user_id, String phone_number, String first_name, String last_name,
+    public UserInfo(int userId, String phoneNumber, String firstName, String lastName,
                     String address, String city, String region, String postalCode) {
-        this.user_id = user_id;
-        this.phone_number = phone_number;
-        this.first_name = first_name;
-        this.last_name = last_name;
+        this.userId = userId;
+        this.phoneNumber = phoneNumber;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.address = address;
         this.city = city;
         this.region = region;
         this.postalCode = postalCode;
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
 
-    public String getPhone_number() {
-        return phone_number;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getLastName() {
+        return lastName;
     }
 
     public String getAddress() {
@@ -62,11 +62,11 @@ public class UserInfo {
 
         UserInfo userInfo = (UserInfo) o;
 
-        if (user_id != userInfo.user_id) return false;
-        if (phone_number != null ? !phone_number.equals(userInfo.phone_number) : userInfo.phone_number != null)
+        if (userId != userInfo.userId) return false;
+        if (phoneNumber != null ? !phoneNumber.equals(userInfo.phoneNumber) : userInfo.phoneNumber != null)
             return false;
-        if (first_name != null ? !first_name.equals(userInfo.first_name) : userInfo.first_name != null) return false;
-        if (last_name != null ? !last_name.equals(userInfo.last_name) : userInfo.last_name != null) return false;
+        if (firstName != null ? !firstName.equals(userInfo.firstName) : userInfo.firstName != null) return false;
+        if (lastName != null ? !lastName.equals(userInfo.lastName) : userInfo.lastName != null) return false;
         if (address != null ? !address.equals(userInfo.address) : userInfo.address != null) return false;
         if (city != null ? !city.equals(userInfo.city) : userInfo.city != null) return false;
         if (region != null ? !region.equals(userInfo.region) : userInfo.region != null) return false;
@@ -75,10 +75,10 @@ public class UserInfo {
 
     @Override
     public int hashCode() {
-        int result = user_id;
-        result = 31 * result + (phone_number != null ? phone_number.hashCode() : 0);
-        result = 31 * result + (first_name != null ? first_name.hashCode() : 0);
-        result = 31 * result + (last_name != null ? last_name.hashCode() : 0);
+        int result = userId;
+        result = 31 * result + (phoneNumber != null ? phoneNumber.hashCode() : 0);
+        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
         result = 31 * result + (address != null ? address.hashCode() : 0);
         result = 31 * result + (city != null ? city.hashCode() : 0);
         result = 31 * result + (region != null ? region.hashCode() : 0);
@@ -89,10 +89,10 @@ public class UserInfo {
     @Override
     public String toString() {
         return "UserInfo{" +
-                "user_id=" + user_id +
-                ", phone_number='" + phone_number + '\'' +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
+                "userId=" + userId +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", address='" + address + '\'' +
                 ", city='" + city + '\'' +
                 ", region='" + region + '\'' +
