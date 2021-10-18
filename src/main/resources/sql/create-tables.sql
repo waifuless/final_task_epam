@@ -194,6 +194,7 @@ create or replace table lot_image
         primary key,
     lot_id int not null,
     path_to_image varchar(128) not null,
+    main_image tinyint(1) default 0 not null,
     constraint lot_image_fk0
         foreign key (lot_id) references lot (lot_id)
 );
