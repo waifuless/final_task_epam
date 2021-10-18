@@ -1,6 +1,5 @@
 package by.epam.finaltask.connection_pool;
 
-import by.epam.finaltask.exception.DataSourceDownException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,11 +81,7 @@ public class PooledConnection implements Connection {
         }
         closeAndUnregisterAllSavepoints();
         closeAndUnregisterAllStatements();
-        try {
-            dataSource.takeBack(this);
-        } catch (DataSourceDownException e) {
-            LOG.error(e.getMessage(), e);
-        }
+        dataSource.takeBack(this);
     }
 
     @Override

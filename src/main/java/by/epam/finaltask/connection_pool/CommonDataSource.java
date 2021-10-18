@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -22,30 +24,23 @@ public class CommonDataSource implements DataSource {
 
     private final static int SIZE = 8;
 
+    private final List<PooledConnection> allConnections; //uses to close all connection without any lock
     private final BlockingQueue<PooledConnection> availableConnections;//blocks when wait element (method take())
     private final Queue<PooledConnection> usingConnections; //does not block
 
-    private final String databaseUrl;
-    private final String login;
-    private final String password;
     private final String driverName;
 
     private final AtomicBoolean dataSourceClosed = new AtomicBoolean(false);
 
     public CommonDataSource(String databaseUrl, String login, String password, String driverName)
             throws DataSourceDownException {
-        this.databaseUrl = databaseUrl;
-        this.login = login;
-        this.password = password;
         this.driverName = driverName;
         try {
             registerDriver(driverName);
+            allConnections = new ArrayList<>();
             availableConnections = new ArrayBlockingQueue<>(SIZE, true);
             usingConnections = new ConcurrentLinkedQueue<>();
-            for (int i = 0; i < SIZE; i++) {
-                availableConnections.add(new PooledConnection(DriverManager.
-                        getConnection(databaseUrl, login, password), this));
-            }
+            initConnections(databaseUrl, login, password);
         } catch (Exception ex) {
             DataSourceDownException downException =
                     new DataSourceDownException("DataSource can`t start", ex);
@@ -65,16 +60,15 @@ public class CommonDataSource implements DataSource {
     }
 
     @Override
-    public void takeBack(Connection connection) throws DataSourceDownException {
-        if (dataSourceClosed.get()) {
-            throw new DataSourceDownException();
-        }
-        try {
-            if (usingConnections.remove((PooledConnection) connection)) {
-                availableConnections.put((PooledConnection) connection);
+    public void takeBack(Connection connection) {
+        if (!dataSourceClosed.get()) {
+            try {
+                if (usingConnections.remove((PooledConnection) connection)) {
+                    availableConnections.put((PooledConnection) connection);
+                }
+            } catch (InterruptedException ex) {
+                LOG.error(ex.getMessage(), ex);
             }
-        } catch (InterruptedException ex) {
-            LOG.error(ex.getMessage(), ex);
         }
     }
 
@@ -82,8 +76,7 @@ public class CommonDataSource implements DataSource {
     public void close() throws Exception {
         if (dataSourceClosed.compareAndSet(false, true)) {
             deregisterDriver(driverName);
-            closeConnections(availableConnections);
-            closeConnections(usingConnections);
+            closeConnections(allConnections);
         }
     }
 
@@ -91,6 +84,15 @@ public class CommonDataSource implements DataSource {
     private void registerDriver(String driverName)
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Class.forName(driverName).newInstance();
+    }
+
+    private void initConnections(String databaseUrl, String login, String password) throws SQLException {
+        for (int i = 0; i < SIZE; i++) {
+            PooledConnection connection = new PooledConnection(DriverManager.
+                    getConnection(databaseUrl, login, password), this);
+            allConnections.add(connection);
+            availableConnections.add(connection);
+        }
     }
 
     private void deregisterDriver(String driverName) {
@@ -103,7 +105,7 @@ public class CommonDataSource implements DataSource {
         }
     }
 
-    private void closeConnections(Queue<PooledConnection> connections) throws SQLException {
+    private void closeConnections(List<PooledConnection> connections) throws SQLException {
         for (PooledConnection connection : connections) {
             connection.realClose();
         }

@@ -8,5 +8,5 @@ public interface DataSource extends AutoCloseable {
 
     Connection getConnection() throws InterruptedException, DataSourceDownException;
 
-    void takeBack(Connection connection) throws DataSourceDownException;
+    void takeBack(Connection connection);
 }
