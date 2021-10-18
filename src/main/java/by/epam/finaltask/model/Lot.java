@@ -1,10 +1,13 @@
 package by.epam.finaltask.model;
 
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.util.Date;
+import java.util.Map;
 
 public class Lot {
 
+    private int lotId;
     private int ownerId;
     private String category;
     private AuctionType auctionType;
@@ -16,10 +19,14 @@ public class Lot {
     private String description;
     private AuctionStatus auctionStatus;
     private ProductCondition productCondition;
+    private Map<String, String> extraAttributes;
+    private Blob mainImage;
 
-    public Lot(int ownerId, String category, AuctionType auctionType, String title, Date startDate, Date endDate,
-               BigDecimal initialPrice, String originPlace, String description, AuctionStatus auctionStatus,
-               ProductCondition productCondition) {
+    public Lot(int lotId, int ownerId, String category, AuctionType auctionType, String title, Date startDate,
+               Date endDate, BigDecimal initialPrice, String originPlace, String description,
+               AuctionStatus auctionStatus, ProductCondition productCondition, Map<String, String> extraAttributes,
+               Blob mainImage) {
+        this.lotId = lotId;
         this.ownerId = ownerId;
         this.category = category;
         this.auctionType = auctionType;
@@ -31,6 +38,12 @@ public class Lot {
         this.description = description;
         this.auctionStatus = auctionStatus;
         this.productCondition = productCondition;
+        this.extraAttributes = extraAttributes;
+        this.mainImage = mainImage;
+    }
+
+    public int getLotId() {
+        return lotId;
     }
 
     public int getOwnerId() {
@@ -77,6 +90,14 @@ public class Lot {
         return productCondition;
     }
 
+    public Map<String, String> getExtraAttributes() {
+        return extraAttributes;
+    }
+
+    public Blob getMainImage() {
+        return mainImage;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -84,6 +105,7 @@ public class Lot {
 
         Lot lot = (Lot) o;
 
+        if (lotId != lot.lotId) return false;
         if (ownerId != lot.ownerId) return false;
         if (category != null ? !category.equals(lot.category) : lot.category != null) return false;
         if (auctionType != lot.auctionType) return false;
@@ -94,12 +116,16 @@ public class Lot {
         if (originPlace != null ? !originPlace.equals(lot.originPlace) : lot.originPlace != null) return false;
         if (description != null ? !description.equals(lot.description) : lot.description != null) return false;
         if (auctionStatus != lot.auctionStatus) return false;
-        return productCondition == lot.productCondition;
+        if (productCondition != lot.productCondition) return false;
+        if (extraAttributes != null ? !extraAttributes.equals(lot.extraAttributes) : lot.extraAttributes != null)
+            return false;
+        return mainImage != null ? mainImage.equals(lot.mainImage) : lot.mainImage == null;
     }
 
     @Override
     public int hashCode() {
-        int result = ownerId;
+        int result = lotId;
+        result = 31 * result + ownerId;
         result = 31 * result + (category != null ? category.hashCode() : 0);
         result = 31 * result + (auctionType != null ? auctionType.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
@@ -110,13 +136,16 @@ public class Lot {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (auctionStatus != null ? auctionStatus.hashCode() : 0);
         result = 31 * result + (productCondition != null ? productCondition.hashCode() : 0);
+        result = 31 * result + (extraAttributes != null ? extraAttributes.hashCode() : 0);
+        result = 31 * result + (mainImage != null ? mainImage.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "Lot{" +
-                "ownerId=" + ownerId +
+                "lotId=" + lotId +
+                ", ownerId=" + ownerId +
                 ", category='" + category + '\'' +
                 ", auctionType=" + auctionType +
                 ", title='" + title + '\'' +
@@ -127,6 +156,8 @@ public class Lot {
                 ", description='" + description + '\'' +
                 ", auctionStatus=" + auctionStatus +
                 ", productCondition=" + productCondition +
+                ", extraAttributes=" + extraAttributes +
+                ", mainImage=" + mainImage +
                 '}';
     }
 }
