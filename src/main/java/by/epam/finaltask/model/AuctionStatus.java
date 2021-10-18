@@ -1,5 +1,5 @@
 package by.epam.finaltask.model;
 
 public enum AuctionStatus {
-    NEW, RUNNING, SUSPENDED, ENDED
+    NOT_VERIFIED, APPROVED_BY_ADMIN, RUNNING, SUSPENDED, ENDED
 }
