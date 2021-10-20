@@ -50,26 +50,6 @@ create or replace table city_or_district
         unique (city_or_district_name)
 );
 
-create or replace table extra_attr
-(
-    attr_id int auto_increment
-        primary key,
-    category_id int not null,
-    attr_name varchar(64) not null,
-    constraint extra_attr_name_fk0
-        foreign key (category_id) references category (category_id)
-);
-
-create or replace table extra_attr_variant
-(
-    attr_variant_id int auto_increment
-        primary key,
-    attr_id int not null,
-    attr_variant_value varchar(128) not null,
-    constraint extra_attr_variant_extra_attr_name_attr_id_fk
-        foreign key (attr_id) references extra_attr (attr_id)
-);
-
 create or replace table postal_code
 (
     postal_code_id int auto_increment
@@ -133,7 +113,7 @@ create or replace table lot
     end_date date not null,
     initial_price decimal(20,2) not null,
     origin_place varchar(128) not null,
-    description varchar(1024) not null,
+    description text not null,
     auction_status_id int not null,
     product_condition_id int not null,
     constraint lot_auction_type_type_id_fk
@@ -174,26 +154,12 @@ create or replace table cart_item
         foreign key (bid_id) references bid (bid_id)
 );
 
-create or replace table extra_attr_value
-(
-    lot_id int not null,
-    attr_id int not null,
-    variant_id int null,
-    primary key (lot_id, attr_id),
-    constraint extra_attr_value_extra_attr_variant_attr_variant_id_fk
-        foreign key (variant_id) references extra_attr_variant (attr_variant_id),
-    constraint extra_attr_value_fk0
-        foreign key (lot_id) references lot (lot_id),
-    constraint extra_attr_value_fk1
-        foreign key (attr_id) references extra_attr (attr_id)
-);
-
 create or replace table lot_image
 (
     image_id int auto_increment
         primary key,
     lot_id int not null,
-    path_to_image varchar(128) not null,
+    image_value blob not null,
     main_image tinyint(1) default 0 not null,
     constraint lot_image_fk0
         foreign key (lot_id) references lot (lot_id)
