@@ -3,29 +3,26 @@ package by.epam.finaltask.model;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.util.Date;
-import java.util.Map;
 
 public class Lot {
 
-    private int lotId;
-    private int ownerId;
-    private String category;
-    private AuctionType auctionType;
-    private String title;
-    private Date startDate;
-    private Date endDate;
-    private BigDecimal initialPrice;
-    private String originPlace;
-    private String description;
-    private AuctionStatus auctionStatus;
-    private ProductCondition productCondition;
-    private Map<String, String> extraAttributes;
-    private Blob mainImage;
+    private final int lotId;
+    private final int ownerId;
+    private final String category;
+    private final AuctionType auctionType;
+    private final String title;
+    private final Date startDate;
+    private final Date endDate;
+    private final BigDecimal initialPrice;
+    private final String originPlace;
+    private final String description;
+    private final AuctionStatus auctionStatus;
+    private final ProductCondition productCondition;
+    private final Blob mainImage;
 
     public Lot(int lotId, int ownerId, String category, AuctionType auctionType, String title, Date startDate,
                Date endDate, BigDecimal initialPrice, String originPlace, String description,
-               AuctionStatus auctionStatus, ProductCondition productCondition, Map<String, String> extraAttributes,
-               Blob mainImage) {
+               AuctionStatus auctionStatus, ProductCondition productCondition, Blob mainImage) {
         this.lotId = lotId;
         this.ownerId = ownerId;
         this.category = category;
@@ -38,7 +35,6 @@ public class Lot {
         this.description = description;
         this.auctionStatus = auctionStatus;
         this.productCondition = productCondition;
-        this.extraAttributes = extraAttributes;
         this.mainImage = mainImage;
     }
 
@@ -90,10 +86,6 @@ public class Lot {
         return productCondition;
     }
 
-    public Map<String, String> getExtraAttributes() {
-        return extraAttributes;
-    }
-
     public Blob getMainImage() {
         return mainImage;
     }
@@ -117,8 +109,6 @@ public class Lot {
         if (description != null ? !description.equals(lot.description) : lot.description != null) return false;
         if (auctionStatus != lot.auctionStatus) return false;
         if (productCondition != lot.productCondition) return false;
-        if (extraAttributes != null ? !extraAttributes.equals(lot.extraAttributes) : lot.extraAttributes != null)
-            return false;
         return mainImage != null ? mainImage.equals(lot.mainImage) : lot.mainImage == null;
     }
 
@@ -136,7 +126,6 @@ public class Lot {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (auctionStatus != null ? auctionStatus.hashCode() : 0);
         result = 31 * result + (productCondition != null ? productCondition.hashCode() : 0);
-        result = 31 * result + (extraAttributes != null ? extraAttributes.hashCode() : 0);
         result = 31 * result + (mainImage != null ? mainImage.hashCode() : 0);
         return result;
     }
@@ -156,7 +145,6 @@ public class Lot {
                 ", description='" + description + '\'' +
                 ", auctionStatus=" + auctionStatus +
                 ", productCondition=" + productCondition +
-                ", extraAttributes=" + extraAttributes +
                 ", mainImage=" + mainImage +
                 '}';
     }

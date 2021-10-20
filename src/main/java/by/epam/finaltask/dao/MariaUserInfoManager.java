@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class MariaUserInfoManager implements UserInfoManager{
+public class MariaUserInfoManager implements UserInfoManager {
 
     private final static String USER_INFO_EXISTENCE_COLUMN = "user_info_existence";
     private final static String PHONE_NUMBER_COLUMN = "phone_number";

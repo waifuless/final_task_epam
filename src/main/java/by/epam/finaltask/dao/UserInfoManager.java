@@ -1,7 +1,6 @@
 package by.epam.finaltask.dao;
 
 import by.epam.finaltask.exception.DataSourceDownException;
-import by.epam.finaltask.model.User;
 import by.epam.finaltask.model.UserInfo;
 
 import java.sql.SQLException;
