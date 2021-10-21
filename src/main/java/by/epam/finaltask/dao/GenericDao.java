@@ -65,7 +65,9 @@ public abstract class GenericDao<T extends DaoEntity> implements Dao<T> {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(findQuery);
             prepareFindStatement(statement, id);
-            return extractEntity(statement.executeQuery());
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return extractEntity(resultSet);
         } catch (SQLException | DataSourceDownException | InterruptedException e) {
             LOG.error(e.getMessage(), e);
             throw e;
