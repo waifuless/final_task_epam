@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.util.Date;
 
-public class Lot {
+public class Lot implements DaoEntity {
 
-    private final int lotId;
-    private final int ownerId;
+    private final long lotId;
+    private final long ownerId;
     private final String category;
     private final AuctionType auctionType;
     private final String title;
@@ -20,7 +20,7 @@ public class Lot {
     private final ProductCondition productCondition;
     private final Blob mainImage;
 
-    public Lot(int lotId, int ownerId, String category, AuctionType auctionType, String title, Date startDate,
+    public Lot(long lotId, long ownerId, String category, AuctionType auctionType, String title, Date startDate,
                Date endDate, BigDecimal initialPrice, String originPlace, String description,
                AuctionStatus auctionStatus, ProductCondition productCondition, Blob mainImage) {
         this.lotId = lotId;
@@ -38,11 +38,11 @@ public class Lot {
         this.mainImage = mainImage;
     }
 
-    public int getLotId() {
+    public long getLotId() {
         return lotId;
     }
 
-    public int getOwnerId() {
+    public long getOwnerId() {
         return ownerId;
     }
 
@@ -114,8 +114,8 @@ public class Lot {
 
     @Override
     public int hashCode() {
-        int result = lotId;
-        result = 31 * result + ownerId;
+        int result = (int) (lotId ^ (lotId >>> 32));
+        result = 31 * result + (int) (ownerId ^ (ownerId >>> 32));
         result = 31 * result + (category != null ? category.hashCode() : 0);
         result = 31 * result + (auctionType != null ? auctionType.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);

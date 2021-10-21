@@ -1,8 +1,8 @@
 package by.epam.finaltask.model;
 
-public class UserInfo {
+public class UserInfo implements DaoEntity {
 
-    private final int userId;
+    private final long userId;
     private final String phoneNumber;
     private final String firstName;
     private final String lastName;
@@ -11,8 +11,8 @@ public class UserInfo {
     private final String region;
     private final String postalCode;
 
-    public UserInfo(int userId, String phoneNumber, String firstName, String lastName,
-                    String address, String city, String region, String postalCode) {
+    public UserInfo(long userId, String phoneNumber, String firstName, String lastName, String address,
+                    String city, String region, String postalCode) {
         this.userId = userId;
         this.phoneNumber = phoneNumber;
         this.firstName = firstName;
@@ -23,7 +23,7 @@ public class UserInfo {
         this.postalCode = postalCode;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
@@ -75,7 +75,7 @@ public class UserInfo {
 
     @Override
     public int hashCode() {
-        int result = userId;
+        int result = (int) (userId ^ (userId >>> 32));
         result = 31 * result + (phoneNumber != null ? phoneNumber.hashCode() : 0);
         result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);

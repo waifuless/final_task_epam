@@ -1,4 +1,6 @@
 package by.epam.finaltask.dao;
 
-public interface LotManager {
+import by.epam.finaltask.model.Lot;
+
+public interface LotManager extends Dao<Lot> {
 }

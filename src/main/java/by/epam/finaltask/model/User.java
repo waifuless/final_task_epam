@@ -1,58 +1,42 @@
 package by.epam.finaltask.model;
 
-public class User {
+public class User implements DaoEntity {
 
     private final static Role DEFAULT_ROLE = Role.USER;
 
-    private int userId;
-    private String email;
-    private String passwordHash;
-    private Role role;
+    private final long userId;
+    private final String email;
+    private final String passwordHash;
+    private final Role role;
 
-    User(int userId, String email, String passwordHash) {
+    User(long userId, String email, String passwordHash) {
         this.userId = userId;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = DEFAULT_ROLE;
     }
 
-    User(int userId, String email, String passwordHash, Role role) {
+    User(long userId, String email, String passwordHash, Role role) {
         this.userId = userId;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
+    }
+
+    public long getUserId() {
+        return userId;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPasswordHash() {
         return passwordHash;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
     public Role getRole() {
         return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     @Override
@@ -70,7 +54,7 @@ public class User {
 
     @Override
     public int hashCode() {
-        int result = userId;
+        int result = (int) (userId ^ (userId >>> 32));
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (passwordHash != null ? passwordHash.hashCode() : 0);
         result = 31 * result + (role != null ? role.hashCode() : 0);

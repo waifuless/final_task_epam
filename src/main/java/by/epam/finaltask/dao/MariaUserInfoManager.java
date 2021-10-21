@@ -2,16 +2,22 @@ package by.epam.finaltask.dao;
 
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.exception.DataSourceDownException;
+import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.UserInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class MariaUserInfoManager implements UserInfoManager {
+public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserInfoManager {
+
+    private final static Logger LOG = LoggerFactory.getLogger(MariaUserInfoManager.class);
 
     private final static String USER_INFO_EXISTENCE_COLUMN = "user_info_existence";
+    private final static String ID_COLUMN = "user_id";
     private final static String PHONE_NUMBER_COLUMN = "phone_number";
     private final static String FIRST_NAME_COLUMN = "first_name";
     private final static String LAST_NAME_COLUMN = "last_name";
@@ -19,18 +25,19 @@ public class MariaUserInfoManager implements UserInfoManager {
     private final static String CITY_OR_DISTRICT_NAME_COLUMN = "city_or_district_name";
     private final static String REGION_NAME_COLUMN = "region_name";
     private final static String POSTAL_CODE_NAME_COLUMN = "postal_code_name";
-    private final static String INSERT_USER_INFO_QUERY =
+    private final static String SAVE_USER_INFO_QUERY =
             "INSERT INTO user_info(user_id, phone_number, first_name, last_name," +
                     " address_id, city_or_district_id, region_id, postal_code_id)" +
                     "VALUES(?,?,?,?," +
                     "insertAddressIfNotExistAndSelectId(?)," +
                     "findCityOrDistrictId(?)," +
                     "findRegionId(?)," +
-                    "insertPostalCodeIfNotExistAndSelectId(?))";
+                    "insertPostalCodeIfNotExistAndSelectId(?));" +
+                    " SELECT LAST_INSERT_ID();";
     private final static String IS_USER_INFO_EXIST_QUERY =
             "SELECT EXISTS(SELECT 1 FROM user_info WHERE user_id=?) AS user_info_existence";
     private final static String FIND_USER_INFO_QUERY =
-            "SELECT phone_number AS phone_number, first_name AS first_name, last_name AS last_name," +
+            "SELECT user_id AS user_id, phone_number AS phone_number, first_name AS first_name, last_name AS last_name," +
                     " address_name AS address_name, city_or_district_name AS city_name, region_name AS region_name," +
                     " postal_code_name AS postal_code_name" +
                     " FROM user_info" +
@@ -51,10 +58,9 @@ public class MariaUserInfoManager implements UserInfoManager {
 
     private static volatile MariaUserInfoManager instance;
 
-    private final ConnectionPool connectionPool;
-
     private MariaUserInfoManager() throws DataSourceDownException {
-        connectionPool = ConnectionPool.getInstance();
+        super(SAVE_USER_INFO_QUERY, FIND_USER_INFO_QUERY, UPDATE_USER_INFO_QUERY, DELETE_USER_INFO_QUERY,
+                ConnectionPool.getInstance());
     }
 
     public static MariaUserInfoManager getInstance() throws DataSourceDownException {
@@ -69,74 +75,72 @@ public class MariaUserInfoManager implements UserInfoManager {
     }
 
     @Override
-    public void save(UserInfo userInfo) throws SQLException, DataSourceDownException, InterruptedException {
-        try (Connection connection = connectionPool.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(INSERT_USER_INFO_QUERY)) {
-                statement.setInt(1, userInfo.getUserId());
-                statement.setString(2, userInfo.getPhoneNumber());
-                statement.setString(3, userInfo.getFirstName());
-                statement.setString(4, userInfo.getLastName());
-                statement.setString(5, userInfo.getAddress());
-                statement.setString(6, userInfo.getCity());
-                statement.setString(7, userInfo.getRegion());
-                statement.setString(8, userInfo.getPostalCode());
-                statement.execute();
-            }
+    protected void prepareSaveStatement(PreparedStatement statement, UserInfo userInfo) throws SQLException {
+        statement.setLong(1, userInfo.getUserId());
+        statement.setString(2, userInfo.getPhoneNumber());
+        statement.setString(3, userInfo.getFirstName());
+        statement.setString(4, userInfo.getLastName());
+        statement.setString(5, userInfo.getAddress());
+        statement.setString(6, userInfo.getCity());
+        statement.setString(7, userInfo.getRegion());
+        statement.setString(8, userInfo.getPostalCode());
+    }
+
+    @Override
+    protected void prepareFindStatement(PreparedStatement statement, long id) throws SQLException {
+        statement.setLong(1, id);
+    }
+
+    @Override
+    protected void prepareUpdateStatement(PreparedStatement statement, UserInfo userInfo) throws SQLException {
+        statement.setString(1, userInfo.getPhoneNumber());
+        statement.setString(2, userInfo.getFirstName());
+        statement.setString(3, userInfo.getLastName());
+        statement.setString(4, userInfo.getAddress());
+        statement.setString(5, userInfo.getCity());
+        statement.setString(6, userInfo.getRegion());
+        statement.setString(7, userInfo.getPostalCode());
+        statement.setLong(8, userInfo.getUserId());
+    }
+
+    @Override
+    protected void prepareDeleteStatement(PreparedStatement statement, long id) throws SQLException {
+        statement.setLong(1, id);
+    }
+
+    @Override
+    protected UserInfo extractEntity(ResultSet resultSet) throws ExtractionException {
+        try {
+            return new UserInfo(resultSet.getLong(ID_COLUMN), resultSet.getString(PHONE_NUMBER_COLUMN),
+                    resultSet.getString(FIRST_NAME_COLUMN), resultSet.getString(LAST_NAME_COLUMN),
+                    resultSet.getString(ADDRESS_NAME_COLUMN), resultSet.getString(CITY_OR_DISTRICT_NAME_COLUMN),
+                    resultSet.getString(REGION_NAME_COLUMN), resultSet.getString(POSTAL_CODE_NAME_COLUMN));
+        } catch (Exception ex) {
+            throw new ExtractionException(ex.getMessage(), ex);
         }
     }
 
     @Override
-    public boolean isUserInfoExist(int userId) throws SQLException, DataSourceDownException, InterruptedException {
+    protected long extractId(ResultSet resultSet) throws ExtractionException {
+        try {
+            return resultSet.getLong(ID_COLUMN);
+        } catch (Exception ex) {
+            throw new ExtractionException(ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public boolean isUserInfoExist(long id) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(IS_USER_INFO_EXIST_QUERY)) {
-                statement.setInt(1, userId);
+                statement.setLong(1, id);
                 ResultSet resultSet = statement.executeQuery();
                 resultSet.next();
                 return resultSet.getBoolean(USER_INFO_EXISTENCE_COLUMN);
             }
-        }
-    }
-
-    @Override
-    public UserInfo findUserInfo(int userId) throws SQLException, DataSourceDownException, InterruptedException {
-        try (Connection connection = connectionPool.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(FIND_USER_INFO_QUERY)) {
-                statement.setInt(1, userId);
-                ResultSet resultSet = statement.executeQuery();
-                resultSet.next();
-                return new UserInfo(userId, resultSet.getString(PHONE_NUMBER_COLUMN),
-                        resultSet.getString(FIRST_NAME_COLUMN), resultSet.getString(LAST_NAME_COLUMN),
-                        resultSet.getString(ADDRESS_NAME_COLUMN), resultSet.getString(CITY_OR_DISTRICT_NAME_COLUMN),
-                        resultSet.getString(REGION_NAME_COLUMN), resultSet.getString(POSTAL_CODE_NAME_COLUMN));
-            }
-        }
-    }
-
-    @Override
-    public void updateUserInfo(int userId, UserInfo newUserInfo)
-            throws SQLException, DataSourceDownException, InterruptedException {
-        try (Connection connection = connectionPool.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(UPDATE_USER_INFO_QUERY)) {
-                statement.setString(1, newUserInfo.getPhoneNumber());
-                statement.setString(2, newUserInfo.getFirstName());
-                statement.setString(3, newUserInfo.getLastName());
-                statement.setString(4, newUserInfo.getAddress());
-                statement.setString(5, newUserInfo.getCity());
-                statement.setString(6, newUserInfo.getRegion());
-                statement.setString(7, newUserInfo.getPostalCode());
-                statement.setInt(8, newUserInfo.getUserId());
-                statement.execute();
-            }
-        }
-    }
-
-    @Override
-    public void deleteUserInfo(int userId) throws SQLException, DataSourceDownException, InterruptedException {
-        try (Connection connection = connectionPool.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(DELETE_USER_INFO_QUERY)) {
-                statement.setInt(1, userId);
-                statement.execute();
-            }
+        } catch (SQLException | DataSourceDownException | InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
         }
     }
 }
