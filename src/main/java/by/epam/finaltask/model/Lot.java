@@ -2,7 +2,7 @@ package by.epam.finaltask.model;
 
 import java.math.BigDecimal;
 import java.sql.Blob;
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class Lot implements DaoEntity {
 
@@ -11,8 +11,8 @@ public class Lot implements DaoEntity {
     private final String category;
     private final AuctionType auctionType;
     private final String title;
-    private final Date startDate;
-    private final Date endDate;
+    private final Timestamp startDatetime;
+    private final Timestamp endDatetime;
     private final BigDecimal initialPrice;
     private final String originPlace;
     private final String description;
@@ -20,16 +20,16 @@ public class Lot implements DaoEntity {
     private final ProductCondition productCondition;
     private final Blob mainImage;
 
-    public Lot(long lotId, long ownerId, String category, AuctionType auctionType, String title, Date startDate,
-               Date endDate, BigDecimal initialPrice, String originPlace, String description,
-               AuctionStatus auctionStatus, ProductCondition productCondition, Blob mainImage) {
+    public Lot(long lotId, long ownerId, String category, AuctionType auctionType, String title,
+               Timestamp startDatetime, Timestamp endDatetime, BigDecimal initialPrice, String originPlace,
+               String description, AuctionStatus auctionStatus, ProductCondition productCondition, Blob mainImage) {
         this.lotId = lotId;
         this.ownerId = ownerId;
         this.category = category;
         this.auctionType = auctionType;
         this.title = title;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDatetime = startDatetime;
+        this.endDatetime = endDatetime;
         this.initialPrice = initialPrice;
         this.originPlace = originPlace;
         this.description = description;
@@ -58,12 +58,12 @@ public class Lot implements DaoEntity {
         return title;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Timestamp getStartDatetime() {
+        return startDatetime;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Timestamp getEndDatetime() {
+        return endDatetime;
     }
 
     public BigDecimal getInitialPrice() {
@@ -102,8 +102,8 @@ public class Lot implements DaoEntity {
         if (category != null ? !category.equals(lot.category) : lot.category != null) return false;
         if (auctionType != lot.auctionType) return false;
         if (title != null ? !title.equals(lot.title) : lot.title != null) return false;
-        if (startDate != null ? !startDate.equals(lot.startDate) : lot.startDate != null) return false;
-        if (endDate != null ? !endDate.equals(lot.endDate) : lot.endDate != null) return false;
+        if (startDatetime != null ? !startDatetime.equals(lot.startDatetime) : lot.startDatetime != null) return false;
+        if (endDatetime != null ? !endDatetime.equals(lot.endDatetime) : lot.endDatetime != null) return false;
         if (initialPrice != null ? !initialPrice.equals(lot.initialPrice) : lot.initialPrice != null) return false;
         if (originPlace != null ? !originPlace.equals(lot.originPlace) : lot.originPlace != null) return false;
         if (description != null ? !description.equals(lot.description) : lot.description != null) return false;
@@ -119,8 +119,8 @@ public class Lot implements DaoEntity {
         result = 31 * result + (category != null ? category.hashCode() : 0);
         result = 31 * result + (auctionType != null ? auctionType.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (startDate != null ? startDate.hashCode() : 0);
-        result = 31 * result + (endDate != null ? endDate.hashCode() : 0);
+        result = 31 * result + (startDatetime != null ? startDatetime.hashCode() : 0);
+        result = 31 * result + (endDatetime != null ? endDatetime.hashCode() : 0);
         result = 31 * result + (initialPrice != null ? initialPrice.hashCode() : 0);
         result = 31 * result + (originPlace != null ? originPlace.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
@@ -138,8 +138,8 @@ public class Lot implements DaoEntity {
                 ", category='" + category + '\'' +
                 ", auctionType=" + auctionType +
                 ", title='" + title + '\'' +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
+                ", startDatetime=" + startDatetime +
+                ", endDatetime=" + endDatetime +
                 ", initialPrice=" + initialPrice +
                 ", originPlace='" + originPlace + '\'' +
                 ", description='" + description + '\'' +

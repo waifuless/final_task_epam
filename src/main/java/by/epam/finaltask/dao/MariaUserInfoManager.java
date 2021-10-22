@@ -132,12 +132,11 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
     @Override
     public boolean isUserInfoExist(long id) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(IS_USER_INFO_EXIST_QUERY)) {
-                statement.setLong(1, id);
-                ResultSet resultSet = statement.executeQuery();
-                resultSet.next();
-                return resultSet.getBoolean(USER_INFO_EXISTENCE_COLUMN);
-            }
+            PreparedStatement statement = connection.prepareStatement(IS_USER_INFO_EXIST_QUERY);
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getBoolean(USER_INFO_EXISTENCE_COLUMN);
         } catch (SQLException | DataSourceDownException | InterruptedException e) {
             LOG.error(e.getMessage(), e);
             throw e;

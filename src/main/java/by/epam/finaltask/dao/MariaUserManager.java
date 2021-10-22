@@ -117,12 +117,11 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     @Override
     public boolean isUserExist(String email) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(IS_EXIST_USER_QUERY)) {
-                statement.setString(1, email);
-                ResultSet resultSet = statement.executeQuery();
-                resultSet.next();
-                return resultSet.getBoolean(USER_EXISTENCE_COLUMN);
-            }
+            PreparedStatement statement = connection.prepareStatement(IS_EXIST_USER_QUERY);
+            statement.setString(1, email);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getBoolean(USER_EXISTENCE_COLUMN);
         } catch (SQLException | DataSourceDownException | InterruptedException e) {
             LOG.error(e.getMessage(), e);
             throw e;
@@ -133,15 +132,14 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     public User findUserByEmailAndPassword(String email, String password)
             throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(FIND_USER_BY_EMAIL_QUERY)) {
-                statement.setString(1, email);
-                ResultSet resultSet = statement.executeQuery();
-                if (resultSet.next()) {
-                    String passwordHash = resultSet.getString(PASSWORD_HASH_COLUMN);
-                    if (encoder.matches(password, passwordHash)) {
-                        return userFactory.createUserWithoutPassword(resultSet.getInt(USER_ID_COLUMN),
-                                email, Role.valueOf(resultSet.getString(ROLE_COLUMN)));
-                    }
+            PreparedStatement statement = connection.prepareStatement(FIND_USER_BY_EMAIL_QUERY);
+            statement.setString(1, email);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String passwordHash = resultSet.getString(PASSWORD_HASH_COLUMN);
+                if (encoder.matches(password, passwordHash)) {
+                    return userFactory.createUserWithoutPassword(resultSet.getInt(USER_ID_COLUMN),
+                            email, Role.valueOf(resultSet.getString(ROLE_COLUMN)));
                 }
             }
         } catch (SQLException | DataSourceDownException | InterruptedException e) {
