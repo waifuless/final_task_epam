@@ -28,13 +28,13 @@ public class CommonDataSource implements DataSource {
     private final BlockingQueue<PooledConnection> availableConnections;//blocks when wait element (method take())
     private final Queue<PooledConnection> usingConnections; //does not block
 
-    private final String driverName;
+    private final String databaseUrl;
 
     private final AtomicBoolean dataSourceClosed = new AtomicBoolean(false);
 
     public CommonDataSource(String databaseUrl, String login, String password, String driverName)
             throws DataSourceDownException {
-        this.driverName = driverName;
+        this.databaseUrl = databaseUrl;
         try {
             registerDriver(driverName);
             allConnections = new ArrayList<>();
@@ -75,15 +75,9 @@ public class CommonDataSource implements DataSource {
     @Override
     public void close() throws Exception {
         if (dataSourceClosed.compareAndSet(false, true)) {
-            deregisterDriver(driverName);
+            deregisterDriver(databaseUrl);
             closeConnections(allConnections);
         }
-    }
-
-
-    private void registerDriver(String driverName)
-            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Class.forName(driverName).newInstance();
     }
 
     private void initConnections(String databaseUrl, String login, String password) throws SQLException {
@@ -95,13 +89,18 @@ public class CommonDataSource implements DataSource {
         }
     }
 
-    private void deregisterDriver(String driverName) {
+    private void registerDriver(String driverName)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Class.forName(driverName).newInstance();
+    }
+
+    private void deregisterDriver(String databaseUrl) {
         try {
-            Driver driver = DriverManager.getDriver(driverName);
+            Driver driver = DriverManager.getDriver(databaseUrl);
             DriverManager.deregisterDriver(driver);
-            LOG.info(String.format(DEREGISTER_DRIVER_MCG, driverName));
+            LOG.info(String.format(DEREGISTER_DRIVER_MCG, databaseUrl));
         } catch (SQLException e) {
-            LOG.error(String.format(ERROR_DEREGISTER_DRIVER_MCG, driverName), e);
+            LOG.error(String.format(ERROR_DEREGISTER_DRIVER_MCG, databaseUrl), e);
         }
     }
 
