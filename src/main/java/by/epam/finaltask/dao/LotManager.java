@@ -12,7 +12,11 @@ public interface LotManager extends Dao<Lot> {
         return MariaLotManager.getInstance();
     }
 
-    List<Lot> findAll() throws SQLException, DataSourceDownException, InterruptedException;
+    List<Lot> find(long offset, long count) throws SQLException, DataSourceDownException, InterruptedException;
 
-    List<Lot> findByCategory(String category) throws SQLException, DataSourceDownException, InterruptedException;
+    List<Lot> findByCategory(String category, long offset, long count)
+            throws SQLException, DataSourceDownException, InterruptedException;
+
+    List<Lot> findByUserId(long userId, long offset, long count)
+            throws SQLException, DataSourceDownException, InterruptedException;
 }

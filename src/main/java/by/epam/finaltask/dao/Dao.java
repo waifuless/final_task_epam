@@ -15,4 +15,6 @@ public interface Dao<T extends DaoEntity> {
 
     void delete(long id) throws SQLException, DataSourceDownException, InterruptedException;
 
+    long count() throws SQLException, DataSourceDownException, InterruptedException;
+
 }

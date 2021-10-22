@@ -25,6 +25,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     private final static String EMAIL_COLUMN = "email";
     private final static String PASSWORD_HASH_COLUMN = "password_hash";
     private final static String ROLE_COLUMN = "role_name";
+    private final static String TABLE_NAME = "app_user";
     private final static String SAVE_USER_QUERY =
             "INSERT INTO app_user(email, password_hash, role_id)" +
                     " VALUES(?,?,(SELECT role_id FROM role WHERE role_name = ?));" +
@@ -53,7 +54,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     private final PasswordEncoder encoder;
 
     private MariaUserManager() throws DataSourceDownException {
-        super(SAVE_USER_QUERY, FIND_USER_BY_ID_QUERY, UPDATE_USER_QUERY, DELETE_USER_QUERY,
+        super(SAVE_USER_QUERY, FIND_USER_BY_ID_QUERY, UPDATE_USER_QUERY, DELETE_USER_QUERY, TABLE_NAME,
                 ConnectionPool.getInstance());
         userFactory = UserFactory.getInstance();
         encoder = PasswordEncoder.getInstance();
@@ -78,21 +79,11 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     }
 
     @Override
-    protected void prepareFindStatement(PreparedStatement statement, long id) throws SQLException {
-        statement.setLong(1, id);
-    }
-
-    @Override
     protected void prepareUpdateStatement(PreparedStatement statement, User user) throws SQLException {
         statement.setString(1, user.getEmail());
         statement.setString(2, user.getPasswordHash());
         statement.setString(3, user.getRole().name());
         statement.setLong(4, user.getUserId());
-    }
-
-    @Override
-    protected void prepareDeleteStatement(PreparedStatement statement, long id) throws SQLException {
-        statement.setLong(1, id);
     }
 
     @Override
@@ -122,8 +113,12 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             return resultSet.getBoolean(USER_EXISTENCE_COLUMN);
-        } catch (SQLException | DataSourceDownException | InterruptedException e) {
+        } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
             throw e;
         }
     }
@@ -142,8 +137,12 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
                             email, Role.valueOf(resultSet.getString(ROLE_COLUMN)));
                 }
             }
-        } catch (SQLException | DataSourceDownException | InterruptedException e) {
+        } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
             throw e;
         }
         throw new UserNotFoundException(email);
