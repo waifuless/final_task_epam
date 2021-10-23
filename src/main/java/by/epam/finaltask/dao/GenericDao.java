@@ -11,7 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GenericDao<T extends DaoEntity> implements Dao<T> {
+public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
 
     private final static Logger LOG = LoggerFactory.getLogger(GenericDao.class);
 
@@ -64,13 +64,13 @@ public abstract class GenericDao<T extends DaoEntity> implements Dao<T> {
     }
 
     @Override
-    public long save(T t) throws SQLException, DataSourceDownException, InterruptedException {
+    public T save(T t) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(saveQuery);
             prepareSaveStatement(statement, t);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
-            return extractId(resultSet);
+            return t.createWithId(extractId(resultSet));
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
             throw e;

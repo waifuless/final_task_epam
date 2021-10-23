@@ -1,6 +1,6 @@
 package by.epam.finaltask.model;
 
-public class UserInfo implements DaoEntity {
+public class UserInfo implements DaoEntity<UserInfo> {
 
     private final long userId;
     private final String phoneNumber;
@@ -98,5 +98,11 @@ public class UserInfo implements DaoEntity {
                 ", region='" + region + '\'' +
                 ", postalCode='" + postalCode + '\'' +
                 '}';
+    }
+
+    @Override
+    public UserInfo createWithId(long id) {
+        return new UserInfo(id, phoneNumber, firstName, lastName, address,
+                city, region, postalCode);
     }
 }

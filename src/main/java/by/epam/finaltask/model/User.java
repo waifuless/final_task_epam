@@ -1,6 +1,6 @@
 package by.epam.finaltask.model;
 
-public class User implements DaoEntity {
+public class User implements DaoEntity<User> {
 
     private final static Role DEFAULT_ROLE = Role.USER;
 
@@ -69,5 +69,10 @@ public class User implements DaoEntity {
                 ", passwordHash='" + passwordHash + '\'' +
                 ", role=" + role +
                 '}';
+    }
+
+    @Override
+    public User createWithId(long id) {
+        return new User(id, email, getPasswordHash(), role);
     }
 }

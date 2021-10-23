@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public interface Dao<T extends DaoEntity> {
 
-    long save(T t) throws SQLException, DataSourceDownException, InterruptedException;
+    T save(T t) throws SQLException, DataSourceDownException, InterruptedException;
 
     T find(long id) throws SQLException, DataSourceDownException, InterruptedException;
 

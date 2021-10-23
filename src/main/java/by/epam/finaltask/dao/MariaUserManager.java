@@ -29,7 +29,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     private final static String SAVE_USER_QUERY =
             "INSERT INTO app_user(email, password_hash, role_id)" +
                     " VALUES(?,?,(SELECT role_id FROM role WHERE role_name = ?));" +
-                    " SELECT LAST_INSERT_ID();";
+                    " SELECT LAST_INSERT_ID() AS user_id;";
     private final static String IS_EXIST_USER_QUERY =
             "SELECT EXISTS(SELECT 1 FROM app_user WHERE email=?) AS user_existence";
     private final static String FIND_USER_BY_EMAIL_QUERY =

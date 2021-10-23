@@ -1,4 +1,6 @@
 package by.epam.finaltask.model;
 
-public interface DaoEntity {
+public interface DaoEntity<T> {
+
+    T createWithId(long id);
 }

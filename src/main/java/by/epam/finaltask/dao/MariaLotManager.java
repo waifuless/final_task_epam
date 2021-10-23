@@ -32,16 +32,13 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     private final static String DESCRIPTION_COLUMN = "description";
     private final static String AUCTION_STATUS_NAME_COLUMN = "auction_status_name";
     private final static String PRODUCT_CONDITION_NAME_COLUMN = "product_condition_name";
-    private final static String MAIN_IMAGE_COLUMN = "main_image";
     private final static String TABLE_NAME = "lot";
     private final static String SAVE_LOT_QUERY =
             "INSERT INTO lot(owner_id, category_id, auction_type_id, title, start_datetime, end_datetime," +
                     " initial_price, origin_place, description, auction_status_id, product_condition_id)" +
                     " VALUES(?, findCategoryId(?), findAuctionTypeId(?), ?, ?, ?, ?, ?, ?, findAuctionStatusId(?)," +
                     " findProductConditionId(?));" +
-                    " SET @lotId = LAST_INSERT_ID();" +
-                    " INSERT INTO lot_image(lot_id, image_value, main_image) VALUES(@lotId, ?, true);" +
-                    " SELECT @lotId;";
+                    " SELECT LAST_INSERT_ID();";
     private final static String SAVE_IMAGE =
             "INSERT INTO lot_image(lot_id, image_value, main_image) VALUES(?, ?, ?);";
     private final static String FIND_ALL_LOTS_QUERY =
@@ -50,12 +47,11 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     " AS auction_type_name, title AS title, start_datetime AS start_datetime," +
                     " end_datetime AS end_datetime, initial_price AS initial_price, origin_place AS origin_place," +
                     " description AS description, auction_status.status_name AS auction_status_name," +
-                    " pc.product_condition_name AS product_condition_name, li.image_value AS main_image FROM lot" +
+                    " pc.product_condition_name AS product_condition_name FROM lot" +
                     " INNER JOIN category ON lot.category_id = category.category_id" +
                     " INNER JOIN auction_type ON lot.auction_type_id = auction_type.type_id" +
                     " INNER JOIN auction_status ON lot.auction_status_id = auction_status.status_id" +
-                    " INNER JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id" +
-                    " INNER JOIN lot_image li ON (lot.lot_id = li.lot_id AND li.main_image = true)";
+                    " INNER JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id";
     private final static String FIND_LOT_BY_ID_QUERY = FIND_ALL_LOTS_QUERY + " WHERE lot.lot_id=?;";
     private final static String FIND_LOT_OFFSET_QUERY =
             FIND_ALL_LOTS_QUERY + " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
@@ -66,13 +62,11 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             FIND_ALL_LOTS_QUERY + " WHERE owner_id = ?" +
                     " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
     private final static String UPDATE_LOT_QUERY =
-            "SET @lotId = ?;" +
-                    "UPDATE lot SET owner_id = ?, category_id = findCategoryId(?), auction_type_id = findAuctionTypeId(?)," +
+            "UPDATE lot SET owner_id = ?, category_id = findCategoryId(?), auction_type_id = findAuctionTypeId(?)," +
                     " title = ?, start_datetime = ?, end_datetime = ?, initial_price = ?, origin_place = ?," +
                     " description = ?, auction_status_id = findAuctionStatusId(?)," +
                     " product_condition_id = findProductConditionId(?)" +
-                    " WHERE lot_id = @lotId;" +
-                    " UPDATE lot_image SET image_value = ? WHERE lot_id = @lotId AND main_image = true;";
+                    " WHERE lot_id = ?";
     private final static String DELETE_LOT_QUERY =
             "DELETE FROM lot WHERE lot_id = ?;";
 
@@ -123,7 +117,6 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
         statement.setString(10, lot.getDescription());
         statement.setString(11, lot.getAuctionStatus().name());
         statement.setString(12, lot.getProductCondition().name());
-        statement.setBlob(13, lot.getMainImage());
     }
 
     @Override
@@ -140,8 +133,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     resultSet.getString(ORIGIN_PLACE_COLUMN),
                     resultSet.getString(DESCRIPTION_COLUMN),
                     AuctionStatus.valueOf(resultSet.getString(AUCTION_STATUS_NAME_COLUMN)),
-                    ProductCondition.valueOf(resultSet.getString(PRODUCT_CONDITION_NAME_COLUMN)),
-                    resultSet.getBlob(MAIN_IMAGE_COLUMN));
+                    ProductCondition.valueOf(resultSet.getString(PRODUCT_CONDITION_NAME_COLUMN)));
         } catch (Exception ex) {
             throw new ExtractionException(ex.getMessage(), ex);
         }
@@ -191,6 +183,28 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
+            preparator.accept(statement);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return extractAll(resultSet);
+        } catch (SQLException | DataSourceDownException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw e;
+        }
+    }
+
+    private List<Lot> shet(String query, StatementPreparator preparator)
+            throws SQLException, DataSourceDownException, InterruptedException {
+        try (Connection connection = connectionPool.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement1 = connection.prepareStatement(SAVE_LOT_QUERY);
+            PreparedStatement statement2 = connection.prepareStatement(UPDATE_LOT_QUERY);
+            PreparedStatement statement3 = connection.prepareStatement(FIND_ALL_LOTS_QUERY);
+            PreparedStatement statement4 = connection.prepareStatement(DELETE_LOT_QUERY);
             preparator.accept(statement);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();

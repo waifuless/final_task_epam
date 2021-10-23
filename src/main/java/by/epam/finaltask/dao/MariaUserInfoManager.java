@@ -34,7 +34,7 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
                     "findCityOrDistrictId(?)," +
                     "findRegionId(?)," +
                     "insertPostalCodeIfNotExistAndSelectId(?));" +
-                    " SELECT LAST_INSERT_ID();";
+                    " SELECT LAST_INSERT_ID() AS user_id;";
     private final static String IS_USER_INFO_EXIST_QUERY =
             "SELECT EXISTS(SELECT 1 FROM user_info WHERE user_id=?) AS user_info_existence";
     private final static String FIND_USER_INFO_QUERY =

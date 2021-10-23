@@ -1,10 +1,9 @@
 package by.epam.finaltask.model;
 
 import java.math.BigDecimal;
-import java.sql.Blob;
 import java.sql.Timestamp;
 
-public class Lot implements DaoEntity {
+public class Lot implements DaoEntity<Lot> {
 
     private final long lotId;
     private final long ownerId;
@@ -18,11 +17,27 @@ public class Lot implements DaoEntity {
     private final String description;
     private final AuctionStatus auctionStatus;
     private final ProductCondition productCondition;
-    private final Blob mainImage;
+
+    public Lot(long ownerId, String category, AuctionType auctionType, String title, Timestamp startDatetime,
+               Timestamp endDatetime, BigDecimal initialPrice, String originPlace, String description,
+               AuctionStatus auctionStatus, ProductCondition productCondition) {
+        this.lotId = -1;
+        this.ownerId = ownerId;
+        this.category = category;
+        this.auctionType = auctionType;
+        this.title = title;
+        this.startDatetime = startDatetime;
+        this.endDatetime = endDatetime;
+        this.initialPrice = initialPrice;
+        this.originPlace = originPlace;
+        this.description = description;
+        this.auctionStatus = auctionStatus;
+        this.productCondition = productCondition;
+    }
 
     public Lot(long lotId, long ownerId, String category, AuctionType auctionType, String title,
                Timestamp startDatetime, Timestamp endDatetime, BigDecimal initialPrice, String originPlace,
-               String description, AuctionStatus auctionStatus, ProductCondition productCondition, Blob mainImage) {
+               String description, AuctionStatus auctionStatus, ProductCondition productCondition) {
         this.lotId = lotId;
         this.ownerId = ownerId;
         this.category = category;
@@ -35,7 +50,6 @@ public class Lot implements DaoEntity {
         this.description = description;
         this.auctionStatus = auctionStatus;
         this.productCondition = productCondition;
-        this.mainImage = mainImage;
     }
 
     public long getLotId() {
@@ -86,10 +100,6 @@ public class Lot implements DaoEntity {
         return productCondition;
     }
 
-    public Blob getMainImage() {
-        return mainImage;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -108,8 +118,7 @@ public class Lot implements DaoEntity {
         if (originPlace != null ? !originPlace.equals(lot.originPlace) : lot.originPlace != null) return false;
         if (description != null ? !description.equals(lot.description) : lot.description != null) return false;
         if (auctionStatus != lot.auctionStatus) return false;
-        if (productCondition != lot.productCondition) return false;
-        return mainImage != null ? mainImage.equals(lot.mainImage) : lot.mainImage == null;
+        return productCondition == lot.productCondition;
     }
 
     @Override
@@ -126,7 +135,6 @@ public class Lot implements DaoEntity {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (auctionStatus != null ? auctionStatus.hashCode() : 0);
         result = 31 * result + (productCondition != null ? productCondition.hashCode() : 0);
-        result = 31 * result + (mainImage != null ? mainImage.hashCode() : 0);
         return result;
     }
 
@@ -145,7 +153,12 @@ public class Lot implements DaoEntity {
                 ", description='" + description + '\'' +
                 ", auctionStatus=" + auctionStatus +
                 ", productCondition=" + productCondition +
-                ", mainImage=" + mainImage +
                 '}';
+    }
+
+    @Override
+    public Lot createWithId(long id) {
+        return new Lot(id, ownerId, category, auctionType, title, startDatetime, endDatetime,
+                initialPrice, originPlace, description, auctionStatus, productCondition);
     }
 }
