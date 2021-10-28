@@ -21,6 +21,8 @@ public class CommonDataSource implements DataSource {
     private final static Logger LOG = LoggerFactory.getLogger(CommonDataSource.class);
     private final static String DEREGISTER_DRIVER_MCG = "deregistering jdbc driver: %s";
     private final static String ERROR_DEREGISTER_DRIVER_MCG = "Error deregistering driver %s";
+    private final static String CONNECTION_ADDED_MCG = "Connection was added to connection pool {}";
+    private final static String CONNECTION_CLOSED_MSG = "Close connection {}";
 
     private final static int SIZE = 8;
 
@@ -75,8 +77,8 @@ public class CommonDataSource implements DataSource {
     @Override
     public void close() throws Exception {
         if (dataSourceClosed.compareAndSet(false, true)) {
-            deregisterDriver(databaseUrl);
             closeConnections(allConnections);
+            deregisterDriver(databaseUrl);
         }
     }
 
@@ -86,6 +88,7 @@ public class CommonDataSource implements DataSource {
                     getConnection(databaseUrl, login, password), this);
             allConnections.add(connection);
             availableConnections.add(connection);
+            LOG.info(CONNECTION_ADDED_MCG, connection);
         }
     }
 
@@ -107,6 +110,7 @@ public class CommonDataSource implements DataSource {
     private void closeConnections(List<PooledConnection> connections) throws SQLException {
         for (PooledConnection connection : connections) {
             connection.realClose();
+            LOG.info(CONNECTION_CLOSED_MSG, connection);
         }
     }
 }
