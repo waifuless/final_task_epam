@@ -13,6 +13,8 @@ public class CommonConnectionPool implements ConnectionPool {
 
     private final static Logger LOG = LoggerFactory.getLogger(CommonConnectionPool.class);
 
+    private final static String INIT_MSG = "Connection pool successfully initialized";
+    private final static String CLOSE_MSG = "Connection pool successfully closed";
     private final static String PROPERTIES_FILE_NAME = "connection-pool.properties";
     private final static String DB_URL_PROPERTY_NAME = "db.url";
     private final static String DB_DRIVER_NAME_PROPERTY_NAME = "db.driver_name";
@@ -30,6 +32,7 @@ public class CommonConnectionPool implements ConnectionPool {
             dataSource = new CommonDataSource(properties.getProperty(DB_URL_PROPERTY_NAME),
                     System.getenv(LOGIN_ENV_NAME), System.getenv(PASSWORD_ENV_NAME),
                     properties.getProperty(DB_DRIVER_NAME_PROPERTY_NAME));
+            LOG.info(INIT_MSG);
         }catch (Exception ex){
             LOG.error(ex.getMessage(), ex);
             throw new DataSourceDownException(ex);
@@ -55,5 +58,6 @@ public class CommonConnectionPool implements ConnectionPool {
     @Override
     public void close() throws Exception {
         dataSource.close();
+        LOG.info(CLOSE_MSG);
     }
 }

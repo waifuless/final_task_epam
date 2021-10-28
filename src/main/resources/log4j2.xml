@@ -15,7 +15,7 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-        <Root level="TRACE">
+        <Root level="ALL">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
         </Root>
