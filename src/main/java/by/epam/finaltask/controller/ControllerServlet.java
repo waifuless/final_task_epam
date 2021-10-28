@@ -18,28 +18,6 @@ public class ControllerServlet extends HttpServlet {
 
     private final static Logger LOG = LoggerFactory.getLogger(ControllerServlet.class);
 
-    private final static String DESTROY_EXCEPTION_MCG = "exception while destroying servlet";
-    private final static String INIT_EXCEPTION_MCG = "exception while initializing servlet";
-
-    @Override
-    public void init() throws ServletException {
-        try {
-            ConnectionPool.getInstance(); //init connection pool
-        } catch (Exception e) {
-            LOG.error(INIT_EXCEPTION_MCG, e);
-            throw new ServletException(e);
-        }
-    }
-
-    @Override
-    public void destroy() {
-        try {
-            ConnectionPool.getInstance().close();
-        } catch (Exception e) {
-            LOG.error(DESTROY_EXCEPTION_MCG, e);
-        }
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
