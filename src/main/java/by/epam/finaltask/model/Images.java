@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Images implements DaoEntity<Images>{
+public class Images implements DaoEntity<Images> {
 
     private final long lotId;
     private final Image mainImage;
@@ -69,7 +69,7 @@ public class Images implements DaoEntity<Images>{
         return new Images(id, mainImage, otherImages);
     }
 
-    public static class Image implements DaoEntity<Image>{
+    public static class Image implements DaoEntity<Image> {
 
         private final long id;
         private final Blob value;

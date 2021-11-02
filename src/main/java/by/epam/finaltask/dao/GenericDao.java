@@ -10,12 +10,15 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
 
     private final static Logger LOG = LoggerFactory.getLogger(GenericDao.class);
 
     private final static String ROWS_COUNT_COLUMN = "rows_count";
+    private final static String LAST_INSERT_ID_COLUMN = "last_id";
+    private final static String SELECT_LAST_INSERT_ID_QUERY = "SELECT LAST_INSERT_ID();";
 
     protected final ConnectionPool connectionPool;
     private final String saveQuery;
@@ -36,27 +39,25 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
 
     protected abstract void prepareSaveStatement(PreparedStatement statement, T t) throws SQLException;
 
-    protected void prepareFindStatement(PreparedStatement statement, long id) throws SQLException{
+    protected void prepareFindStatement(PreparedStatement statement, long id) throws SQLException {
         statement.setLong(1, id);
     }
 
     protected abstract void prepareUpdateStatement(PreparedStatement statement, T t) throws SQLException;
 
-    protected void prepareDeleteStatement(PreparedStatement statement, long id) throws SQLException{
+    protected void prepareDeleteStatement(PreparedStatement statement, long id) throws SQLException {
         statement.setLong(1, id);
     }
 
     protected abstract T extractEntity(ResultSet resultSet) throws ExtractionException;
 
-    protected abstract long extractId(ResultSet resultSet) throws ExtractionException;
-
-    protected List<T> extractAll(ResultSet resultSet) throws ExtractionException{
+    protected List<T> extractAll(ResultSet resultSet) throws ExtractionException {
         List<T> list = new ArrayList<>();
         try {
             while (resultSet.next()) {
                 list.add(extractEntity(resultSet));
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ExtractionException(ex.getMessage(), ex);
         }
@@ -64,13 +65,18 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
     }
 
     @Override
-    public T save(T t) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<T> save(T t) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(saveQuery);
-            prepareSaveStatement(statement, t);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            return t.createWithId(extractId(resultSet));
+            PreparedStatement insertStatement = connection.prepareStatement(saveQuery);
+            Statement selectIdStatement = connection.createStatement();
+            prepareSaveStatement(insertStatement, t);
+            insertStatement.execute();
+            ResultSet resultSet = selectIdStatement.executeQuery(SELECT_LAST_INSERT_ID_QUERY);
+            if (resultSet.next()) {
+                return Optional.of(t.createWithId(extractId(resultSet)));
+            } else {
+                return Optional.empty();
+            }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
             throw e;
@@ -82,13 +88,16 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
     }
 
     @Override
-    public T find(long id) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<T> find(long id) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(findQuery);
             prepareFindStatement(statement, id);
             ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            return extractEntity(resultSet);
+            if (resultSet.next()) {
+                return Optional.of(extractEntity(resultSet));
+            } else {
+                return Optional.empty();
+            }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
             throw e;
@@ -143,6 +152,14 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
             throw e;
+        }
+    }
+
+    private long extractId(ResultSet resultSet) throws ExtractionException {
+        try {
+            return resultSet.getLong(LAST_INSERT_ID_COLUMN);
+        } catch (Exception ex) {
+            throw new ExtractionException(ex.getMessage(), ex);
         }
     }
 }

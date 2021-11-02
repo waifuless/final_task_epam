@@ -3,7 +3,6 @@ package by.epam.finaltask.dao;
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
-import by.epam.finaltask.exception.UserNotFoundException;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.model.User;
 import by.epam.finaltask.model.UserFactory;
@@ -15,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class MariaUserManager extends GenericDao<User> implements UserManager {
 
@@ -28,8 +28,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     private final static String TABLE_NAME = "app_user";
     private final static String SAVE_USER_QUERY =
             "INSERT INTO app_user(email, password_hash, role_id)" +
-                    " VALUES(?,?,(SELECT role_id FROM role WHERE role_name = ?));" +
-                    " SELECT LAST_INSERT_ID() AS user_id;";
+                    " VALUES(?,?,(SELECT role_id FROM role WHERE role_name = ?));";
     private final static String IS_EXIST_USER_QUERY =
             "SELECT EXISTS(SELECT 1 FROM app_user WHERE email=?) AS user_existence";
     private final static String FIND_USER_BY_EMAIL_QUERY =
@@ -97,15 +96,6 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     }
 
     @Override
-    protected long extractId(ResultSet resultSet) throws ExtractionException {
-        try {
-            return resultSet.getLong(USER_ID_COLUMN);
-        } catch (Exception ex) {
-            throw new ExtractionException(ex.getMessage(), ex);
-        }
-    }
-
-    @Override
     public boolean isUserExist(String email) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(IS_EXIST_USER_QUERY);
@@ -124,7 +114,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     }
 
     @Override
-    public User findUserByEmailAndPassword(String email, String password)
+    public Optional<User> findUserByEmailAndPassword(String email, String password)
             throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(FIND_USER_BY_EMAIL_QUERY);
@@ -133,8 +123,8 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
             if (resultSet.next()) {
                 String passwordHash = resultSet.getString(PASSWORD_HASH_COLUMN);
                 if (encoder.matches(password, passwordHash)) {
-                    return userFactory.createUserWithoutPassword(resultSet.getInt(USER_ID_COLUMN),
-                            email, Role.valueOf(resultSet.getString(ROLE_COLUMN)));
+                    return Optional.of(userFactory.createUserWithoutPassword(resultSet.getInt(USER_ID_COLUMN),
+                            email, Role.valueOf(resultSet.getString(ROLE_COLUMN))));
                 }
             }
         } catch (SQLException | DataSourceDownException e) {
@@ -145,6 +135,6 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
             Thread.currentThread().interrupt();
             throw e;
         }
-        throw new UserNotFoundException(email);
+        return Optional.empty();
     }
 }

@@ -37,10 +37,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             "INSERT INTO lot(owner_id, category_id, auction_type_id, title, start_datetime, end_datetime," +
                     " initial_price, origin_place, description, auction_status_id, product_condition_id)" +
                     " VALUES(?, findCategoryId(?), findAuctionTypeId(?), ?, ?, ?, ?, ?, ?, findAuctionStatusId(?)," +
-                    " findProductConditionId(?));" +
-                    " SELECT LAST_INSERT_ID();";
-    private final static String SAVE_IMAGE =
-            "INSERT INTO lot_image(lot_id, image_value, main_image) VALUES(?, ?, ?);";
+                    " findProductConditionId(?));";
     private final static String FIND_ALL_LOTS_QUERY =
             "SELECT lot.lot_id AS lot_id, owner_id AS owner_id, category.category_name AS category_name," +
                     " auction_type.type_name" +
@@ -140,15 +137,6 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     }
 
     @Override
-    protected long extractId(ResultSet resultSet) throws ExtractionException {
-        try {
-            return resultSet.getLong(ID_COLUMN);
-        } catch (Exception ex) {
-            throw new ExtractionException(ex.getMessage(), ex);
-        }
-    }
-
-    @Override
     public List<Lot> find(long offset, long count) throws SQLException, DataSourceDownException, InterruptedException {
         return findListWithPreparator(FIND_LOT_OFFSET_QUERY, statement ->
         {
@@ -183,28 +171,6 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
-            preparator.accept(statement);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            return extractAll(resultSet);
-        } catch (SQLException | DataSourceDownException e) {
-            LOG.error(e.getMessage(), e);
-            throw e;
-        } catch (InterruptedException e) {
-            LOG.error(e.getMessage(), e);
-            Thread.currentThread().interrupt();
-            throw e;
-        }
-    }
-
-    private List<Lot> shet(String query, StatementPreparator preparator)
-            throws SQLException, DataSourceDownException, InterruptedException {
-        try (Connection connection = connectionPool.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
-            PreparedStatement statement1 = connection.prepareStatement(SAVE_LOT_QUERY);
-            PreparedStatement statement2 = connection.prepareStatement(UPDATE_LOT_QUERY);
-            PreparedStatement statement3 = connection.prepareStatement(FIND_ALL_LOTS_QUERY);
-            PreparedStatement statement4 = connection.prepareStatement(DELETE_LOT_QUERY);
             preparator.accept(statement);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();

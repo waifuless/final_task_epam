@@ -1,13 +1,9 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>JSP - Hello World</title>
+    <title>Перенаправление на главную</title>
 </head>
 <body>
-<h1><%= "Hello World!" %>
-</h1>
-<br/>
-<a href="ControllerServlet">Hello Servlet</a>
+    <jsp:forward page="/ControllerServlet?command=show_main_page"/>
 </body>
 </html>

@@ -3,9 +3,9 @@ package by.epam.finaltask.model;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-public class LotWithImages extends Lot{
+public class LotWithImages extends Lot {
 
-    private Images images;
+    private final Images images;
 
     public LotWithImages(long ownerId, String category, AuctionType auctionType, String title,
                          Timestamp startDatetime, Timestamp endDatetime, BigDecimal initialPrice, String originPlace,
@@ -50,7 +50,7 @@ public class LotWithImages extends Lot{
     @Override
     public String toString() {
         return "LotWithImages{" +
-                super.toString()+
+                super.toString() +
                 "images=" + images +
                 '}';
     }

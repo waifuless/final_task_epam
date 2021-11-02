@@ -1,6 +1,6 @@
 package by.epam.finaltask.exception;
 
-public class DataSourceDownException extends Exception {
+public class DataSourceDownException extends Error {
 
     public DataSourceDownException() {
     }

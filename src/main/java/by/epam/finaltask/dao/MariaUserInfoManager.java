@@ -33,8 +33,7 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
                     "insertAddressIfNotExistAndSelectId(?)," +
                     "findCityOrDistrictId(?)," +
                     "findRegionId(?)," +
-                    "insertPostalCodeIfNotExistAndSelectId(?));" +
-                    " SELECT LAST_INSERT_ID() AS user_id;";
+                    "insertPostalCodeIfNotExistAndSelectId(?));";
     private final static String IS_USER_INFO_EXIST_QUERY =
             "SELECT EXISTS(SELECT 1 FROM user_info WHERE user_id=?) AS user_info_existence";
     private final static String FIND_USER_INFO_QUERY =
@@ -106,15 +105,6 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
                     resultSet.getString(FIRST_NAME_COLUMN), resultSet.getString(LAST_NAME_COLUMN),
                     resultSet.getString(ADDRESS_NAME_COLUMN), resultSet.getString(CITY_OR_DISTRICT_NAME_COLUMN),
                     resultSet.getString(REGION_NAME_COLUMN), resultSet.getString(POSTAL_CODE_NAME_COLUMN));
-        } catch (Exception ex) {
-            throw new ExtractionException(ex.getMessage(), ex);
-        }
-    }
-
-    @Override
-    protected long extractId(ResultSet resultSet) throws ExtractionException {
-        try {
-            return resultSet.getLong(ID_COLUMN);
         } catch (Exception ex) {
             throw new ExtractionException(ex.getMessage(), ex);
         }

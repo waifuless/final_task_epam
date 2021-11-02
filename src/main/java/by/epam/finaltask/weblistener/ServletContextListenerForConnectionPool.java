@@ -1,8 +1,9 @@
 package by.epam.finaltask.weblistener;
 
 import by.epam.finaltask.connection_pool.ConnectionPool;
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

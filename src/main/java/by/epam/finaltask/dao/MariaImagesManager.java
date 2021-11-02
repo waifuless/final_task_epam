@@ -9,10 +9,11 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static by.epam.finaltask.model.Images.Image;
 
-public class MariaImagesManager implements ImagesManager{
+public class MariaImagesManager implements ImagesManager {
 
     private final static Logger LOG = LoggerFactory.getLogger(GenericDao.class);
 
@@ -38,10 +39,8 @@ public class MariaImagesManager implements ImagesManager{
     private final static String DELETE_ALL_LOT_IMAGES_QUERY =
             "DELETE FROM lot_image WHERE lot_id = ?;";
     private final static String COUNT_QUERY = "SELECT COUNT(1) AS rows_count FROM lot_image";
-
-    protected final ConnectionPool connectionPool;
-
     private static volatile MariaImagesManager instance;
+    protected final ConnectionPool connectionPool;
 
     private MariaImagesManager() throws DataSourceDownException {
         connectionPool = ConnectionPool.getInstance();
@@ -66,25 +65,27 @@ public class MariaImagesManager implements ImagesManager{
     }
 
     @Override
-    public Images save(Images images) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<Images> save(Images images) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SAVE_IMAGE);
             final long lotId = images.getLotId();
 
             prepareSaveStatement(statement, lotId, images.getMainImage().getValue(), true);
             ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            Image savedMainImage = images.getMainImage().createWithId(resultSet.getLong(IMAGE_ID_COLUMN));
+            if (resultSet.next()) {
+                Image savedMainImage = images.getMainImage().createWithId(resultSet.getLong(IMAGE_ID_COLUMN));
 
-            List<Image> otherSavedImages = new ArrayList<>();
-            for (Image image : images.getOtherImages()) {
-                prepareSaveStatement(statement, lotId, image.getValue(), false);
-                resultSet = statement.executeQuery();
-                resultSet.next();
-                otherSavedImages.add(image.createWithId(resultSet.getLong(IMAGE_ID_COLUMN)));
+                List<Image> otherSavedImages = new ArrayList<>();
+                for (Image image : images.getOtherImages()) {
+                    prepareSaveStatement(statement, lotId, image.getValue(), false);
+                    resultSet = statement.executeQuery();
+                    resultSet.next();
+                    otherSavedImages.add(image.createWithId(resultSet.getLong(IMAGE_ID_COLUMN)));
+                }
+                return Optional.of(new Images(lotId, savedMainImage, otherSavedImages));
+            } else {
+                return Optional.empty();
             }
-
-            return new Images(lotId, savedMainImage, otherSavedImages);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
             throw e;
@@ -96,7 +97,7 @@ public class MariaImagesManager implements ImagesManager{
     }
 
     @Override
-    public Images find(long id) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<Images> find(long id) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(FIND_ALL_LOT_IMAGES_QUERY);
             statement.setLong(1, id);
@@ -104,15 +105,19 @@ public class MariaImagesManager implements ImagesManager{
             Image mainImage = null;
             List<Image> otherImages = new ArrayList<>();
             Image newImage;
-            while(resultSet.next()){
+            while (resultSet.next()) {
                 newImage = new Image(resultSet.getLong(IMAGE_ID_COLUMN), resultSet.getBlob(IMAGE_VALUE_COLUMN));
-                if(resultSet.getBoolean(MAIN_IMAGE_COLUMN)){
+                if (resultSet.getBoolean(MAIN_IMAGE_COLUMN)) {
                     mainImage = newImage;
-                }else{
+                } else {
                     otherImages.add(newImage);
                 }
             }
-            return new Images(id, mainImage, otherImages);
+            if (mainImage != null) {
+                return Optional.of(new Images(id, mainImage, otherImages));
+            } else {
+                return Optional.empty();
+            }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
             throw e;

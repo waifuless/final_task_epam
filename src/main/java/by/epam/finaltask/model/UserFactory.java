@@ -5,6 +5,8 @@ import by.epam.finaltask.security.PasswordEncoder;
 public class UserFactory {
 
     private final static String EMPTY_STRING = "";
+    private final static int DEFAULT_ID = -1;
+
     private static volatile UserFactory instance;
     private final PasswordEncoder encoder;
 
@@ -33,5 +35,13 @@ public class UserFactory {
 
     public User createUser(int user_id, String email, String password, Role role) {
         return new User(user_id, email, encoder.encode(password), role);
+    }
+
+    public User createUser(String email, String password) {
+        return createUser(DEFAULT_ID, email, password);
+    }
+
+    public User createUser(String email, String password, Role role) {
+        return createUser(DEFAULT_ID, email, password, role);
     }
 }

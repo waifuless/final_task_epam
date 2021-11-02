@@ -1,7 +1,7 @@
 package by.epam.finaltask.filter;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.annotation.WebFilter;
 
 import java.io.IOException;
 

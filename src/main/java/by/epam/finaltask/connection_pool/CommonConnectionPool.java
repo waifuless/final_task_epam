@@ -4,7 +4,6 @@ import by.epam.finaltask.exception.DataSourceDownException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.Properties;
@@ -26,14 +25,14 @@ public class CommonConnectionPool implements ConnectionPool {
     private static DataSource dataSource;
 
     private CommonConnectionPool() throws DataSourceDownException {
-        try(InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME)){
+        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME)) {
             Properties properties = new Properties();
             properties.load(inputStream);
             dataSource = new CommonDataSource(properties.getProperty(DB_URL_PROPERTY_NAME),
                     System.getenv(LOGIN_ENV_NAME), System.getenv(PASSWORD_ENV_NAME),
                     properties.getProperty(DB_DRIVER_NAME_PROPERTY_NAME));
             LOG.info(INIT_MSG);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new DataSourceDownException(ex);
         }
