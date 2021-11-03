@@ -21,6 +21,7 @@ public class UserPermissionFilter implements Filter {
 
     private final static Logger LOG = LoggerFactory.getLogger(UserPermissionFilter.class);
     private final static int FORBIDDEN_STATUS_CODE = 403;
+    private final static int BAD_REQUEST_STATUS_CODE = 400;
     private final CommandFactory commandFactory = CommandFactory.getInstance();
 
     @Override
@@ -32,14 +33,21 @@ public class UserPermissionFilter implements Filter {
 
         final Role userRole = getCurrentRole(request);
 
-        Optional<Command> optionalCommand = commandFactory.findCommand(request.getParameter("command"));
-        if (optionalCommand.isPresent() && optionalCommand.get().getAllowedRoles().contains(userRole)) {
-            chain.doFilter(req, res);
-        } else {
+        String commandName = request.getParameter("command");
+        Optional<Command> optionalCommand = commandFactory.findCommand(commandName);
+        if(!optionalCommand.isPresent() ){
+            LOG.warn("Command {} does not exist", commandName);
+            response.setStatus(BAD_REQUEST_STATUS_CODE);
+            response.sendRedirect(PagePath.ERROR.getPath());
+            return;
+        }
+        if (!optionalCommand.get().getAllowedRoles().contains(userRole)) {
             LOG.warn("forbidden {} to access {} command", userRole, optionalCommand);
             response.setStatus(FORBIDDEN_STATUS_CODE);
             response.sendRedirect(PagePath.ERROR.getPath());
+            return;
         }
+        chain.doFilter(req, res);
     }
 
     private Role getCurrentRole(HttpServletRequest request) {
