@@ -18,7 +18,7 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
 
     private final static String ROWS_COUNT_COLUMN = "rows_count";
     private final static String LAST_INSERT_ID_COLUMN = "last_id";
-    private final static String SELECT_LAST_INSERT_ID_QUERY = "SELECT LAST_INSERT_ID();";
+    private final static String SELECT_LAST_INSERT_ID_QUERY = "SELECT LAST_INSERT_ID() AS last_id;";
 
     protected final ConnectionPool connectionPool;
     private final String saveQuery;
