@@ -16,6 +16,16 @@ html, body {
     height: 100%;
 }
 
+#accountDropDownMenu{
+    max-width: 250px;
+}
+
+#accountDropDownMenu *{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .page-buffer {
     height: 50px;
 }
