@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Optional;
 
-@WebFilter(filterName = "UserPermissionFilter", urlPatterns = "/ControllerServlet")
+@WebFilter(filterName = "UserPermissionFilter")
 public class UserPermissionFilter implements Filter {
 
     private final static Logger LOG = LoggerFactory.getLogger(UserPermissionFilter.class);
