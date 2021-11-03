@@ -4,7 +4,6 @@ import by.epam.finaltask.controller.CommandRequest;
 import by.epam.finaltask.controller.CommandResponse;
 import by.epam.finaltask.controller.PagePath;
 import by.epam.finaltask.model.Role;
-import by.epam.finaltask.service.CommonUserService;
 import by.epam.finaltask.service.RegisterError;
 import by.epam.finaltask.service.ServiceFactory;
 import by.epam.finaltask.service.UserService;
@@ -17,7 +16,7 @@ import java.util.List;
 
 public class RegisterCommand implements Command {
 
-    private final static Logger LOG = LogManager.getLogger(CommonUserService.class);
+    private final static Logger LOG = LogManager.getLogger(RegisterCommand.class);
     private final static String COMMON_ERROR_MCG = "Exception while register user";
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays.asList(Role.NOT_AUTHORIZED));
 
@@ -40,7 +39,8 @@ public class RegisterCommand implements Command {
                 setErrorAttributes(errors, request);
                 return new CommandResponse(false, PagePath.REGISTRATION.getPath());
             }
-            return new CommandResponse(false, PagePath.SIGN_IN.getPath());
+            return new CommandResponse(true, request
+                    .createCommandPath(CommandFactory.CommandVariant.SHOW_SIGN_IN));
         } catch (Exception ex) {
             LOG.warn(COMMON_ERROR_MCG, ex);
             request.setAttribute("errorMessage", COMMON_ERROR_MCG);
