@@ -20,7 +20,9 @@ import java.util.Optional;
 public class UserPermissionFilter implements Filter {
 
     private final static Logger LOG = LoggerFactory.getLogger(UserPermissionFilter.class);
+    private final static String FORBIDDEN_MCG = "forbidden {} to access {} command";
     private final static int FORBIDDEN_STATUS_CODE = 403;
+    private final static String BAD_REQUEST_MCG = "Command {} does not exist";
     private final static int BAD_REQUEST_STATUS_CODE = 400;
     private final CommandFactory commandFactory = CommandFactory.getInstance();
 
@@ -35,16 +37,15 @@ public class UserPermissionFilter implements Filter {
 
         String commandName = request.getParameter("command");
         Optional<Command> optionalCommand = commandFactory.findCommand(commandName);
+
         if(!optionalCommand.isPresent() ){
-            LOG.warn("Command {} does not exist", commandName);
-            response.setStatus(BAD_REQUEST_STATUS_CODE);
-            response.sendRedirect(PagePath.ERROR.getPath());
+            LOG.warn(BAD_REQUEST_MCG, commandName);
+            response.sendError(BAD_REQUEST_STATUS_CODE);
             return;
         }
         if (!optionalCommand.get().getAllowedRoles().contains(userRole)) {
-            LOG.warn("forbidden {} to access {} command", userRole, optionalCommand);
-            response.setStatus(FORBIDDEN_STATUS_CODE);
-            response.sendRedirect(PagePath.ERROR.getPath());
+            LOG.warn(FORBIDDEN_MCG, userRole, optionalCommand.get());
+            response.sendError(FORBIDDEN_STATUS_CODE);
             return;
         }
         chain.doFilter(req, res);

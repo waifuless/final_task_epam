@@ -11,4 +11,8 @@
         <filter-name>UserPermissionFilter</filter-name>
         <servlet-name>ControllerServlet</servlet-name>
     </filter-mapping>
+
+    <error-page>
+        <location>/WEB-INF/jsp/exception.jsp</location>
+    </error-page>
 </web-app>
