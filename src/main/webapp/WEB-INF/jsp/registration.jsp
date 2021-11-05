@@ -22,17 +22,18 @@
         <form class="needs-validation" action="${pageContext.request.contextPath}/ControllerServlet?command=register"
               method="post">
             <div class="form-floating my-2">
-                <input type="email" required class="form-control <c:if test="${requestScope.EMAIL_INVALID!=null || requestScope.USER_WITH_EMAIL_ALREADY_EXISTS!=null}">is-invalid</c:if>"
+                <input type="email" required class="form-control <c:if test="${requestScope.containsKey('EMAIL_INVALID')
+                || requestScope.containsKey('USER_WITH_EMAIL_ALREADY_EXISTS')}">is-invalid</c:if>"
                        id="emailInput" name="email" placeholder="name@example.com"
-                       <c:if test="${not empty requestScope.email}">value="${requestScope.email}"</c:if>>
+                       <c:if test="${not empty requestScope.get('email')}">value="${requestScope.get('email')}"</c:if>>
                 <label for="emailInput">Email address</label>
                 <div class="invalid-feedback">
-                    <c:if test="${requestScope.EMAIL_INVALID!=null}">Email invalid</c:if>
-                    <c:if test="${requestScope.USER_WITH_EMAIL_ALREADY_EXISTS!=null}">User with this email already exists</c:if>
+                    <c:if test="${requestScope.containsKey('EMAIL_INVALID')}">Email invalid</c:if>
+                    <c:if test="${requestScope.containsKey('USER_WITH_EMAIL_ALREADY_EXISTS')}">User with this email already exists</c:if>
                 </div>
             </div>
             <div class="form-floating my-2">
-                <input type="password" required class="form-control <c:if test="${requestScope.PASSWORD_INVALID!=null}">
+                <input type="password" required class="form-control <c:if test="${requestScope.containsKey('PASSWORD_INVALID')}">
                 is-invalid</c:if>" id="PasswordInput" name="password" placeholder="Password">
                 <label for="PasswordInput">Password</label>
                 <div class="invalid-feedback">
@@ -40,7 +41,8 @@
                 </div>
             </div>
             <div class="form-floating my-2">
-                <input type="password" required class="form-control <c:if test="${requestScope.PASSWORDS_NOT_MATCH!=null}">
+                <input type="password" required
+                       class="form-control <c:if test="${requestScope.containsKey('PASSWORDS_NOT_MATCH')}">
                 is-invalid</c:if>" id="PasswordRepeatInput" name="passwordRepeat"
                        placeholder="Repeat password">
                 <label for="PasswordRepeatInput">Repeat password</label>
