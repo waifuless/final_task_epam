@@ -23,12 +23,12 @@
             <form action="${pageContext.request.contextPath}/ControllerServlet?command=sign_in" method="post">
                 <div class="form-floating my-2">
                     <input type="email" class="form-control" id="floatingInput" name="email"
-                           placeholder="name@example.com">
+                           placeholder="name@example.com" required>
                     <label for="floatingInput">Email address</label>
                 </div>
                 <div class="form-floating my-2">
                     <input type="password" class="form-control" id="floatingPassword" name="password"
-                           placeholder="Password">
+                           placeholder="Password" required>
                     <label for="floatingPassword">Password</label>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Sign in</button>

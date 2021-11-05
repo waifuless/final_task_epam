@@ -22,7 +22,6 @@
 
     <div class="container-lg">
         <h2>Error status: ${requestScope.get('jakarta.servlet.error.status_code')}</h2>
-<%--        <h2>Description: ${requestScope.get('jakarta.servlet.error.message')}</h2>--%>
     </div>
 
     <div class="page-buffer"></div>

@@ -22,7 +22,7 @@
         <form class="needs-validation" action="${pageContext.request.contextPath}/ControllerServlet?command=register"
               method="post">
             <div class="form-floating my-2">
-                <input type="email" class="form-control <c:if test="${requestScope.EMAIL_INVALID!=null || requestScope.USER_WITH_EMAIL_ALREADY_EXISTS!=null}">is-invalid</c:if>"
+                <input type="email" required class="form-control <c:if test="${requestScope.EMAIL_INVALID!=null || requestScope.USER_WITH_EMAIL_ALREADY_EXISTS!=null}">is-invalid</c:if>"
                        id="emailInput" name="email" placeholder="name@example.com"
                        <c:if test="${not empty requestScope.email}">value="${requestScope.email}"</c:if>>
                 <label for="emailInput">Email address</label>
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="form-floating my-2">
-                <input type="password" class="form-control <c:if test="${requestScope.PASSWORD_INVALID!=null}">
+                <input type="password" required class="form-control <c:if test="${requestScope.PASSWORD_INVALID!=null}">
                 is-invalid</c:if>" id="PasswordInput" name="password" placeholder="Password">
                 <label for="PasswordInput">Password</label>
                 <div class="invalid-feedback">
@@ -40,7 +40,7 @@
                 </div>
             </div>
             <div class="form-floating my-2">
-                <input type="password" class="form-control <c:if test="${requestScope.PASSWORDS_NOT_MATCH!=null}">
+                <input type="password" required class="form-control <c:if test="${requestScope.PASSWORDS_NOT_MATCH!=null}">
                 is-invalid</c:if>" id="PasswordRepeatInput" name="passwordRepeat"
                        placeholder="Repeat password">
                 <label for="PasswordRepeatInput">Repeat password</label>
