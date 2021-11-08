@@ -23,16 +23,16 @@ public class MariaImagesManager implements ImagesManager {
     private final static String MAIN_IMAGE_COLUMN = "main_image";
     private final static String LOT_ID_COLUMN = "lot_id";
     private final static String SAVE_IMAGE =
-            "INSERT INTO lot_image(lot_id, image_value, main_image) VALUES(?, ?, ?);" +
+            "INSERT INTO lot_image(lot_id, image_path, main_image) VALUES(?, ?, ?);" +
                     "SELECT LAST_INSERT_ID() AS image_id;";
     private final static String FIND_IMAGE_QUERY =
             "SELECT lot_id AS lot_id, image_value AS image_value, main_image AS main_image FROM lot_image" +
                     " WHERE image_id=?;";
     private final static String FIND_ALL_LOT_IMAGES_QUERY =
-            "SELECT image_id AS image_id, image_value AS image_value, main_image AS main_image FROM lot_image" +
+            "SELECT image_id AS image_id, image_path AS image_value, main_image AS main_image FROM lot_image" +
                     " WHERE lot_id=?;";
     private final static String UPDATE_IMAGE_QUERY =
-            "UPDATE lot_image SET image_value = ?" +
+            "UPDATE lot_image SET image_path = ?" +
                     " WHERE image_id = ? AND lot_id = ?";
     private final static String DELETE_IMAGE_QUERY =
             "DELETE FROM lot_image WHERE image_id = ? AND lot_id = ?;";
