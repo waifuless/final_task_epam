@@ -13,14 +13,15 @@ public class Lot implements DaoEntity<Lot> {
     private final Timestamp startDatetime;
     private final Timestamp endDatetime;
     private final BigDecimal initialPrice;
-    private final String originPlace;
+    private final String region;
+    private final String cityOrDistrict;
     private final String description;
     private final AuctionStatus auctionStatus;
     private final ProductCondition productCondition;
 
     public Lot(long ownerId, String category, AuctionType auctionType, String title, Timestamp startDatetime,
-               Timestamp endDatetime, BigDecimal initialPrice, String originPlace, String description,
-               AuctionStatus auctionStatus, ProductCondition productCondition) {
+               Timestamp endDatetime, BigDecimal initialPrice, String region, String cityOrDistrict,
+               String description, AuctionStatus auctionStatus, ProductCondition productCondition) {
         this.lotId = -1;
         this.ownerId = ownerId;
         this.category = category;
@@ -29,15 +30,17 @@ public class Lot implements DaoEntity<Lot> {
         this.startDatetime = startDatetime;
         this.endDatetime = endDatetime;
         this.initialPrice = initialPrice;
-        this.originPlace = originPlace;
+        this.region = region;
+        this.cityOrDistrict = cityOrDistrict;
         this.description = description;
         this.auctionStatus = auctionStatus;
         this.productCondition = productCondition;
     }
 
     public Lot(long lotId, long ownerId, String category, AuctionType auctionType, String title,
-               Timestamp startDatetime, Timestamp endDatetime, BigDecimal initialPrice, String originPlace,
-               String description, AuctionStatus auctionStatus, ProductCondition productCondition) {
+               Timestamp startDatetime, Timestamp endDatetime, BigDecimal initialPrice, String region,
+               String cityOrDistrict, String description, AuctionStatus auctionStatus,
+               ProductCondition productCondition) {
         this.lotId = lotId;
         this.ownerId = ownerId;
         this.category = category;
@@ -46,7 +49,8 @@ public class Lot implements DaoEntity<Lot> {
         this.startDatetime = startDatetime;
         this.endDatetime = endDatetime;
         this.initialPrice = initialPrice;
-        this.originPlace = originPlace;
+        this.region = region;
+        this.cityOrDistrict = cityOrDistrict;
         this.description = description;
         this.auctionStatus = auctionStatus;
         this.productCondition = productCondition;
@@ -84,8 +88,12 @@ public class Lot implements DaoEntity<Lot> {
         return initialPrice;
     }
 
-    public String getOriginPlace() {
-        return originPlace;
+    public String getRegion() {
+        return region;
+    }
+
+    public String getCityOrDistrict() {
+        return cityOrDistrict;
     }
 
     public String getDescription() {
@@ -115,7 +123,9 @@ public class Lot implements DaoEntity<Lot> {
         if (startDatetime != null ? !startDatetime.equals(lot.startDatetime) : lot.startDatetime != null) return false;
         if (endDatetime != null ? !endDatetime.equals(lot.endDatetime) : lot.endDatetime != null) return false;
         if (initialPrice != null ? !initialPrice.equals(lot.initialPrice) : lot.initialPrice != null) return false;
-        if (originPlace != null ? !originPlace.equals(lot.originPlace) : lot.originPlace != null) return false;
+        if (region != null ? !region.equals(lot.region) : lot.region != null) return false;
+        if (cityOrDistrict != null ? !cityOrDistrict.equals(lot.cityOrDistrict) : lot.cityOrDistrict != null)
+            return false;
         if (description != null ? !description.equals(lot.description) : lot.description != null) return false;
         if (auctionStatus != lot.auctionStatus) return false;
         return productCondition == lot.productCondition;
@@ -131,7 +141,8 @@ public class Lot implements DaoEntity<Lot> {
         result = 31 * result + (startDatetime != null ? startDatetime.hashCode() : 0);
         result = 31 * result + (endDatetime != null ? endDatetime.hashCode() : 0);
         result = 31 * result + (initialPrice != null ? initialPrice.hashCode() : 0);
-        result = 31 * result + (originPlace != null ? originPlace.hashCode() : 0);
+        result = 31 * result + (region != null ? region.hashCode() : 0);
+        result = 31 * result + (cityOrDistrict != null ? cityOrDistrict.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (auctionStatus != null ? auctionStatus.hashCode() : 0);
         result = 31 * result + (productCondition != null ? productCondition.hashCode() : 0);
@@ -149,7 +160,8 @@ public class Lot implements DaoEntity<Lot> {
                 ", startDatetime=" + startDatetime +
                 ", endDatetime=" + endDatetime +
                 ", initialPrice=" + initialPrice +
-                ", originPlace='" + originPlace + '\'' +
+                ", region='" + region + '\'' +
+                ", cityOrDistrict='" + cityOrDistrict + '\'' +
                 ", description='" + description + '\'' +
                 ", auctionStatus=" + auctionStatus +
                 ", productCondition=" + productCondition +
@@ -158,7 +170,7 @@ public class Lot implements DaoEntity<Lot> {
 
     @Override
     public Lot createWithId(long id) {
-        return new Lot(id, ownerId, category, auctionType, title, startDatetime, endDatetime,
-                initialPrice, originPlace, description, auctionStatus, productCondition);
+        return new Lot(id, ownerId, category, auctionType, title, startDatetime, endDatetime, initialPrice, region,
+                cityOrDistrict, description, auctionStatus, productCondition);
     }
 }

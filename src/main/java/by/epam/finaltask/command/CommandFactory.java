@@ -54,6 +54,7 @@ public class CommandFactory {
         SIGN_IN("sign_in", SignInCommand.class),
         SIGN_OUT("sign_out", SignOutCommand.class),
         SHOW_REGISTRATION("show_registration", ShowRegistrationPageCommand.class),
+        SHOW_LOT("show_lot_page", ShowLotPageCommand.class),
         SHOW_RESTORE_PASSWORD("show_restore_password", ShowRestorePasswordPageCommand.class);
 
         private final String commandName;

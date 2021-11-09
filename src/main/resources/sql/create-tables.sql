@@ -41,15 +41,6 @@ create table category
     category_name varchar(64) not null
 );
 
-create table city_or_district
-(
-    city_or_district_id   int auto_increment
-        primary key,
-    city_or_district_name varchar(60) not null,
-    constraint city_city_name_uindex
-        unique (city_or_district_name)
-);
-
 create table postal_code
 (
     postal_code_id   int auto_increment
@@ -75,6 +66,18 @@ create table region
     region_name varchar(60) not null,
     constraint region_region_name_uindex
         unique (region_name)
+);
+
+create table city_or_district
+(
+    city_or_district_id   int auto_increment
+        primary key,
+    city_or_district_name varchar(60) not null,
+    region_id             int         not null,
+    constraint city_city_name_uindex
+        unique (city_or_district_name),
+    constraint city_or_district_region_region_id_fk
+        foreign key (region_id) references region (region_id)
 );
 
 create table role
@@ -112,12 +115,15 @@ create table lot
     start_datetime       datetime       not null,
     end_datetime         datetime       not null,
     initial_price        decimal(20, 2) not null,
-    origin_place         varchar(128)   not null,
     description          text           not null,
     auction_status_id    int            not null,
     product_condition_id int            not null,
+    region_id            int            not null,
+    city_or_district_id  int            null,
     constraint lot_auction_type_type_id_fk
         foreign key (auction_type_id) references auction_type (type_id),
+    constraint lot_city_or_district_city_or_district_id_fk
+        foreign key (city_or_district_id) references city_or_district (city_or_district_id),
     constraint lot_fk0
         foreign key (owner_id) references app_user (user_id),
     constraint lot_fk1
@@ -125,7 +131,9 @@ create table lot
     constraint lot_lot_product_condition_product_condition_id_fk
         foreign key (product_condition_id) references product_condition (product_condition_id),
     constraint lot_lot_status_status_id_fk
-        foreign key (auction_status_id) references auction_status (status_id)
+        foreign key (auction_status_id) references auction_status (status_id),
+    constraint lot_region_region_id_fk
+        foreign key (region_id) references region (region_id)
 );
 
 create table bid
@@ -156,11 +164,11 @@ create table cart_item
 
 create table lot_image
 (
-    image_id    int auto_increment
+    image_id   int auto_increment
         primary key,
-    lot_id      int                  not null,
-    image_value blob                 not null,
-    main_image  tinyint(1) default 0 not null,
+    lot_id     int                  not null,
+    image_path varchar(256)         not null,
+    main_image tinyint(1) default 0 not null,
     constraint lot_image_fk0
         foreign key (lot_id) references lot (lot_id)
             on delete cascade

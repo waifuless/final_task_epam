@@ -1,6 +1,5 @@
 package by.epam.finaltask.model;
 
-import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,24 +71,24 @@ public class Images implements DaoEntity<Images> {
     public static class Image implements DaoEntity<Image> {
 
         private final long id;
-        private final Blob value;
+        private final String path;
 
-        public Image(Blob value) {
+        public Image(String path) {
             this.id = -1;
-            this.value = value;
+            this.path = path;
         }
 
-        public Image(long id, Blob value) {
+        public Image(long id, String path) {
             this.id = id;
-            this.value = value;
+            this.path = path;
         }
 
         public long getId() {
             return id;
         }
 
-        public Blob getValue() {
-            return value;
+        public String getPath() {
+            return path;
         }
 
         @Override
@@ -100,13 +99,13 @@ public class Images implements DaoEntity<Images> {
             Image image = (Image) o;
 
             if (id != image.id) return false;
-            return value != null ? value.equals(image.value) : image.value == null;
+            return path != null ? path.equals(image.path) : image.path == null;
         }
 
         @Override
         public int hashCode() {
             int result = (int) (id ^ (id >>> 32));
-            result = 31 * result + (value != null ? value.hashCode() : 0);
+            result = 31 * result + (path != null ? path.hashCode() : 0);
             return result;
         }
 
@@ -114,13 +113,13 @@ public class Images implements DaoEntity<Images> {
         public String toString() {
             return "Image{" +
                     "id=" + id +
-                    ", value=" + value +
+                    ", path='" + path + '\'' +
                     '}';
         }
 
         @Override
         public Image createWithId(long id) {
-            return new Image(id, value);
+            return new Image(id, path);
         }
     }
 }

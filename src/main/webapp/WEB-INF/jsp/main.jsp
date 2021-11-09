@@ -1,3 +1,4 @@
+<jsp:useBean id="lots" scope="request" type="java.util.List<by.epam.finaltask.model.LotWithImages>"/>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
@@ -82,91 +83,32 @@
 
 
         <h2 style="border-bottom: 1px solid green; margin-top: 30px">Все товары</h2>
+
         <div class="row mt-4">
-            <a href="html/page2.html" class="container__row__a col-12 col-lg-6 mb-3 mb-3">
-                <div class="card " style="max-width: 540px;">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="images/dollar-symbol-large.png" class="img-fluid rounded-start" alt="...">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">Жопа новогодняя</h5>
-                                <p class="card-text category">Одежда</p>
-                                <p class="card-text auction-type">Тип аукциона: прямой</p>
-                                <p class="card-text region">Регион: Минск</p>
-                                <p class="card-text address">Адрес: ул.Зопы д.2 кв.2</p>
-                                <p class="card-text initial-price">Начальная цена: 800000р</p>
-                                <p class="card-text auction-start"><small class="text-muted">Начало аукциона:
-                                    25.11.2021, 19:00</small></p>
+            <c:forEach var="lot" items="${lots}">
+                <a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=${lot.lotId}"
+                   class="container__row__a col-12 col-lg-6 mb-3 mb-3">
+                    <div class="card " style="max-width: 540px;">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="${lot.images.mainImage.path}" class="img-fluid rounded-start" alt="...">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">${lot.title}</h5>
+                                    <p class="card-text category">${lot.category}</p>
+                                    <p class="card-text auction-type">Тип аукциона: ${lot.auctionType}</p>
+                                    <p class="card-text region">Регион: ${lot.region}</p>
+                                    <p class="card-text address">Город(район): ${lot.cityOrDistrict}</p>
+                                    <p class="card-text initial-price">Начальная цена: ${lot.initialPrice}</p>
+                                    <p class="card-text auction-start"><small class="text-muted">Начало аукциона:
+                                            ${lot.startDatetime}</small></p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </a>
-            <a href="html/page2.html" class="container__row__a col-12 col-lg-6 mb-3 mb-3">
-                <div class="card " style="max-width: 540px;">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="images/dollar-symbol-large.png" class="img-fluid rounded-start" alt="...">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">Жопа новогодняя</h5>
-                                <p class="card-text category">Одежда</p>
-                                <p class="card-text auction-type">Тип аукциона: прямой</p>
-                                <p class="card-text region">Регион: Минск</p>
-                                <p class="card-text address">Адрес: ул.Зопы д.2 кв.2</p>
-                                <p class="card-text initial-price">Начальная цена: 800000р</p>
-                                <p class="card-text auction-start"><small class="text-muted">Начало аукциона:
-                                    25.11.2021, 19:00</small></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-            <a href="html/page2.html" class="container__row__a col-12 col-lg-6 mb-3 mb-3">
-                <div class="card " style="max-width: 540px;">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="images/dollar-symbol-large.png" class="img-fluid rounded-start" alt="...">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">Жопа новогодняя</h5>
-                                <p class="card-text category">Одежда</p>
-                                <p class="card-text auction-type">Тип аукциона: прямой</p>
-                                <p class="card-text region">Регион: Минск</p>
-                                <p class="card-text address">Адрес: ул.Зопы д.2 кв.2</p>
-                                <p class="card-text initial-price">Начальная цена: 800000р</p>
-                                <p class="card-text auction-start"><small class="text-muted">Начало аукциона:
-                                    25.11.2021, 19:00</small></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-            <a href="html/page2.html" class="container__row__a col-12 col-lg-6 mb-3 mb-3">
-                <div class="card " style="max-width: 540px;">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="images/dollar-symbol-large.png" class="img-fluid rounded-start" alt="...">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">Жопа новогодняя</h5>
-                                <p class="card-text category">Одежда</p>
-                                <p class="card-text auction-type">Тип аукциона: прямой</p>
-                                <p class="card-text region">Регион: Минск</p>
-                                <p class="card-text address">Адрес: ул.Зопы д.2 кв.2</p>
-                                <p class="card-text initial-price">Начальная цена: 800000р</p>
-                                <p class="card-text auction-start"><small class="text-muted">Начало аукциона:
-                                    25.11.2021, 19:00</small></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
+                </a>
+            </c:forEach>
         </div>
     </div>
 

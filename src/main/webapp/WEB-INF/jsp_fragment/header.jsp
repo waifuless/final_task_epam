@@ -3,7 +3,7 @@
 <header style="background-color: #e3f2fd;">
   <nav class="container-lg navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" href="${pageContext.request.contextPath}/ControllerServlet?command=show_main_page">
         <img src="images/dollar-symbol-large.png" alt="" width="30" height="24"
              class="d-inline-block align-text-top">
         Auction
@@ -16,10 +16,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Главная</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Категории</a>
+            <a class="nav-link active" aria-current="page" href="${pageContext.request.contextPath}/ControllerServlet?command=show_main_page">Главная</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Личный кабинет</a>
@@ -34,11 +31,7 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="#">Помощь</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="#">Выйти</a></li>
+              <li><a class="dropdown-item" href="#">Информация</a></li>
             </ul>
           </li>
         </ul>

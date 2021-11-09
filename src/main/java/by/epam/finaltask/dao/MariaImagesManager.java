@@ -19,17 +19,17 @@ public class MariaImagesManager implements ImagesManager {
 
     private final static String ROWS_COUNT_COLUMN = "rows_count";
     private final static String IMAGE_ID_COLUMN = "image_id";
-    private final static String IMAGE_VALUE_COLUMN = "image_value";
+    private final static String IMAGE_PATH_COLUMN = "image_path";
     private final static String MAIN_IMAGE_COLUMN = "main_image";
     private final static String LOT_ID_COLUMN = "lot_id";
     private final static String SAVE_IMAGE =
             "INSERT INTO lot_image(lot_id, image_path, main_image) VALUES(?, ?, ?);" +
                     "SELECT LAST_INSERT_ID() AS image_id;";
     private final static String FIND_IMAGE_QUERY =
-            "SELECT lot_id AS lot_id, image_value AS image_value, main_image AS main_image FROM lot_image" +
+            "SELECT lot_id AS lot_id, image_path AS image_path, main_image AS main_image FROM lot_image" +
                     " WHERE image_id=?;";
     private final static String FIND_ALL_LOT_IMAGES_QUERY =
-            "SELECT image_id AS image_id, image_path AS image_value, main_image AS main_image FROM lot_image" +
+            "SELECT image_id AS image_id, image_path AS image_path, main_image AS main_image FROM lot_image" +
                     " WHERE lot_id=?;";
     private final static String UPDATE_IMAGE_QUERY =
             "UPDATE lot_image SET image_path = ?" +
@@ -57,10 +57,10 @@ public class MariaImagesManager implements ImagesManager {
         return instance;
     }
 
-    void prepareSaveStatement(PreparedStatement statement, long lotId, Blob imageValue, boolean mainImage)
+    void prepareSaveStatement(PreparedStatement statement, long lotId, String imagePath, boolean mainImage)
             throws SQLException {
         statement.setLong(1, lotId);
-        statement.setBlob(2, imageValue);
+        statement.setString(2, imagePath);
         statement.setBoolean(3, mainImage);
     }
 
@@ -70,14 +70,14 @@ public class MariaImagesManager implements ImagesManager {
             PreparedStatement statement = connection.prepareStatement(SAVE_IMAGE);
             final long lotId = images.getLotId();
 
-            prepareSaveStatement(statement, lotId, images.getMainImage().getValue(), true);
+            prepareSaveStatement(statement, lotId, images.getMainImage().getPath(), true);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 Image savedMainImage = images.getMainImage().createWithId(resultSet.getLong(IMAGE_ID_COLUMN));
 
                 List<Image> otherSavedImages = new ArrayList<>();
                 for (Image image : images.getOtherImages()) {
-                    prepareSaveStatement(statement, lotId, image.getValue(), false);
+                    prepareSaveStatement(statement, lotId, image.getPath(), false);
                     resultSet = statement.executeQuery();
                     resultSet.next();
                     otherSavedImages.add(image.createWithId(resultSet.getLong(IMAGE_ID_COLUMN)));
@@ -106,7 +106,7 @@ public class MariaImagesManager implements ImagesManager {
             List<Image> otherImages = new ArrayList<>();
             Image newImage;
             while (resultSet.next()) {
-                newImage = new Image(resultSet.getLong(IMAGE_ID_COLUMN), resultSet.getBlob(IMAGE_VALUE_COLUMN));
+                newImage = new Image(resultSet.getLong(IMAGE_ID_COLUMN), resultSet.getString(IMAGE_PATH_COLUMN));
                 if (resultSet.getBoolean(MAIN_IMAGE_COLUMN)) {
                     mainImage = newImage;
                 } else {
@@ -136,7 +136,7 @@ public class MariaImagesManager implements ImagesManager {
             allImages.add(images.getMainImage());
             statement.setLong(3, images.getLotId());
             for (Image image : allImages) {
-                statement.setBlob(1, image.getValue());
+                statement.setString(1, image.getPath());
                 statement.setLong(2, image.getId());
                 statement.execute();
             }

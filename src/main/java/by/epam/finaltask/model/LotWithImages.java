@@ -7,21 +7,28 @@ public class LotWithImages extends Lot {
 
     private final Images images;
 
-    public LotWithImages(long ownerId, String category, AuctionType auctionType, String title,
-                         Timestamp startDatetime, Timestamp endDatetime, BigDecimal initialPrice, String originPlace,
+    public LotWithImages(long ownerId, String category, AuctionType auctionType, String title, Timestamp startDatetime,
+                         Timestamp endDatetime, BigDecimal initialPrice, String region, String cityOrDistrict,
                          String description, AuctionStatus auctionStatus, ProductCondition productCondition,
                          Images images) {
-        super(ownerId, category, auctionType, title, startDatetime, endDatetime, initialPrice, originPlace,
-                description, auctionStatus, productCondition);
+        super(ownerId, category, auctionType, title, startDatetime, endDatetime, initialPrice, region,
+                cityOrDistrict, description, auctionStatus, productCondition);
         this.images = images;
     }
 
     public LotWithImages(long lotId, long ownerId, String category, AuctionType auctionType, String title,
-                         Timestamp startDatetime, Timestamp endDatetime, BigDecimal initialPrice, String originPlace,
-                         String description, AuctionStatus auctionStatus, ProductCondition productCondition,
-                         Images images) {
-        super(lotId, ownerId, category, auctionType, title, startDatetime, endDatetime, initialPrice, originPlace,
-                description, auctionStatus, productCondition);
+                         Timestamp startDatetime, Timestamp endDatetime, BigDecimal initialPrice, String region,
+                         String cityOrDistrict, String description, AuctionStatus auctionStatus,
+                         ProductCondition productCondition, Images images) {
+        super(lotId, ownerId, category, auctionType, title, startDatetime, endDatetime, initialPrice, region,
+                cityOrDistrict, description, auctionStatus, productCondition);
+        this.images = images;
+    }
+
+    public LotWithImages(Lot lot, Images images){
+        super(images.getLotId(), lot.getOwnerId(), lot.getCategory(), lot.getAuctionType(), lot.getTitle(),
+                lot.getStartDatetime(), lot.getEndDatetime(), lot.getInitialPrice(), lot.getRegion(),
+                lot.getCityOrDistrict(), lot.getDescription(), lot.getAuctionStatus(), lot.getProductCondition());
         this.images = images;
     }
 
@@ -58,7 +65,7 @@ public class LotWithImages extends Lot {
     @Override
     public LotWithImages createWithId(long id) {
         return new LotWithImages(id, getOwnerId(), getCategory(), getAuctionType(), getTitle(), getStartDatetime(),
-                getEndDatetime(), getInitialPrice(), getOriginPlace(), getDescription(), getAuctionStatus(),
-                getProductCondition(), images);
+                getEndDatetime(), getInitialPrice(), getRegion(), getCityOrDistrict(), getDescription(),
+                getAuctionStatus(), getProductCondition(), images);
     }
 }

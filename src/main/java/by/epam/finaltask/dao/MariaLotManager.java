@@ -28,25 +28,31 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     private final static String START_DATETIME_COLUMN = "start_datetime";
     private final static String END_DATETIME = "end_datetime";
     private final static String INITIAL_PRICE_COLUMN = "initial_price";
-    private final static String ORIGIN_PLACE_COLUMN = "origin_place";
+    private final static String REGION_NAME_COLUMN = "region_name";
+    private final static String CITY_OR_DISTRICT_NAME_COLUMN = "city_or_district_name";
     private final static String DESCRIPTION_COLUMN = "description";
     private final static String AUCTION_STATUS_NAME_COLUMN = "auction_status_name";
     private final static String PRODUCT_CONDITION_NAME_COLUMN = "product_condition_name";
     private final static String TABLE_NAME = "lot";
     private final static String SAVE_LOT_QUERY =
             "INSERT INTO lot(owner_id, category_id, auction_type_id, title, start_datetime, end_datetime," +
-                    " initial_price, origin_place, description, auction_status_id, product_condition_id)" +
-                    " VALUES(?, findCategoryId(?), findAuctionTypeId(?), ?, ?, ?, ?, ?, ?, findAuctionStatusId(?)," +
+                    " initial_price, region_id, city_or_district_id, description, auction_status_id," +
+                    " product_condition_id)" +
+                    " VALUES(?, findCategoryId(?), findAuctionTypeId(?), ?, ?, ?, ?, findRegionId(?)," +
+                    " findCityOrDistrictId(?), ?, findAuctionStatusId(?)," +
                     " findProductConditionId(?));";
     private final static String FIND_ALL_LOTS_QUERY =
             "SELECT lot.lot_id AS lot_id, owner_id AS owner_id, category.category_name AS category_name," +
                     " auction_type.type_name" +
                     " AS auction_type_name, title AS title, start_datetime AS start_datetime," +
-                    " end_datetime AS end_datetime, initial_price AS initial_price, origin_place AS origin_place," +
+                    " end_datetime AS end_datetime, initial_price AS initial_price, region_name AS region_name," +
+                    " city_or_district_name AS city_or_district_name," +
                     " description AS description, auction_status.status_name AS auction_status_name," +
                     " pc.product_condition_name AS product_condition_name FROM lot" +
                     " INNER JOIN category ON lot.category_id = category.category_id" +
                     " INNER JOIN auction_type ON lot.auction_type_id = auction_type.type_id" +
+                    " INNER JOIN region r on lot.region_id = r.region_id" +
+                    " INNER JOIN city_or_district c on lot.city_or_district_id = c.city_or_district_id" +
                     " INNER JOIN auction_status ON lot.auction_status_id = auction_status.status_id" +
                     " INNER JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id";
     private final static String FIND_LOT_BY_ID_QUERY = FIND_ALL_LOTS_QUERY + " WHERE lot.lot_id=?;";
@@ -60,7 +66,8 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
     private final static String UPDATE_LOT_QUERY =
             "UPDATE lot SET owner_id = ?, category_id = findCategoryId(?), auction_type_id = findAuctionTypeId(?)," +
-                    " title = ?, start_datetime = ?, end_datetime = ?, initial_price = ?, origin_place = ?," +
+                    " title = ?, start_datetime = ?, end_datetime = ?, initial_price = ?, region_id = findRegionId(?)," +
+                    " city_or_district_id = findCityOrDistrictId(?)," +
                     " description = ?, auction_status_id = findAuctionStatusId(?)," +
                     " product_condition_id = findProductConditionId(?)" +
                     " WHERE lot_id = ?";
@@ -94,10 +101,11 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
         statement.setTimestamp(5, lot.getStartDatetime());
         statement.setTimestamp(6, lot.getEndDatetime());
         statement.setBigDecimal(7, lot.getInitialPrice());
-        statement.setString(8, lot.getOriginPlace());
-        statement.setString(9, lot.getDescription());
-        statement.setString(10, lot.getAuctionStatus().name());
-        statement.setString(11, lot.getProductCondition().name());
+        statement.setString(8, lot.getRegion());
+        statement.setString(9, lot.getCityOrDistrict());
+        statement.setString(10, lot.getDescription());
+        statement.setString(11, lot.getAuctionStatus().name());
+        statement.setString(12, lot.getProductCondition().name());
     }
 
     @Override
@@ -110,10 +118,11 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
         statement.setTimestamp(6, lot.getStartDatetime());
         statement.setTimestamp(7, lot.getEndDatetime());
         statement.setBigDecimal(8, lot.getInitialPrice());
-        statement.setString(9, lot.getOriginPlace());
-        statement.setString(10, lot.getDescription());
-        statement.setString(11, lot.getAuctionStatus().name());
-        statement.setString(12, lot.getProductCondition().name());
+        statement.setString(9, lot.getRegion());
+        statement.setString(10, lot.getCityOrDistrict());
+        statement.setString(11, lot.getDescription());
+        statement.setString(12, lot.getAuctionStatus().name());
+        statement.setString(13, lot.getProductCondition().name());
     }
 
     @Override
@@ -127,7 +136,8 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     resultSet.getTimestamp(START_DATETIME_COLUMN),
                     resultSet.getTimestamp(END_DATETIME),
                     resultSet.getBigDecimal(INITIAL_PRICE_COLUMN),
-                    resultSet.getString(ORIGIN_PLACE_COLUMN),
+                    resultSet.getString(REGION_NAME_COLUMN),
+                    resultSet.getString(CITY_OR_DISTRICT_NAME_COLUMN),
                     resultSet.getString(DESCRIPTION_COLUMN),
                     AuctionStatus.valueOf(resultSet.getString(AUCTION_STATUS_NAME_COLUMN)),
                     ProductCondition.valueOf(resultSet.getString(PRODUCT_CONDITION_NAME_COLUMN)));
@@ -173,7 +183,6 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             PreparedStatement statement = connection.prepareStatement(query);
             preparator.accept(statement);
             ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
             return extractAll(resultSet);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);

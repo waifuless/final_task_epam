@@ -13,8 +13,9 @@ import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-public class ShowMainPageCommand implements Command {
+public class ShowLotPageCommand implements Command {
 
     private final static Logger LOG = LogManager.getLogger(ShowLotPageCommand.class);
 
@@ -23,22 +24,27 @@ public class ShowMainPageCommand implements Command {
 
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
 
-    ShowMainPageCommand() {
+    ShowLotPageCommand() {
     }
 
     @Override
     public CommandResponse execute(CommandRequest request) {
-        String pageNumberParam = request.getParameter("pageNum");
         try {
-            //todo:validation
-            int pageNumber = pageNumberParam==null ? 1 : Integer.parseInt(pageNumberParam);
-            request.setAttribute("lots", lotService.findLotsByPage(pageNumber));
-        }catch (Exception ex) {
+            //todo: validate parsing string to int
+            int lot_id = Integer.parseInt(request.getParameter("lot_id"));
+            Optional<LotWithImages> optionalLotWithImages = lotService.findLot(lot_id);
+            if (optionalLotWithImages.isPresent()){
+                request.setAttribute("lot", optionalLotWithImages.get());
+            }else{
+                //todo: remake
+                throw new RuntimeException();
+            }
+            return new CommandResponse(false, PagePath.LOT.getPath());
+        } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
             request.setAttribute("errorMessage", ex.getMessage());
             return new CommandResponse(false, PagePath.ERROR.getPath());
         }
-        return new CommandResponse(false, PagePath.MAIN.getPath());
     }
 
     @Override
