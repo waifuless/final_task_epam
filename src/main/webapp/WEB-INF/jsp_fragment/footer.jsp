@@ -9,7 +9,6 @@
             <li class="nav-item"><a href="#" class="nav-link px-2 text-muted"><fmt:message bundle="${footerLoc}" key="cart"/></a></li>
             <li class="nav-item"><a href="#" class="nav-link px-2 text-muted"><fmt:message bundle="${footerLoc}" key="help"/></a></li>
             <li class="nav-item"><a href="#" class="nav-link px-2 text-muted"><fmt:message bundle="${footerLoc}" key="info"/></a></li>
-<%--            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">About</a></li>--%>
         </ul>
         <p class="text-center text-muted">&copy; All rights belong to Vova</p>
     </footer>
