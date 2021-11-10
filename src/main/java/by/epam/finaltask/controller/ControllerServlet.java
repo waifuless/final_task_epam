@@ -19,6 +19,8 @@ public class ControllerServlet extends HttpServlet {
 
     private final static Logger LOG = LogManager.getLogger(ControllerServlet.class);
 
+    private final static String OPERATION_NOT_FOUND_MCG = "Operation %s not found";
+
     private final CommandFactory commandFactory = CommandFactory.getInstance();
 
     @Override
@@ -40,7 +42,8 @@ public class ControllerServlet extends HttpServlet {
                 throw new InvalidArgumentException("command does not exist");
             }
             Command command = commandFactory.findCommand(requestedCommand)
-                    .orElseThrow(OperationNotSupportedException::new);
+                    .orElseThrow(() -> new OperationNotSupportedException
+                            (String.format(OPERATION_NOT_FOUND_MCG, requestedCommand)));
             CommandResponse commandResponse = command.execute(new CommandRequest(request));
             if (commandResponse.isRedirect()) {
                 response.sendRedirect(commandResponse.getPath());

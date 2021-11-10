@@ -1,12 +1,15 @@
 <jsp:useBean id="lots" scope="request" type="java.util.List<by.epam.finaltask.model.LotWithImages>"/>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
+
+<fmt:setLocale value="${cookie.get('lang').value}"/>
+<fmt:setBundle basename="l10n.page.main" var="loc"/>
 <html>
 <head>
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="images/dollar-symbol.png" type="image/x-icon">
-    <title>Auction</title>
+    <title><fmt:message bundle="${loc}" key="head.title"/></title>
     <script src="js/jquery-3.6.0.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
@@ -23,10 +26,10 @@
 
     <div class="container-lg">
 
-        <h2 style="border-bottom: 1px solid green; margin-top: 30px">Фильтры</h2>
+        <h2 style="border-bottom: 1px solid green; margin-top: 30px"><fmt:message bundle="${loc}" key="container.filters.header"/></h2>
         <div class="row mt-4">
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="auction-type-filter">Тип аукциона</label>
+                <label class="mb-2" for="auction-type-filter"><fmt:message bundle="${loc}" key="container.filter.label.auction_type"/></label>
                 <select id="auction-type-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любой</option>
                     <option value="1">Прямой</option>
@@ -34,7 +37,7 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="category-filter">Категория</label>
+                <label class="mb-2" for="category-filter"><fmt:message bundle="${loc}" key="container.filter.label.category"/></label>
                 <select id="category-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любая</option>
                     <option value="1">One</option>
@@ -43,7 +46,7 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="region-filter">Регион</label>
+                <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}" key="container.filter.label.region"/></label>
                 <select id="region-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любой</option>
                     <option value="1">One</option>
@@ -52,7 +55,7 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="city-filter">Город</label>
+                <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}" key="container.filter.label.city"/></label>
                 <select id="city-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любой</option>
                     <option value="1">One</option>
@@ -61,7 +64,7 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="condition-filter">Состояние</label>
+                <label class="mb-2" for="condition-filter"><fmt:message bundle="${loc}" key="container.filter.label.condition"/></label>
                 <select id="condition-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любое</option>
                     <option value="1">One</option>
@@ -70,19 +73,19 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="price-filter">Цена</label>
+                <label class="mb-2" for="price-filter"><fmt:message bundle="${loc}" key="container.filter.label.price"/></label>
                 <div id="price-filter" class="input-group">
                     <input type="text" aria-label="from" class="form-control" placeholder="от" id="price-from">
                     <input type="text" aria-label="to" class="form-control" placeholder="до" id="price-to">
                 </div>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
-                <button type="button" class="btn btn-success w-100">Применить</button>
+                <button type="button" class="btn btn-success w-100"><fmt:message bundle="${loc}" key="container.filters.apply"/></button>
             </div>
         </div>
 
 
-        <h2 style="border-bottom: 1px solid green; margin-top: 30px">Все товары</h2>
+        <h2 style="border-bottom: 1px solid green; margin-top: 30px"><fmt:message bundle="${loc}" key="container.lots.header"/></h2>
 
         <div class="row mt-4">
             <c:forEach var="lot" items="${lots}">
@@ -97,11 +100,11 @@
                                 <div class="card-body">
                                     <h5 class="card-title">${lot.title}</h5>
                                     <p class="card-text category">${lot.category}</p>
-                                    <p class="card-text auction-type">Тип аукциона: ${lot.auctionType}</p>
-                                    <p class="card-text region">Регион: ${lot.region}</p>
-                                    <p class="card-text address">Город(район): ${lot.cityOrDistrict}</p>
-                                    <p class="card-text initial-price">Начальная цена: ${lot.initialPrice}</p>
-                                    <p class="card-text auction-start"><small class="text-muted">Начало аукциона:
+                                    <p class="card-text auction-type"><fmt:message bundle="${loc}" key="container.lot.auction_type"/> ${lot.auctionType}</p>
+                                    <p class="card-text region"><fmt:message bundle="${loc}" key="container.lot.region"/> ${lot.region}</p>
+                                    <p class="card-text address"><fmt:message bundle="${loc}" key="container.lot.city"/> ${lot.cityOrDistrict}</p>
+                                    <p class="card-text initial-price"><fmt:message bundle="${loc}" key="container.lot.price"/> ${lot.initialPrice}</p>
+                                    <p class="card-text auction-start"><small class="text-muted"><fmt:message bundle="${loc}" key="container.lot.auction_start_datetime"/>
                                             ${lot.startDatetime}</small></p>
                                 </div>
                             </div>

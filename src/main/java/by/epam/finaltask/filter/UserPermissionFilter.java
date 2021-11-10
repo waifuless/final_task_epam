@@ -30,6 +30,8 @@ public class UserPermissionFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws ServletException, IOException {
 
+        LOG.debug("In permission filter");
+
         final HttpServletRequest request = (HttpServletRequest) req;
         final HttpServletResponse response = (HttpServletResponse) res;
 
