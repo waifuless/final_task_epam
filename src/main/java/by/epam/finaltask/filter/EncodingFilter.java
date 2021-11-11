@@ -19,7 +19,7 @@ public class EncodingFilter implements Filter {
             throws ServletException, IOException {
         LOG.debug("In encoding filter");
         String currentEncoding = request.getCharacterEncoding();
-        if(!COMMON_ENCODING.equalsIgnoreCase(currentEncoding)){
+        if (!COMMON_ENCODING.equalsIgnoreCase(currentEncoding)) {
             request.setCharacterEncoding(COMMON_ENCODING);
             response.setCharacterEncoding(COMMON_ENCODING);
         }

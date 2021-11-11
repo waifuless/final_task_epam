@@ -1,9 +1,8 @@
 package by.epam.finaltask.filter;
 
-import by.epam.finaltask.command.Command;
-import by.epam.finaltask.command.CommandFactory;
-import by.epam.finaltask.controller.PagePath;
-import by.epam.finaltask.controller.UserSessionAttribute;
+import by.epam.finaltask.command.UserSessionAttribute;
+import by.epam.finaltask.command.sync_command.SyncCommand;
+import by.epam.finaltask.command.sync_command.SyncCommandFactory;
 import by.epam.finaltask.model.Role;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
@@ -24,7 +23,7 @@ public class UserPermissionFilter implements Filter {
     private final static int FORBIDDEN_STATUS_CODE = 403;
     private final static String BAD_REQUEST_MCG = "Command {} does not exist";
     private final static int BAD_REQUEST_STATUS_CODE = 400;
-    private final CommandFactory commandFactory = CommandFactory.getInstance();
+    private final SyncCommandFactory syncCommandFactory = SyncCommandFactory.getInstance();
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -38,9 +37,9 @@ public class UserPermissionFilter implements Filter {
         final Role userRole = getCurrentRole(request);
 
         String commandName = request.getParameter("command");
-        Optional<Command> optionalCommand = commandFactory.findCommand(commandName);
+        Optional<SyncCommand> optionalCommand = syncCommandFactory.findCommand(commandName);
 
-        if(!optionalCommand.isPresent() ){
+        if (!optionalCommand.isPresent()) {
             LOG.warn(BAD_REQUEST_MCG, commandName);
             response.sendError(BAD_REQUEST_STATUS_CODE);
             return;

@@ -1,9 +1,7 @@
 package by.epam.finaltask.service;
 
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
-import by.epam.finaltask.model.Lot;
 import by.epam.finaltask.model.LotWithImages;
-import by.epam.finaltask.model.User;
 
 import java.util.List;
 import java.util.Optional;

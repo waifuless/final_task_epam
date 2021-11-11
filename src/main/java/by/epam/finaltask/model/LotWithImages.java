@@ -25,7 +25,7 @@ public class LotWithImages extends Lot {
         this.images = images;
     }
 
-    public LotWithImages(Lot lot, Images images){
+    public LotWithImages(Lot lot, Images images) {
         super(images.getLotId(), lot.getOwnerId(), lot.getCategory(), lot.getAuctionType(), lot.getTitle(),
                 lot.getStartDatetime(), lot.getEndDatetime(), lot.getInitialPrice(), lot.getRegion(),
                 lot.getCityOrDistrict(), lot.getDescription(), lot.getAuctionStatus(), lot.getProductCondition());

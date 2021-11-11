@@ -1,6 +1,6 @@
-package by.epam.finaltask.controller;
+package by.epam.finaltask.command;
 
-import by.epam.finaltask.command.CommandFactory;
+import by.epam.finaltask.command.sync_command.SyncCommandFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -17,8 +17,8 @@ public class CommandRequest {
         commandPathTemplate = request.getContextPath() + request.getServletPath() + "?command=%s";
     }
 
-    public String createCommandPath(CommandFactory.CommandVariant commandVariant) {
-        return String.format(commandPathTemplate, commandVariant.getCommandName());
+    public String createCommandPath(SyncCommandFactory.SyncCommandVariant syncCommandVariant) {
+        return String.format(commandPathTemplate, syncCommandVariant.getCommandName());
     }
 
     public HttpSession createSession() {

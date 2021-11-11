@@ -1,11 +1,11 @@
-package by.epam.finaltask.controller;
+package by.epam.finaltask.command;
 
-public class CommandResponse {
+public class SyncCommandResponse {
 
     private final boolean isRedirect;
     private final String path;
 
-    public CommandResponse(boolean isRedirect, String path) {
+    public SyncCommandResponse(boolean isRedirect, String path) {
         this.isRedirect = isRedirect;
         this.path = path;
     }

@@ -1,7 +1,7 @@
-package by.epam.finaltask.command;
+package by.epam.finaltask.command.sync_command;
 
-import by.epam.finaltask.controller.CommandRequest;
-import by.epam.finaltask.controller.CommandResponse;
+import by.epam.finaltask.command.CommandRequest;
+import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.controller.PagePath;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.RegisterError;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class RegisterCommand implements Command {
+public class RegisterCommand implements SyncCommand {
 
     private final static Logger LOG = LogManager.getLogger(RegisterCommand.class);
     private final static String COMMON_ERROR_MCG = "Exception while register user";
@@ -26,7 +26,7 @@ public class RegisterCommand implements Command {
     }
 
     @Override
-    public CommandResponse execute(CommandRequest request) {
+    public SyncCommandResponse execute(CommandRequest request) {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String passwordRepeat = request.getParameter("passwordRepeat");
@@ -37,14 +37,14 @@ public class RegisterCommand implements Command {
                     request.setAttribute("email", email);
                 }
                 setErrorAttributes(errors, request);
-                return new CommandResponse(false, PagePath.REGISTRATION.getPath());
+                return new SyncCommandResponse(false, PagePath.REGISTRATION.getPath());
             }
-            return new CommandResponse(true, request
-                    .createCommandPath(CommandFactory.CommandVariant.SHOW_SIGN_IN));
+            return new SyncCommandResponse(true, request
+                    .createCommandPath(SyncCommandFactory.SyncCommandVariant.SHOW_SIGN_IN));
         } catch (Exception ex) {
             LOG.warn(COMMON_ERROR_MCG, ex);
             request.setAttribute("errorMessage", COMMON_ERROR_MCG);
-            return new CommandResponse(false, PagePath.ERROR.getPath());
+            return new SyncCommandResponse(false, PagePath.ERROR.getPath());
         }
     }
 

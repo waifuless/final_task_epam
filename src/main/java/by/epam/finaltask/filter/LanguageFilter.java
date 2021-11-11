@@ -26,7 +26,7 @@ public class LanguageFilter implements Filter {
         Cookie[] cookies = ((HttpServletRequest) request).getCookies();
         if (cookies == null || Arrays.stream(cookies).noneMatch(this::isLanguageCookie)) {
             LOG.debug("lang cookie not found");
-            addDefaultLanguageCookie((HttpServletResponse)response);
+            addDefaultLanguageCookie((HttpServletResponse) response);
         }
         chain.doFilter(request, response);
     }
@@ -35,7 +35,7 @@ public class LanguageFilter implements Filter {
         return cookie.getName().equals(LANGUAGE_COOKIE_NAME);
     }
 
-    private void addDefaultLanguageCookie(HttpServletResponse response){
+    private void addDefaultLanguageCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie(LANGUAGE_COOKIE_NAME, DEFAULT_LANGUAGE);
         response.addCookie(cookie);
     }

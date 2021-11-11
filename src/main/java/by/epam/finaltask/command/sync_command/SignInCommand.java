@@ -1,9 +1,9 @@
-package by.epam.finaltask.command;
+package by.epam.finaltask.command.sync_command;
 
-import by.epam.finaltask.controller.CommandRequest;
-import by.epam.finaltask.controller.CommandResponse;
+import by.epam.finaltask.command.CommandRequest;
+import by.epam.finaltask.command.SyncCommandResponse;
+import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.controller.PagePath;
-import by.epam.finaltask.controller.UserSessionAttribute;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.model.User;
 import by.epam.finaltask.service.CommonUserService;
@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class SignInCommand implements Command {
+public class SignInCommand implements SyncCommand {
 
     private final static Logger LOG = LogManager.getLogger(CommonUserService.class);
 
@@ -33,22 +33,22 @@ public class SignInCommand implements Command {
     }
 
     @Override
-    public CommandResponse execute(CommandRequest request) {
+    public SyncCommandResponse execute(CommandRequest request) {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         try {
             Optional<User> optionalUser = userService.authenticate(email, password);
             if (optionalUser.isPresent()) {
                 SignInUser(optionalUser.get(), request);
-                return new CommandResponse(true, PagePath.START_PAGE.getPath());
+                return new SyncCommandResponse(true, PagePath.START_PAGE.getPath());
             } else {
                 request.setAttribute(ERROR_ATTRIBUTE_NAME, CAN_NOT_SIGN_IN_MCG);
-                return new CommandResponse(false, PagePath.SIGN_IN.getPath());
+                return new SyncCommandResponse(false, PagePath.SIGN_IN.getPath());
             }
         } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
             request.setAttribute("errorMessage", ex.getMessage());
-            return new CommandResponse(false, PagePath.ERROR.getPath());
+            return new SyncCommandResponse(false, PagePath.ERROR.getPath());
         }
     }
 

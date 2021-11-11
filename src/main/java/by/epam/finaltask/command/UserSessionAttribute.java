@@ -1,4 +1,4 @@
-package by.epam.finaltask.controller;
+package by.epam.finaltask.command;
 
 public enum UserSessionAttribute {
     USER_ID,
