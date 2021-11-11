@@ -25,13 +25,13 @@ public class HandlerFactory {
     }
 
     public CommandHandler find(HttpServletRequest request) {
-        boolean requestIsAjax = isRequestAjax(request.getParameter("requestIsAjax"));
+        boolean requestIsAjax = isRequestAjax(request);
         return commandHandlers.computeIfAbsent(requestIsAjax, this::createHandler);
     }
 
-    private boolean isRequestAjax(String requestIsAjaxParam) {
+    public boolean isRequestAjax(HttpServletRequest request) {
         try {
-            return Boolean.parseBoolean(requestIsAjaxParam);
+            return Boolean.parseBoolean(request.getParameter("requestIsAjax"));
         } catch (Exception ex) {
             return false;
         }

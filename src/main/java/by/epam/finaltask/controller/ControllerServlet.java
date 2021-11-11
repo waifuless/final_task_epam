@@ -3,6 +3,7 @@ package by.epam.finaltask.controller;
 import by.epam.finaltask.command.handler.CommandHandler;
 import by.epam.finaltask.command.handler.HandlerFactory;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-//@MultipartConfig
+@MultipartConfig
 @WebServlet(name = "ControllerServlet", value = "/ControllerServlet")
 public class ControllerServlet extends HttpServlet {
 

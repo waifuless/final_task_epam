@@ -17,10 +17,11 @@ import java.io.IOException;
 public class SyncCommandHandler implements CommandHandler {
 
     private final static Logger LOG = LogManager.getLogger(SyncCommandHandler.class);
-
     private final static String OPERATION_NOT_FOUND_MCG = "Operation %s not found";
 
     private final SyncCommandFactory syncCommandFactory = SyncCommandFactory.getInstance();
+
+    SyncCommandHandler(){}
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

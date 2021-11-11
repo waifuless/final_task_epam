@@ -18,10 +18,11 @@ import java.io.PrintWriter;
 public class AjaxCommandHandler implements CommandHandler {
 
     private final static Logger LOG = LogManager.getLogger(AjaxCommandHandler.class);
-
     private final static String OPERATION_NOT_FOUND_MCG = "Operation %s not found";
 
     private final AjaxCommandFactory ajaxCommandFactory = AjaxCommandFactory.getInstance();
+
+    AjaxCommandHandler(){}
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
