@@ -1,6 +1,12 @@
 <jsp:useBean id="lot" scope="request" type="by.epam.finaltask.model.LotWithImages"/>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<fmt:setBundle basename="path-to-images-folder" var="imgFolderPath"/>
+
+<fmt:message bundle="${imgFolderPath}" key="folder.context.path" var="imagesFolderContextPath"/>
+
 <html>
 <head>
     <meta charset="UTF-8">
@@ -31,11 +37,11 @@
             <h5>Фотографии</h5>
             <div class="gallery">
                 <div class="lot-image lot-main-image">
-                    <img src="${lot.images.mainImage.path}" alt=""/>
+                    <img src="${imagesFolderContextPath}/${lot.images.mainImage.path}" alt=""/>
                 </div>
                 <c:forEach var="image" items="${lot.images.otherImages}">
                     <div class="lot-image">
-                        <img src="${image.path}" alt=""/>
+                        <img src="${imagesFolderContextPath}/${image.path}" alt=""/>
                     </div>
                 </c:forEach>
             </div>

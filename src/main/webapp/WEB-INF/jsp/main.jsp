@@ -5,6 +5,7 @@
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.main" var="loc"/>
+<fmt:setBundle basename="path-to-images-folder" var="imgFolderPath"/>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -22,14 +23,17 @@
 <body>
 <div class="page-wrapper">
 
-    <%@include file="/WEB-INF/jsp_fragment/header.jsp"%>
+    <%@include file="/WEB-INF/jsp_fragment/header.jsp" %>
 
     <div class="container-lg">
 
-        <h2 style="border-bottom: 1px solid green; margin-top: 30px"><fmt:message bundle="${loc}" key="container.filters.header"/></h2>
+        <h2 style="border-bottom: 1px solid green; margin-top: 30px">
+            <fmt:message bundle="${loc}" key="container.filters.header"/>
+        </h2>
         <div class="row mt-4">
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="auction-type-filter"><fmt:message bundle="${loc}" key="container.filter.label.auction_type"/></label>
+                <label class="mb-2" for="auction-type-filter"><fmt:message bundle="${loc}"
+                                                                           key="container.filter.label.auction_type"/></label>
                 <select id="auction-type-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любой</option>
                     <option value="1">Прямой</option>
@@ -37,7 +41,8 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="category-filter"><fmt:message bundle="${loc}" key="container.filter.label.category"/></label>
+                <label class="mb-2" for="category-filter"><fmt:message bundle="${loc}"
+                                                                       key="container.filter.label.category"/></label>
                 <select id="category-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любая</option>
                     <option value="1">One</option>
@@ -46,7 +51,8 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}" key="container.filter.label.region"/></label>
+                <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}"
+                                                                     key="container.filter.label.region"/></label>
                 <select id="region-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любой</option>
                     <option value="1">One</option>
@@ -55,7 +61,8 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}" key="container.filter.label.city"/></label>
+                <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}"
+                                                                   key="container.filter.label.city"/></label>
                 <select id="city-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любой</option>
                     <option value="1">One</option>
@@ -64,7 +71,8 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="condition-filter"><fmt:message bundle="${loc}" key="container.filter.label.condition"/></label>
+                <label class="mb-2" for="condition-filter"><fmt:message bundle="${loc}"
+                                                                        key="container.filter.label.condition"/></label>
                 <select id="condition-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любое</option>
                     <option value="1">One</option>
@@ -73,19 +81,24 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="price-filter"><fmt:message bundle="${loc}" key="container.filter.label.price"/></label>
+                <label class="mb-2" for="price-filter"><fmt:message bundle="${loc}"
+                                                                    key="container.filter.label.price"/></label>
                 <div id="price-filter" class="input-group">
                     <input type="text" aria-label="from" class="form-control" placeholder="от" id="price-from">
                     <input type="text" aria-label="to" class="form-control" placeholder="до" id="price-to">
                 </div>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
-                <button type="button" class="btn btn-success w-100"><fmt:message bundle="${loc}" key="container.filters.apply"/></button>
+                <button type="button" class="btn btn-success w-100">
+                    <fmt:message bundle="${loc}" key="container.filters.apply"/>
+                </button>
             </div>
         </div>
 
 
-        <h2 style="border-bottom: 1px solid green; margin-top: 30px"><fmt:message bundle="${loc}" key="container.lots.header"/></h2>
+        <h2 style="border-bottom: 1px solid green; margin-top: 30px">
+            <fmt:message bundle="${loc}" key="container.lots.header"/>
+        </h2>
 
         <div class="row mt-4">
             <c:forEach var="lot" items="${lots}">
@@ -94,18 +107,29 @@
                     <div class="card " style="max-width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="${lot.images.mainImage.path}" class="img-fluid rounded-start" alt="...">
+                                <img src="<fmt:message bundle="${imgFolderPath}" key="folder.context.path"/>/${lot.images.mainImage.path}" class="img-fluid rounded-start"
+                                     alt="...">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body">
                                     <h5 class="card-title">${lot.title}</h5>
                                     <p class="card-text category">${lot.category}</p>
-                                    <p class="card-text auction-type"><fmt:message bundle="${loc}" key="container.lot.auction_type"/> ${lot.auctionType}</p>
-                                    <p class="card-text region"><fmt:message bundle="${loc}" key="container.lot.region"/> ${lot.region}</p>
-                                    <p class="card-text address"><fmt:message bundle="${loc}" key="container.lot.city"/> ${lot.cityOrDistrict}</p>
-                                    <p class="card-text initial-price"><fmt:message bundle="${loc}" key="container.lot.price"/> ${lot.initialPrice}</p>
-                                    <p class="card-text auction-start"><small class="text-muted"><fmt:message bundle="${loc}" key="container.lot.auction_start_datetime"/>
-                                            ${lot.startDatetime}</small></p>
+                                    <p class="card-text auction-type">
+                                        <fmt:message bundle="${loc}" key="container.lot.auction_type"/> ${lot.auctionType}
+                                    </p>
+                                    <p class="card-text region">
+                                        <fmt:message bundle="${loc}" key="container.lot.region"/> ${lot.region}
+                                    </p>
+                                    <p class="card-text address">
+                                        <fmt:message bundle="${loc}" key="container.lot.city"/> ${lot.cityOrDistrict}
+                                    </p>
+                                    <p class="card-text initial-price">
+                                        <fmt:message bundle="${loc}" key="container.lot.price"/> ${lot.initialPrice}
+                                    </p>
+                                    <p class="card-text auction-start"><small class="text-muted">
+                                        <fmt:message bundle="${loc}"
+                                                     key="container.lot.auction_start_datetime"/>${lot.startDatetime}</small>
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -119,7 +143,7 @@
     <div class="page-buffer"></div>
 </div>
 
-<%@include file="/WEB-INF/jsp_fragment/footer.jsp"%>
+<%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
 </body>
 </html>
