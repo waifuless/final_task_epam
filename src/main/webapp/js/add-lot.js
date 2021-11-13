@@ -17,24 +17,30 @@ $(document).ready(function () {
             .appendTo(divToFill);
     };
 
+    let saveImageAndPlace = function(file){
+        let formData = new FormData();
+        formData.append( 'imageInput', file);
+        $.ajax({
+            type: 'POST',
+            url: 'ControllerServlet?command=upload_image&requestIsAjax=true',
+            data:formData,
+            cache:false,
+            contentType: false,
+            processData: false,
+            success: function(path) {
+                placeImage(path);
+            },
+            error: function (error){
+                alert(error);
+            }
+        });
+    }
+
     $('#gallery-photo-add-input').on('change', function () {
         if ($('.div__added-image').length < maxImageCount) {
             if (this.files && this.files[0]) {
                 if(validateFile(this.files[0])) {
-                    let input = $('#gallery-photo-add-input')[0];
-                    let formData = new FormData();
-                    formData.append( 'imageInput', input.files[0] );
-                    $.ajax({
-                        type: 'POST',
-                        url: 'ControllerServlet?command=upload_image&requestIsAjax=true',
-                        data:formData,
-                        cache:false,
-                        contentType: false,
-                        processData: false,
-                        success: function(path) {
-                            placeImage(path);
-                        }
-                    });
+                    saveImageAndPlace(this.files[0]);
                 }else{
                     alert("Не допустипый формат или слишком большой размер файла. " +
                         "Допустмые форматы: png, jpeg, jpg, gif");
@@ -62,7 +68,7 @@ $(document).ready(function () {
             dropZone.removeClass('dragover');
             let file = e.originalEvent.dataTransfer.files[0];
             if (validateFile(file)) {
-                loadAndPlaceImage(file);
+                saveImageAndPlace(file);
             }else{
                 alert("Не допустипый формат или слишком большой размер файла. " +
                     "Допустмые форматы: png, jpeg, jpg, gif");
