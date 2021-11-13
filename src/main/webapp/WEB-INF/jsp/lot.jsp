@@ -5,8 +5,6 @@
 
 <fmt:setBundle basename="path-to-images-folder" var="imgFolderPath"/>
 
-<fmt:message bundle="${imgFolderPath}" key="folder.context.path" var="imagesFolderContextPath"/>
-
 <html>
 <head>
     <meta charset="UTF-8">
@@ -37,11 +35,11 @@
             <h5>Фотографии</h5>
             <div class="gallery">
                 <div class="lot-image lot-main-image">
-                    <img src="${imagesFolderContextPath}/${lot.images.mainImage.path}" alt=""/>
+                    <img src="${lot.images.mainImage.path}" alt=""/>
                 </div>
                 <c:forEach var="image" items="${lot.images.otherImages}">
                     <div class="lot-image">
-                        <img src="${imagesFolderContextPath}/${image.path}" alt=""/>
+                        <img src="${image.path}" alt=""/>
                     </div>
                 </c:forEach>
             </div>

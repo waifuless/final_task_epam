@@ -39,6 +39,8 @@ public class MariaImagesManager implements ImagesManager {
     private final static String DELETE_ALL_LOT_IMAGES_QUERY =
             "DELETE FROM lot_image WHERE lot_id = ?;";
     private final static String COUNT_QUERY = "SELECT COUNT(1) AS rows_count FROM lot_image";
+    private final static String SAVE_IMAGE_PATH_QUERY = "INSERT INTO lot_image(image_path) VALUES(?);";
+
     private static volatile MariaImagesManager instance;
     protected final ConnectionPool connectionPool;
 
@@ -55,6 +57,22 @@ public class MariaImagesManager implements ImagesManager {
             }
         }
         return instance;
+    }
+
+    @Override
+    public void saveImagePath(String path) throws SQLException, DataSourceDownException, InterruptedException {
+        try (Connection connection = connectionPool.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(SAVE_IMAGE_PATH_QUERY);
+            statement.setString(1, path);
+            statement.execute();
+        } catch (SQLException | DataSourceDownException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw e;
+        }
     }
 
     void prepareSaveStatement(PreparedStatement statement, long lotId, String imagePath, boolean mainImage)

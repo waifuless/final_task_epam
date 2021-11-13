@@ -5,7 +5,6 @@
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.main" var="loc"/>
-<fmt:setBundle basename="path-to-images-folder" var="imgFolderPath"/>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -107,7 +106,7 @@
                     <div class="card " style="max-width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="<fmt:message bundle="${imgFolderPath}" key="folder.context.path"/>/${lot.images.mainImage.path}" class="img-fluid rounded-start"
+                                <img src="${lot.images.mainImage.path}" class="img-fluid rounded-start"
                                      alt="...">
                             </div>
                             <div class="col-md-8">

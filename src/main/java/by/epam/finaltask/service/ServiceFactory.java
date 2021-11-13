@@ -4,11 +4,14 @@ import by.epam.finaltask.dao.ImagesManager;
 import by.epam.finaltask.dao.LotManager;
 import by.epam.finaltask.dao.UserManager;
 
+import java.io.IOException;
+
 public class ServiceFactory {
 
     private static volatile ServiceFactory factoryInstance;
     private static volatile UserService userServiceInstance;
     private static volatile LotService lotServiceInstance;
+    private static volatile ImagesService imagesServiceInstance;
 
     private ServiceFactory() {
     }
@@ -44,5 +47,16 @@ public class ServiceFactory {
             }
         }
         return lotServiceInstance;
+    }
+
+    public ImagesService imagesService() throws IOException {
+        if (imagesServiceInstance == null) {
+            synchronized (CommonLotService.class) {
+                if (imagesServiceInstance == null) {
+                    imagesServiceInstance = new CommonImagesService(ImagesManager.getInstance());
+                }
+            }
+        }
+        return imagesServiceInstance;
     }
 }

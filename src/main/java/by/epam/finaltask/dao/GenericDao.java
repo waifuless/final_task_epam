@@ -37,32 +37,6 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
         this.connectionPool = connectionPool;
     }
 
-    protected abstract void prepareSaveStatement(PreparedStatement statement, T t) throws SQLException;
-
-    protected void prepareFindStatement(PreparedStatement statement, long id) throws SQLException {
-        statement.setLong(1, id);
-    }
-
-    protected abstract void prepareUpdateStatement(PreparedStatement statement, T t) throws SQLException;
-
-    protected void prepareDeleteStatement(PreparedStatement statement, long id) throws SQLException {
-        statement.setLong(1, id);
-    }
-
-    protected abstract T extractEntity(ResultSet resultSet) throws ExtractionException;
-
-    protected List<T> extractAll(ResultSet resultSet) throws ExtractionException {
-        List<T> list = new ArrayList<>();
-        try {
-            while (resultSet.next()) {
-                list.add(extractEntity(resultSet));
-            }
-        } catch (Exception ex) {
-            LOG.error(ex.getMessage(), ex);
-            throw new ExtractionException(ex.getMessage(), ex);
-        }
-        return list;
-    }
 
     @Override
     public Optional<T> save(T t) throws SQLException, DataSourceDownException, InterruptedException {
@@ -153,6 +127,33 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
             Thread.currentThread().interrupt();
             throw e;
         }
+    }
+
+    protected abstract void prepareSaveStatement(PreparedStatement statement, T t) throws SQLException;
+
+    protected void prepareFindStatement(PreparedStatement statement, long id) throws SQLException {
+        statement.setLong(1, id);
+    }
+
+    protected abstract void prepareUpdateStatement(PreparedStatement statement, T t) throws SQLException;
+
+    protected void prepareDeleteStatement(PreparedStatement statement, long id) throws SQLException {
+        statement.setLong(1, id);
+    }
+
+    protected abstract T extractEntity(ResultSet resultSet) throws ExtractionException;
+
+    protected List<T> extractAll(ResultSet resultSet) throws ExtractionException {
+        List<T> list = new ArrayList<>();
+        try {
+            while (resultSet.next()) {
+                list.add(extractEntity(resultSet));
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ExtractionException(ex.getMessage(), ex);
+        }
+        return list;
     }
 
     private long extractId(ResultSet resultSet) throws ExtractionException {

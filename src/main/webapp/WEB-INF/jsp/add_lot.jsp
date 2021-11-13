@@ -4,8 +4,6 @@
 
 <fmt:setBundle basename="path-to-images-folder" var="imgFolderPath"/>
 
-<fmt:message bundle="${imgFolderPath}" key="folder.context.path" var="imagesFolderContextPath"/>
-
 <html>
 <head>
     <meta charset="UTF-8">
