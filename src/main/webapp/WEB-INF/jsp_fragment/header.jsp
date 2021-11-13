@@ -25,7 +25,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><fmt:message bundle="${headerLoc}" key="link.add_lot"/></a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_creation"><fmt:message bundle="${headerLoc}" key="link.add_lot"/></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#"><fmt:message bundle="${headerLoc}" key="link.cart"/></a>

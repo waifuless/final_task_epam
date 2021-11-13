@@ -1,0 +1,44 @@
+.input-image{
+    background-color: whitesmoke;
+    border: 1px dashed black;
+    height: 120px;
+    min-width: 200px;
+}
+
+.gallery{
+    display: flex;
+}
+
+#gallery-photo-add-input{
+    display: none;
+}
+
+.div__added-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: 150px;
+    height: 150px;
+    margin-right: 30px;
+}
+
+.div__added-image img {
+    /*flex-shrink: 0;*/
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+}
+
+.dragover{
+    background-color: #fafafa;
+    outline-offset: -17px;
+}
+
+.big-text{
+    font-size: 1.5em;
+}
+
+.container > div > p, label{
+    margin: 10px;
+}

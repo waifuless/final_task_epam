@@ -57,7 +57,7 @@ public class AjaxCommandFactory {
     }
 
     public enum AjaxCommandVariant {
-        SHOW_SIGN_IN("upload_image", FindImageCommand.class);
+        SHOW_SIGN_IN("upload_image", UploadImageCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;

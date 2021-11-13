@@ -64,7 +64,8 @@ public class SyncCommandFactory {
         SIGN_OUT("sign_out", SignOutCommand.class),
         SHOW_REGISTRATION("show_registration", ShowRegistrationPageCommand.class),
         SHOW_LOT("show_lot_page", ShowLotPageCommand.class),
-        SHOW_RESTORE_PASSWORD("show_restore_password", ShowRestorePasswordPageCommand.class);
+        SHOW_RESTORE_PASSWORD("show_restore_password", ShowRestorePasswordPageCommand.class),
+        SHOW_LOT_CREATION("show_lot_creation", ShowLotCreationCommand.class);
 
         private final String commandName;
         private final Class<? extends SyncCommand> commandClass;

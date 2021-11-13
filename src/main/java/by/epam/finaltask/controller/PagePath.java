@@ -7,7 +7,8 @@ public enum PagePath {
     LOT("WEB-INF/jsp/lot.jsp"),
     RESTORE_PASSWORD("WEB-INF/jsp/restore_password.jsp"),
     ERROR("WEB-INF/jsp/exception.jsp"),
-    START_PAGE("index.jsp");
+    START_PAGE("index.jsp"),
+    LOT_CREATION("WEB-INF/jsp/add_lot.jsp");
 
     private final String path;
 

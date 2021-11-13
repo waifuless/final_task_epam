@@ -1,9 +1,13 @@
 package by.epam.finaltask.command;
 
 import by.epam.finaltask.command.sync_command.SyncCommandFactory;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 public class CommandRequest {
@@ -55,5 +59,13 @@ public class CommandRequest {
 
     public String getServletPath() {
         return request.getServletPath();
+    }
+
+    public Collection<Part> getParts() throws IOException, ServletException {
+        return request.getParts();
+    }
+
+    public Part getPart(String s) throws IOException, ServletException {
+        return request.getPart(s);
     }
 }

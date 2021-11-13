@@ -2,10 +2,8 @@ package by.epam.finaltask.filter;
 
 import by.epam.finaltask.command.RoledCommand;
 import by.epam.finaltask.command.UserSessionAttribute;
-import by.epam.finaltask.command.async_command.AjaxCommand;
 import by.epam.finaltask.command.async_command.AjaxCommandFactory;
 import by.epam.finaltask.command.handler.HandlerFactory;
-import by.epam.finaltask.command.sync_command.SyncCommand;
 import by.epam.finaltask.command.sync_command.SyncCommandFactory;
 import by.epam.finaltask.model.Role;
 import jakarta.servlet.*;
@@ -66,10 +64,10 @@ public class UserPermissionFilter implements Filter {
         return role != null ? role : Role.NOT_AUTHORIZED;
     }
 
-    private Optional<RoledCommand> findCommand(String commandName, HttpServletRequest request){
-        if(handlerFactory.isRequestAjax(request)){
+    private Optional<RoledCommand> findCommand(String commandName, HttpServletRequest request) {
+        if (handlerFactory.isRequestAjax(request)) {
             return Optional.ofNullable(ajaxCommandFactory.findCommand(commandName).orElse(null));
-        }else{
+        } else {
             return Optional.ofNullable(syncCommandFactory.findCommand(commandName).orElse(null));
         }
     }
