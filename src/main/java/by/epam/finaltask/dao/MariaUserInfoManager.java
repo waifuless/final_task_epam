@@ -36,7 +36,7 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
                     "insertPostalCodeIfNotExistAndSelectId(?));";
     private final static String IS_USER_INFO_EXIST_QUERY =
             "SELECT EXISTS(SELECT 1 FROM user_info WHERE user_id=?) AS user_info_existence";
-    private final static String FIND_USER_INFO_QUERY =
+    private final static String FIND_ALL_USER_INFO_QUERY =
             "SELECT user_id AS user_id, phone_number AS phone_number, first_name AS first_name, last_name AS last_name," +
                     " address_name AS address_name, city_or_district_name AS city_name, region_name AS region_name," +
                     " postal_code_name AS postal_code_name" +
@@ -44,8 +44,8 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
                     " INNER JOIN address a on user_info.address_id = a.address_id" +
                     " INNER JOIN city_or_district c on user_info.city_or_district_id = c.city_or_district_id" +
                     " INNER JOIN region r on user_info.region_id = r.region_id" +
-                    " INNER JOIN postal_code pc on user_info.postal_code_id = pc.postal_code_id" +
-                    " WHERE user_id=?";
+                    " INNER JOIN postal_code pc on user_info.postal_code_id = pc.postal_code_id";
+    private final static String FIND_USER_INFO_BY_ID_QUERY = FIND_ALL_USER_INFO_QUERY + " WHERE user_id=?";
     private final static String UPDATE_USER_INFO_QUERY =
             "UPDATE user_info SET phone_number = ?, first_name = ?, last_name = ?," +
                     " address_id = insertAddressIfNotExistAndSelectId(?)," +
@@ -59,8 +59,8 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
     private static volatile MariaUserInfoManager instance;
 
     private MariaUserInfoManager() throws DataSourceDownException {
-        super(SAVE_USER_INFO_QUERY, FIND_USER_INFO_QUERY, UPDATE_USER_INFO_QUERY, DELETE_USER_INFO_QUERY, TABLE_NAME,
-                ConnectionPool.getInstance());
+        super(SAVE_USER_INFO_QUERY, FIND_ALL_USER_INFO_QUERY, FIND_USER_INFO_BY_ID_QUERY, UPDATE_USER_INFO_QUERY,
+                DELETE_USER_INFO_QUERY, TABLE_NAME, ConnectionPool.getInstance());
     }
 
     public static MariaUserInfoManager getInstance() throws DataSourceDownException {

@@ -20,7 +20,7 @@ import java.util.Optional;
 
 public class SignInCommand implements SyncCommand {
 
-    private final static Logger LOG = LogManager.getLogger(CommonUserService.class);
+    private final static Logger LOG = LogManager.getLogger(SignInCommand.class);
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.NOT_AUTHORIZED));
@@ -42,6 +42,7 @@ public class SignInCommand implements SyncCommand {
                 SignInUser(optionalUser.get(), request);
                 return new SyncCommandResponse(true, PagePath.START_PAGE.getPath());
             } else {
+                LOG.debug(CAN_NOT_SIGN_IN_MCG);
                 request.setAttribute(ERROR_ATTRIBUTE_NAME, CAN_NOT_SIGN_IN_MCG);
                 return new SyncCommandResponse(false, PagePath.SIGN_IN.getPath());
             }

@@ -23,14 +23,16 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
     protected final ConnectionPool connectionPool;
     private final String saveQuery;
     private final String findQuery;
+    private final String findAllQuery;
     private final String updateQuery;
     private final String deleteQuery;
     private String countQuery = "SELECT COUNT(1) AS rows_count FROM %s";
 
-    protected GenericDao(String saveQuery, String findQuery, String updateQuery, String deleteQuery, String tableName,
-                         ConnectionPool connectionPool) {
+    protected GenericDao(String saveQuery, String findAllQuery, String findByIdQuery, String updateQuery,
+                         String deleteQuery, String tableName, ConnectionPool connectionPool) {
         this.saveQuery = saveQuery;
-        this.findQuery = findQuery;
+        this.findAllQuery = findAllQuery;
+        this.findQuery = findByIdQuery;
         this.updateQuery = updateQuery;
         this.deleteQuery = deleteQuery;
         this.countQuery = String.format(this.countQuery, tableName);
@@ -51,6 +53,22 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
             } else {
                 return Optional.empty();
             }
+        } catch (SQLException | DataSourceDownException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw e;
+        }
+    }
+
+    @Override
+    public List<T> findAll() throws SQLException, DataSourceDownException, InterruptedException {
+        try (Connection connection = connectionPool.getConnection()) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(findAllQuery);
+            return extractAll(resultSet);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
             throw e;

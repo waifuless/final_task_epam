@@ -34,16 +34,16 @@
                 <label class="mb-2" for="auction-type-filter"><fmt:message bundle="${loc}"
                                                                            key="container.filter.label.auction_type"/></label>
                 <select id="auction-type-filter" class="form-select" aria-label="Default select example">
-                    <option selected>Любой</option>
-                    <option value="1">Прямой</option>
-                    <option value="2">Обратный</option>
+                    <option value="" selected>Любой</option>
+                    <option value="FORWARD">Прямой</option>
+                    <option value="REVERSE">Обратный</option>
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="category-filter"><fmt:message bundle="${loc}"
                                                                        key="container.filter.label.category"/></label>
                 <select id="category-filter" class="form-select" aria-label="Default select example">
-                    <option selected>Любая</option>
+                    <option value="" selected>Любая</option>
                     <option value="1">One</option>
                     <option value="2">Two</option>
                     <option value="3">Three</option>
@@ -53,7 +53,7 @@
                 <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}"
                                                                      key="container.filter.label.region"/></label>
                 <select id="region-filter" class="form-select" aria-label="Default select example">
-                    <option selected>Любой</option>
+                    <option value="" selected>Любой</option>
                     <option value="1">One</option>
                     <option value="2">Two</option>
                     <option value="3">Three</option>
@@ -62,11 +62,8 @@
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}"
                                                                    key="container.filter.label.city"/></label>
-                <select id="city-filter" class="form-select" aria-label="Default select example">
-                    <option selected>Любой</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                <select disabled id="city-filter" class="form-select" aria-label="Default select example">
+                    <option value="" selected>Любой</option>
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
@@ -74,9 +71,9 @@
                                                                         key="container.filter.label.condition"/></label>
                 <select id="condition-filter" class="form-select" aria-label="Default select example">
                     <option selected>Любое</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                    <option value="NEW">NEW</option>
+                    <option value="USED">USED</option>
+                    <option value="NOT_SPECIFIED">NOT_SPECIFIED</option>
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
@@ -90,6 +87,11 @@
             <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
                 <button type="button" class="btn btn-success w-100">
                     <fmt:message bundle="${loc}" key="container.filters.apply"/>
+                </button>
+            </div>
+            <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
+                <button type="button" class="btn btn-danger w-100">
+                    <fmt:message bundle="${loc}" key="container.filters.reset"/>
                 </button>
             </div>
         </div>

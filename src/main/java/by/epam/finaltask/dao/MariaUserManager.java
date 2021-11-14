@@ -35,11 +35,11 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
             "SELECT user_id as user_id, password_hash as password_hash, role.role_name as role_name FROM app_user" +
                     " INNER JOIN role ON app_user.role_id = role.role_id" +
                     " WHERE email=?";
-    private final static String FIND_USER_BY_ID_QUERY =
+    private final static String FIND_ALL_USER_QUERY =
             "SELECT user_id as user_id, email as email," +
                     " role.role_name as role_name FROM app_user" +
-                    " INNER JOIN role ON app_user.role_id = role.role_id" +
-                    " WHERE user_id=?";
+                    " INNER JOIN role ON app_user.role_id = role.role_id";
+    private final static String FIND_USER_BY_ID_QUERY = FIND_ALL_USER_QUERY+ " WHERE user_id=?";
     private final static String UPDATE_USER_QUERY =
             "UPDATE app_user SET email = ?, password_hash = ?," +
                     " role_id = (SELECT role_id FROM role WHERE role_name = ?)" +
@@ -53,8 +53,8 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     private final PasswordEncoder encoder;
 
     private MariaUserManager() throws DataSourceDownException {
-        super(SAVE_USER_QUERY, FIND_USER_BY_ID_QUERY, UPDATE_USER_QUERY, DELETE_USER_QUERY, TABLE_NAME,
-                ConnectionPool.getInstance());
+        super(SAVE_USER_QUERY, FIND_ALL_USER_QUERY, FIND_USER_BY_ID_QUERY, UPDATE_USER_QUERY, DELETE_USER_QUERY,
+                TABLE_NAME, ConnectionPool.getInstance());
         userFactory = UserFactory.getInstance();
         encoder = PasswordEncoder.getInstance();
     }

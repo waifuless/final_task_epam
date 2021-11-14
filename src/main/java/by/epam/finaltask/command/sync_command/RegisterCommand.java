@@ -17,6 +17,7 @@ import java.util.List;
 public class RegisterCommand implements SyncCommand {
 
     private final static Logger LOG = LogManager.getLogger(RegisterCommand.class);
+
     private final static String COMMON_ERROR_MCG = "Exception while register user";
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays.asList(Role.NOT_AUTHORIZED));
 

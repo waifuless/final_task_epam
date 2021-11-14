@@ -77,7 +77,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     private static volatile MariaLotManager instance;
 
     private MariaLotManager() throws DataSourceDownException {
-        super(SAVE_LOT_QUERY, FIND_LOT_BY_ID_QUERY, UPDATE_LOT_QUERY, DELETE_LOT_QUERY, TABLE_NAME,
+        super(SAVE_LOT_QUERY, FIND_ALL_LOTS_QUERY, FIND_LOT_BY_ID_QUERY, UPDATE_LOT_QUERY, DELETE_LOT_QUERY, TABLE_NAME,
                 ConnectionPool.getInstance());
     }
 

@@ -15,7 +15,7 @@ import static by.epam.finaltask.model.Images.Image;
 
 public class MariaImagesManager implements ImagesManager {
 
-    private final static Logger LOG = LoggerFactory.getLogger(GenericDao.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MariaImagesManager.class);
 
     private final static String ROWS_COUNT_COLUMN = "rows_count";
     private final static String IMAGE_ID_COLUMN = "image_id";

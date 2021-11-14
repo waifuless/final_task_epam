@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ShowMainPageCommand implements SyncCommand {
 
-    private final static Logger LOG = LogManager.getLogger(ShowLotPageCommand.class);
+    private final static Logger LOG = LogManager.getLogger(ShowMainPageCommand.class);
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.NOT_AUTHORIZED, Role.ADMIN, Role.USER));
