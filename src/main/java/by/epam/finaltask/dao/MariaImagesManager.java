@@ -22,9 +22,11 @@ public class MariaImagesManager implements ImagesManager {
     private final static String IMAGE_PATH_COLUMN = "image_path";
     private final static String MAIN_IMAGE_COLUMN = "main_image";
     private final static String LOT_ID_COLUMN = "lot_id";
+    private final static String LAST_INSERT_ID_COLUMN = "last_id";
+    private final static String SELECT_LAST_INSERT_ID_QUERY = "SELECT LAST_INSERT_ID() AS last_id;";
     private final static String SAVE_IMAGE =
-            "INSERT INTO lot_image(lot_id, image_path, main_image) VALUES(?, ?, ?);" +
-                    "SELECT LAST_INSERT_ID() AS image_id;";
+            "INSERT INTO lot_image(lot_id, image_path, main_image) VALUES(?, ?, ?)" +
+                    "ON DUPLICATE KEY UPDATE lot_id=VALUES(lot_id), main_image=VALUES(main_image);";
     private final static String FIND_IMAGE_QUERY =
             "SELECT lot_id AS lot_id, image_path AS image_path, main_image AS main_image FROM lot_image" +
                     " WHERE image_id=?;";
@@ -85,20 +87,24 @@ public class MariaImagesManager implements ImagesManager {
     @Override
     public Optional<Images> save(Images images) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(SAVE_IMAGE);
+            PreparedStatement insertStatement = connection.prepareStatement(SAVE_IMAGE);
+            PreparedStatement findLastInsertIdStatement = connection.prepareStatement(SELECT_LAST_INSERT_ID_QUERY);
             final long lotId = images.getLotId();
 
-            prepareSaveStatement(statement, lotId, images.getMainImage().getPath(), true);
-            ResultSet resultSet = statement.executeQuery();
+            prepareSaveStatement(insertStatement, lotId, images.getMainImage().getPath(), true);
+            insertStatement.execute();
+            ResultSet resultSet = findLastInsertIdStatement.executeQuery();
             if (resultSet.next()) {
-                Image savedMainImage = images.getMainImage().createWithId(resultSet.getLong(IMAGE_ID_COLUMN));
+                Image savedMainImage = images.getMainImage().createWithId(resultSet.getLong(LAST_INSERT_ID_COLUMN));
 
                 List<Image> otherSavedImages = new ArrayList<>();
                 for (Image image : images.getOtherImages()) {
-                    prepareSaveStatement(statement, lotId, image.getPath(), false);
-                    resultSet = statement.executeQuery();
-                    resultSet.next();
-                    otherSavedImages.add(image.createWithId(resultSet.getLong(IMAGE_ID_COLUMN)));
+                    prepareSaveStatement(insertStatement, lotId, image.getPath(), false);
+                    insertStatement.execute();
+                    resultSet = findLastInsertIdStatement.executeQuery();
+                    if(resultSet.next()) {
+                        otherSavedImages.add(image.createWithId(resultSet.getLong(LAST_INSERT_ID_COLUMN)));
+                    }
                 }
                 return Optional.of(new Images(lotId, savedMainImage, otherSavedImages));
             } else {

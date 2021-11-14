@@ -41,10 +41,10 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
                     " address_name AS address_name, city_or_district_name AS city_name, region_name AS region_name," +
                     " postal_code_name AS postal_code_name" +
                     " FROM user_info" +
-                    " INNER JOIN address a on user_info.address_id = a.address_id" +
-                    " INNER JOIN city_or_district c on user_info.city_or_district_id = c.city_or_district_id" +
-                    " INNER JOIN region r on user_info.region_id = r.region_id" +
-                    " INNER JOIN postal_code pc on user_info.postal_code_id = pc.postal_code_id";
+                    " LEFT JOIN address a on user_info.address_id = a.address_id" +
+                    " LEFT JOIN city_or_district c on user_info.city_or_district_id = c.city_or_district_id" +
+                    " LEFT JOIN region r on user_info.region_id = r.region_id" +
+                    " LEFT JOIN postal_code pc on user_info.postal_code_id = pc.postal_code_id";
     private final static String FIND_USER_INFO_BY_ID_QUERY = FIND_ALL_USER_INFO_QUERY + " WHERE user_id=?";
     private final static String UPDATE_USER_INFO_QUERY =
             "UPDATE user_info SET phone_number = ?, first_name = ?, last_name = ?," +

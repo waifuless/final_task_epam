@@ -8,12 +8,17 @@ $(document).ready(function () {
             || (file.type === 'image/jpg') || (file.type === 'image/gif')));
     }
 
-    let placeImage = function (path) {
+    let placeImage = function (path, imageName) {
         let divToFill = $($.parseHTML('<div class="div__added-image"></div>'))
             .appendTo('div.gallery');
 
         $($.parseHTML('<img alt="" />'))
             .attr('src', path)
+            .appendTo(divToFill);
+
+        $($.parseHTML('<input type="hidden" />'))
+            .attr('name', imageName)
+            .attr('value', path)
             .appendTo(divToFill);
     };
 
@@ -28,7 +33,8 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             success: function(path) {
-                placeImage(path);
+                let imageName = $('.div__added-image').length>0 ? 'otherImage[]' : 'mainImage';
+                placeImage(path, imageName);
             },
             error: function (error){
                 alert(error);

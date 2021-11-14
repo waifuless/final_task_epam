@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.create_lot" var="loc"/>
@@ -24,7 +24,7 @@
 <body>
 <div class="page-wrapper">
 
-    <%@include file="/WEB-INF/jsp_fragment/header.jsp"%>
+    <%@include file="/WEB-INF/jsp_fragment/header.jsp" %>
 
     <div class="container">
 
@@ -33,7 +33,8 @@
             <div class="mb-3 input-image">
                 <div>
                     <form id="imageInputForm" enctype="multipart/form-data">
-                        <label for="gallery-photo-add-input" id="gallery-photo-add-label" class="m-3 btn btn-primary">
+                        <label for="gallery-photo-add-input" id="gallery-photo-add-label"
+                               class="m-3 btn btn-primary">
                             <fmt:message bundle="${loc}" key="photos.input.label"/>
                         </label>
                         <input type="file" id="gallery-photo-add-input"
@@ -45,92 +46,113 @@
                     </p>
                 </div>
             </div>
-            <div class="gallery" id="gallery"></div>
         </div>
 
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <label for="title"><fmt:message bundle="${loc}" key="lot.label.title"/></label><br>
-            <input type="text" required name="title" id="title" class="form-control">
-        </div>
+        <form action="${pageContext.request.contextPath}/ControllerServlet?command=create_lot" method="post">
 
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <label class="mb-2" for="category-filter"><fmt:message bundle="${loc}" key="lot.label.category"/></label>
-            <select id="category-filter" class="form-select" aria-label="Default select example">
-                <option selected><fmt:message bundle="${loc}" key="lot.category.not_chosen"/></option>
-                <jsp:useBean id="categories" scope="request" type="java.util.List<by.epam.finaltask.model.Category>"/>
-                <c:forEach items="${categories}" var="category">
-                    <option>${category.categoryName}</option>
-                </c:forEach>
-            </select>
-        </div>
+            <div class="row col-lg-8 col-sm-9 col-11 mb-3 mx-auto mx-lg-0">
+                <div class="gallery" id="gallery"></div>
+            </div>
 
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <label class="mb-2" for="auction-type-filter"><fmt:message bundle="${loc}" key="lot.label.auction_type"/></label>
-            <select id="auction-type-filter" class="form-select" aria-label="Default select example">
-                <option selected><fmt:message bundle="${loc}" key="lot.auction_type.not_chosen"/></option>
-                <option value="FORWARD"><fmt:message bundle="${loc}" key="lot.auction_type.forward"/></option>
-                <option value="REVERSE"><fmt:message bundle="${loc}" key="lot.auction_type.reverse"/></option>
-            </select>
-        </div>
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <label for="title"><fmt:message bundle="${loc}" key="lot.label.title"/></label><br>
+                <input type="text" required name="title" id="title" class="form-control">
+            </div>
 
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <label class="mb-2" for="condition-filter"><fmt:message bundle="${loc}" key="lot.label.condition"/></label>
-            <select id="condition-filter" class="form-select" aria-label="Default select example">
-                <option value="NOT_SPECIFIED" selected><fmt:message bundle="${loc}" key="lot.condition.not_specified"/></option>
-                <option value="NEW"><fmt:message bundle="${loc}" key="lot.condition.new"/></option>
-                <option value="USED"><fmt:message bundle="${loc}" key="lot.condition.used"/></option>
-            </select>
-        </div>
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <label class="mb-2" for="category-filter"><fmt:message bundle="${loc}"
+                                                                       key="lot.label.category"/></label>
+                <select id="category-filter" name="category" class="form-select" aria-label="Default select example">
+                    <option value="" selected><fmt:message bundle="${loc}" key="lot.category.not_chosen"/></option>
+                    <jsp:useBean id="categories" scope="request"
+                                 type="java.util.List<by.epam.finaltask.model.Category>"/>
+                    <c:forEach items="${categories}" var="category">
+                        <option value="${category.categoryName}">${category.categoryName}</option>
+                    </c:forEach>
+                </select>
+            </div>
 
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <label for="description"><fmt:message bundle="${loc}" key="lot.label.description"/></label><br>
-            <textarea style="resize: none" required name="description" id="description" class="form-control"></textarea>
-        </div>
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <label class="mb-2" for="auction-type-filter"><fmt:message bundle="${loc}"
+                                                                           key="lot.label.auction_type"/></label>
+                <select id="auction-type-filter" name="auction-type" class="form-select"
+                        aria-label="Default select example">
+                    <option value="" selected><fmt:message bundle="${loc}" key="lot.auction_type.not_chosen"/></option>
+                    <option value="FORWARD"><fmt:message bundle="${loc}" key="lot.auction_type.forward"/></option>
+                    <option value="REVERSE"><fmt:message bundle="${loc}" key="lot.auction_type.reverse"/></option>
+                </select>
+            </div>
 
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <label class="big-text" for="init-price"><fmt:message bundle="${loc}" key="lot.label.initial_price"/></label><br>
-            <input type="text" required name="init-price" id="init-price" class="form-control">
-        </div>
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <label class="mb-2" for="condition-filter">
+                    <fmt:message bundle="${loc}" key="lot.label.condition"/>
+                </label>
+                <select id="condition-filter" name="condition" class="form-select" aria-label="Default select example">
+                    <option value="NOT_SPECIFIED" selected>
+                        <fmt:message bundle="${loc}" key="lot.condition.not_specified"/>
+                    </option>
+                    <option value="NEW"><fmt:message bundle="${loc}" key="lot.condition.new"/></option>
+                    <option value="USED"><fmt:message bundle="${loc}" key="lot.condition.used"/></option>
+                </select>
+            </div>
 
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <label for="auction-start"><fmt:message bundle="${loc}" key="lot.label.auction_start"/></label><br>
-            <input type="datetime-local" required name="auction-start" id="auction-start" class="form-control"/>
-        </div>
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <label for="description"><fmt:message bundle="${loc}" key="lot.label.description"/></label><br>
+                <textarea style="resize: none" required name="description" id="description"
+                          class="form-control"></textarea>
+            </div>
 
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <label for="duration"><fmt:message bundle="${loc}" key="lot.label.auction_duration"/></label><br>
-            <input type="number" required name="duration" id="duration" class="form-control"/>
-        </div>
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <label class="big-text" for="init-price">
+                    <fmt:message bundle="${loc}" key="lot.label.initial_price"/>
+                </label><br>
+                <input type="text" required name="init-price" id="init-price" class="form-control">
+            </div>
 
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <p class="big-text"><fmt:message bundle="${loc}" key="lot.label.location"/></p>
-            <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}" key="lot.label.region"/></label>
-            <select id="region-filter" class="form-select" aria-label="Default select example">
-                <option selected><fmt:message bundle="${loc}" key="lot.region.not_chosen"/></option>
-                <jsp:useBean id="regions" scope="request" type="java.util.List<by.epam.finaltask.model.Region>"/>
-                <c:forEach items="${regions}" var="region">
-                    <option>${region.regionName}</option>
-                </c:forEach>
-            </select>
-        </div>
-        <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-            <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}" key="lot.label.city_or_district"/></label>
-            <select disabled id="city-filter" class="form-select" aria-label="Default select example">
-                <option selected><fmt:message bundle="${loc}" key="lot.city_or_district.not_chosen"/></option>
-            </select>
-        </div>
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <label for="auction-start"><fmt:message bundle="${loc}" key="lot.label.auction_start"/></label><br>
+                <input type="datetime-local" required name="auction-start" id="auction-start" class="form-control"/>
+            </div>
 
-        <div class="row">
-            <a class="btn btn-success mx-auto col-lg-5 col-sm-8 col-10 my-5">
-                <fmt:message bundle="${loc}" key="add_lot_form.apply"/>
-            </a>
-        </div>
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <label for="duration"><fmt:message bundle="${loc}" key="lot.label.auction_duration"/></label><br>
+                <input type="number" required name="duration" id="duration" class="form-control"/>
+            </div>
+
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <p class="big-text"><fmt:message bundle="${loc}" key="lot.label.location"/></p>
+                <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}" key="lot.label.region"/></label>
+                <select id="region-filter" name="region" class="form-select" aria-label="Default select example">
+                    <option value="" selected><fmt:message bundle="${loc}" key="lot.region.not_chosen"/></option>
+                    <jsp:useBean id="regions" scope="request" type="java.util.List<by.epam.finaltask.model.Region>"/>
+                    <c:forEach items="${regions}" var="region">
+                        <option value="${region.regionName}">${region.regionName}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
+                <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}"
+                                                                   key="lot.label.city_or_district"/></label>
+                <select disabled id="city-filter" name="city-or-district" class="form-select"
+                        aria-label="Default select example">
+                    <option value="" selected><fmt:message bundle="${loc}"
+                                                           key="lot.city_or_district.not_chosen"/></option>
+                </select>
+            </div>
+
+            <div class="row">
+                <button type="submit" class="btn btn-success mx-auto col-lg-5 col-sm-8 col-10 my-5">
+                    <fmt:message bundle="${loc}" key="add_lot_form.apply"/>
+                </button>
+            </div>
+
+        </form>
 
         <div class="page-buffer"></div>
     </div>
 </div>
 
-<%@include file="/WEB-INF/jsp_fragment/footer.jsp"%>
+<%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
 </body>
 </html>

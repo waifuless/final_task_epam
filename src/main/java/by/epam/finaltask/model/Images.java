@@ -22,6 +22,15 @@ public class Images implements DaoEntity<Images> {
         this.otherImages = Collections.emptyList();
     }
 
+    public Images(long lotId, String mainImagePath, List<String> otherImagesPaths){
+        this.lotId = lotId;
+        this.mainImage = new Image(mainImagePath);
+        this.otherImages = new ArrayList<>();
+        for (String otherImagePath : otherImagesPaths) {
+            this.otherImages.add(new Image(otherImagePath));
+        }
+    }
+
     public long getLotId() {
         return lotId;
     }

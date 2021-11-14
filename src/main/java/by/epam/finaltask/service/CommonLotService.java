@@ -3,14 +3,14 @@ package by.epam.finaltask.service;
 import by.epam.finaltask.dao.ImagesManager;
 import by.epam.finaltask.dao.LotManager;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
-import by.epam.finaltask.model.Lot;
-import by.epam.finaltask.model.LotWithImages;
+import by.epam.finaltask.model.*;
+import com.sun.xml.internal.ws.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.*;
 
 public class CommonLotService implements LotService {
 
@@ -50,10 +50,45 @@ public class CommonLotService implements LotService {
             for (Lot lot : lots) {
                 lotsWithImages.add(new LotWithImages(lot, imagesManager.find(lot.getLotId()).orElse(null)));
             }
+            LOG.debug("Lots: {}",lotsWithImages);
             return lotsWithImages;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
         }
+    }
+
+    @Override
+    public void createAndSaveLot(long userId, String maimImagePath, String[] otherImagePaths, String title,
+                                 String category, String auctionType, String condition, String description,
+                                 String initPrice, String auctionStart, String duration, String region,
+                                 String cityOrDistrict)
+            throws ServiceCanNotCompleteCommandRequest {
+        try {
+            Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
+            Timestamp endDatetime =
+                    new Timestamp(startDatetime.getTime() + (long) Integer.parseInt(duration) * 60 * 60 * 1000);
+            Lot lot = new Lot(userId, category, AuctionType.valueOf(auctionType), title, startDatetime, endDatetime,
+                    new BigDecimal(initPrice), region, cityOrDistrict, description, AuctionStatus.NOT_VERIFIED,
+                    ProductCondition.valueOf(condition));
+            Optional<Lot> optionalLot = lotManager.save(lot);
+            if (optionalLot.isPresent()) {
+                Lot savedLot = optionalLot.get();
+                List<String> imagePaths = otherImagePaths == null ? Collections.emptyList()
+                        : Arrays.asList(otherImagePaths);
+                Images images = new Images(savedLot.getLotId(), maimImagePath, imagePaths);
+                imagesManager.save(images);
+            } else {
+                //throw exception
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    private String reformatForTimestamp(String time){
+        time = time.replace("T", " ");
+        return time.indexOf(':')==time.lastIndexOf(':') ?  time.concat(":00") : time;
     }
 }

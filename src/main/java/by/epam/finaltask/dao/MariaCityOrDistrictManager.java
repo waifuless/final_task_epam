@@ -31,7 +31,7 @@ public class MariaCityOrDistrictManager extends GenericDao<CityOrDistrict> imple
     private final static String DELETE_CITY_OR_DISTRICT_QUERY =
             "DELETE FROM city_or_district WHERE city_or_district_id = ?";
     private final static String FIND_CITY_OR_DISTRICT_BY_REGION_NAME_QUERY = FIND_ALL_CITY_OR_DISTRICTS_QUERY +
-            " INNER JOIN region ON region.region_id = city_or_district.region_id WHERE region.region_name=?";
+            " LEFT JOIN region ON region.region_id = city_or_district.region_id WHERE region.region_name=?";
 
     private final static Logger LOG = LoggerFactory.getLogger(MariaCityOrDistrictManager.class);
 

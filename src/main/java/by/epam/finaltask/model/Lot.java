@@ -173,4 +173,6 @@ public class Lot implements DaoEntity<Lot> {
         return new Lot(id, ownerId, category, auctionType, title, startDatetime, endDatetime, initialPrice, region,
                 cityOrDistrict, description, auctionStatus, productCondition);
     }
+
+
 }

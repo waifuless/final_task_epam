@@ -49,12 +49,12 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     " city_or_district_name AS city_or_district_name," +
                     " description AS description, auction_status.status_name AS auction_status_name," +
                     " pc.product_condition_name AS product_condition_name FROM lot" +
-                    " INNER JOIN category ON lot.category_id = category.category_id" +
-                    " INNER JOIN auction_type ON lot.auction_type_id = auction_type.type_id" +
-                    " INNER JOIN region r on lot.region_id = r.region_id" +
-                    " INNER JOIN city_or_district c on lot.city_or_district_id = c.city_or_district_id" +
-                    " INNER JOIN auction_status ON lot.auction_status_id = auction_status.status_id" +
-                    " INNER JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id";
+                    " LEFT JOIN category ON lot.category_id = category.category_id" +
+                    " LEFT JOIN auction_type ON lot.auction_type_id = auction_type.type_id" +
+                    " LEFT JOIN region r on lot.region_id = r.region_id" +
+                    " LEFT JOIN city_or_district c on lot.city_or_district_id = c.city_or_district_id" +
+                    " LEFT JOIN auction_status ON lot.auction_status_id = auction_status.status_id" +
+                    " LEFT JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id";
     private final static String FIND_LOT_BY_ID_QUERY = FIND_ALL_LOTS_QUERY + " WHERE lot.lot_id=?;";
     private final static String FIND_LOT_OFFSET_QUERY =
             FIND_ALL_LOTS_QUERY + " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
