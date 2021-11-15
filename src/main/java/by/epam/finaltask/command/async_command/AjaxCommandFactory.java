@@ -57,7 +57,9 @@ public class AjaxCommandFactory {
     }
 
     public enum AjaxCommandVariant {
-        SHOW_SIGN_IN("upload_image", UploadImageCommand.class);
+        SHOW_SIGN_IN("upload_image", UploadImageCommand.class),
+        FIND_CITIES_OR_DISTRICTS_BY_REGION("find_cities_or_districts_by_region",
+                FindCitiesOrDistrictsByRegionCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;

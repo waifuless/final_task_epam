@@ -18,6 +18,7 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/main-page.css">
+    <script src="js/region-cities-select.js"></script>
 </head>
 <body>
 <div class="page-wrapper">
@@ -31,8 +32,9 @@
         </h2>
         <div class="row mt-4">
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="auction-type-filter"><fmt:message bundle="${loc}"
-                                                                           key="container.filter.label.auction_type"/></label>
+                <label class="mb-2" for="auction-type-filter">
+                    <fmt:message bundle="${loc}" key="container.filter.label.auction_type"/>
+                </label>
                 <select id="auction-type-filter" class="form-select" aria-label="Default select example">
                     <option value="" selected>Любой</option>
                     <option value="FORWARD">Прямой</option>
@@ -40,8 +42,9 @@
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
-                <label class="mb-2" for="category-filter"><fmt:message bundle="${loc}"
-                                                                       key="container.filter.label.category"/></label>
+                <label class="mb-2" for="category-filter">
+                    <fmt:message bundle="${loc}" key="container.filter.label.category"/>
+                </label>
                 <select id="category-filter" class="form-select" aria-label="Default select example">
                     <option value="" selected>Любая</option>
                     <option value="1">One</option>
@@ -105,9 +108,9 @@
             <c:forEach var="lot" items="${lots}">
                 <a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=${lot.lotId}"
                    class="container__row__a col-12 col-lg-6 mb-3 mb-3">
-                    <div class="card " style="max-width: 540px;">
+                    <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
                         <div class="row g-0">
-                            <div class="col-md-4">
+                            <div class="col-md-4 div-image">
                                 <img src="${lot.images.mainImage.path}" class="img-fluid rounded-start"
                                      alt="...">
                             </div>

@@ -24,12 +24,12 @@ public class UploadImageCommand implements AjaxCommand {
 
     private final ImagesService imagesService = ServiceFactory.getFactoryInstance().imagesService();
 
+    UploadImageCommand() throws IOException {
+    }
+
     @Override
     public List<Role> getAllowedRoles() {
         return ALLOWED_ROLES;
-    }
-
-    UploadImageCommand() throws IOException {
     }
 
     @Override

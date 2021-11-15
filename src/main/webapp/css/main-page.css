@@ -84,3 +84,18 @@ html, body {
     overflow: hidden;
     white-space: nowrap;
 }
+
+.div-image{
+    max-height: 213px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.div-image img {
+    height:100%;
+    width: 100%;
+    object-fit: cover;
+    padding: 10px;
+}

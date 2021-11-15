@@ -23,7 +23,7 @@ public class MariaCityOrDistrictManager extends GenericDao<CityOrDistrict> imple
             "INSERT INTO city_or_district(city_or_district_name, region_id) VALUES(?, ?);";
     private final static String FIND_ALL_CITY_OR_DISTRICTS_QUERY =
             "SELECT city_or_district_id AS city_or_district_id, city_or_district_name AS city_or_district_name," +
-                    " region_id AS region_id FROM city_or_district";
+                    " city_or_district.region_id AS region_id FROM city_or_district";
     private final static String FIND_CITY_OR_DISTRICT_BY_ID_QUERY = FIND_ALL_CITY_OR_DISTRICTS_QUERY +
             " WHERE city_or_district_id=?";
     private final static String UPDATE_CITY_OR_DISTRICT_QUERY =

@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/main-page.css">
     <link rel="stylesheet" href="css/add-lot.css">
     <script src="js/add-lot.js"></script>
+    <script src="js/region-cities-select.js"></script>
 </head>
 <body>
 <div class="page-wrapper">
@@ -63,7 +64,7 @@
                 <label class="mb-2" for="category-filter"><fmt:message bundle="${loc}"
                                                                        key="lot.label.category"/></label>
                 <select id="category-filter" name="category" class="form-select" aria-label="Default select example">
-                    <option value="" selected><fmt:message bundle="${loc}" key="lot.category.not_chosen"/></option>
+                    <option value="" disabled selected><fmt:message bundle="${loc}" key="lot.category.not_chosen"/></option>
                     <jsp:useBean id="categories" scope="request"
                                  type="java.util.List<by.epam.finaltask.model.Category>"/>
                     <c:forEach items="${categories}" var="category">
@@ -77,7 +78,7 @@
                                                                            key="lot.label.auction_type"/></label>
                 <select id="auction-type-filter" name="auction-type" class="form-select"
                         aria-label="Default select example">
-                    <option value="" selected><fmt:message bundle="${loc}" key="lot.auction_type.not_chosen"/></option>
+                    <option value="" disabled selected><fmt:message bundle="${loc}" key="lot.auction_type.not_chosen"/></option>
                     <option value="FORWARD"><fmt:message bundle="${loc}" key="lot.auction_type.forward"/></option>
                     <option value="REVERSE"><fmt:message bundle="${loc}" key="lot.auction_type.reverse"/></option>
                 </select>
@@ -122,21 +123,26 @@
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <p class="big-text"><fmt:message bundle="${loc}" key="lot.label.location"/></p>
                 <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}" key="lot.label.region"/></label>
-                <select id="region-filter" name="region" class="form-select" aria-label="Default select example">
-                    <option value="" selected><fmt:message bundle="${loc}" key="lot.region.not_chosen"/></option>
+                <select id="region-filter" name="region" onchange="placeCitiesOrDistricts('region-filter','city-filter')"
+                        class="form-select" aria-label="Default select example">
+                    <option value="" disabled selected>
+                        <fmt:message bundle="${loc}" key="lot.region.not_chosen"/>
+                    </option>
                     <jsp:useBean id="regions" scope="request" type="java.util.List<by.epam.finaltask.model.Region>"/>
                     <c:forEach items="${regions}" var="region">
                         <option value="${region.regionName}">${region.regionName}</option>
                     </c:forEach>
                 </select>
             </div>
+
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}"
                                                                    key="lot.label.city_or_district"/></label>
                 <select disabled id="city-filter" name="city-or-district" class="form-select"
                         aria-label="Default select example">
-                    <option value="" selected><fmt:message bundle="${loc}"
-                                                           key="lot.city_or_district.not_chosen"/></option>
+                    <option value="" disabled selected>
+                        <fmt:message bundle="${loc}" key="lot.city_or_district.not_chosen"/>
+                    </option>
                 </select>
             </div>
 
