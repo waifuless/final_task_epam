@@ -43,7 +43,7 @@ public class CreateLotCommand implements SyncCommand {
             if (isStringEmpty(mainImagePath) || isStringEmpty(title) || isStringEmpty(category)
                     || isStringEmpty(auctionType) || isStringEmpty(condition) || isStringEmpty(description)
                     || isStringEmpty(initPrice) || isStringEmpty(auctionStart) || isStringEmpty(duration)
-                    || isStringEmpty(region)) {
+                    || isStringEmpty(region) || isStringEmpty(cityOrDistrict)) {
                 LOG.debug("One of required fields is empty");
                 request.setAttribute("errorMessage","One of required fields is empty");
                 return new SyncCommandResponse(false, PagePath.LOT_CREATION.getPath());

@@ -55,7 +55,8 @@
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}"
                                                                      key="container.filter.label.region"/></label>
-                <select id="region-filter" class="form-select" aria-label="Default select example">
+                <select id="region-filter" class="form-select" aria-label="Default select example"
+                        onchange="placeCitiesOrDistricts('region-filter','city-filter')">
                     <option value="" selected>Любой</option>
                     <option value="1">One</option>
                     <option value="2">Two</option>

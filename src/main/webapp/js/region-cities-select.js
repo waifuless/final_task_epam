@@ -1,9 +1,6 @@
 function placeCitiesOrDistricts(regionSelectId, cityOrDistrictSelectId) {
 
-    // let citiesList = $(`#${cityOrDistrictSelectId}`);
-    // //удалять не все?
-    // // citiesList.empty();
-    $(`#${cityOrDistrictSelectId} option:not(:disabled)`).remove();
+    $(`#${cityOrDistrictSelectId} option:not(:first)`).remove();
 
     $.ajax({
         url: "ControllerServlet",

@@ -61,9 +61,9 @@
             </div>
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-                <label class="mb-2" for="category-filter"><fmt:message bundle="${loc}"
+                <label class="mb-2" for="category-input"><fmt:message bundle="${loc}"
                                                                        key="lot.label.category"/></label>
-                <select id="category-filter" name="category" class="form-select" aria-label="Default select example">
+                <select id="category-input" name="category" class="form-select" aria-label="Default select example">
                     <option value="" disabled selected><fmt:message bundle="${loc}" key="lot.category.not_chosen"/></option>
                     <jsp:useBean id="categories" scope="request"
                                  type="java.util.List<by.epam.finaltask.model.Category>"/>
@@ -74,9 +74,9 @@
             </div>
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-                <label class="mb-2" for="auction-type-filter"><fmt:message bundle="${loc}"
+                <label class="mb-2" for="auction-type-input"><fmt:message bundle="${loc}"
                                                                            key="lot.label.auction_type"/></label>
-                <select id="auction-type-filter" name="auction-type" class="form-select"
+                <select id="auction-type-input" name="auction-type" class="form-select"
                         aria-label="Default select example">
                     <option value="" disabled selected><fmt:message bundle="${loc}" key="lot.auction_type.not_chosen"/></option>
                     <option value="FORWARD"><fmt:message bundle="${loc}" key="lot.auction_type.forward"/></option>
@@ -85,10 +85,10 @@
             </div>
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-                <label class="mb-2" for="condition-filter">
+                <label class="mb-2" for="condition-input">
                     <fmt:message bundle="${loc}" key="lot.label.condition"/>
                 </label>
-                <select id="condition-filter" name="condition" class="form-select" aria-label="Default select example">
+                <select id="condition-input" name="condition" class="form-select" aria-label="Default select example">
                     <option value="NOT_SPECIFIED" selected>
                         <fmt:message bundle="${loc}" key="lot.condition.not_specified"/>
                     </option>
@@ -122,8 +122,8 @@
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <p class="big-text"><fmt:message bundle="${loc}" key="lot.label.location"/></p>
-                <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}" key="lot.label.region"/></label>
-                <select id="region-filter" name="region" onchange="placeCitiesOrDistricts('region-filter','city-filter')"
+                <label class="mb-2" for="region-input"><fmt:message bundle="${loc}" key="lot.label.region"/></label>
+                <select id="region-input" name="region" onchange="placeCitiesOrDistricts('region-input','city-input')"
                         class="form-select" aria-label="Default select example">
                     <option value="" disabled selected>
                         <fmt:message bundle="${loc}" key="lot.region.not_chosen"/>
@@ -136,9 +136,9 @@
             </div>
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
-                <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}"
+                <label class="mb-2" for="city-input"><fmt:message bundle="${loc}"
                                                                    key="lot.label.city_or_district"/></label>
-                <select disabled id="city-filter" name="city-or-district" class="form-select"
+                <select disabled id="city-input" name="city-or-district" class="form-select"
                         aria-label="Default select example">
                     <option value="" disabled selected>
                         <fmt:message bundle="${loc}" key="lot.city_or_district.not_chosen"/>

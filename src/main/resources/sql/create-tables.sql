@@ -74,8 +74,6 @@ create table city_or_district
         primary key,
     city_or_district_name varchar(60) not null,
     region_id             int         not null,
-    constraint city_city_name_uindex
-        unique (city_or_district_name),
     constraint city_or_district_region_region_id_fk
         foreign key (region_id) references region (region_id)
 );
@@ -119,13 +117,14 @@ create table lot
     auction_status_id    int            not null,
     product_condition_id int            not null,
     region_id            int            not null,
-    city_or_district_id  int            null,
+    city_or_district_id  int            not null,
     constraint lot_auction_type_type_id_fk
         foreign key (auction_type_id) references auction_type (type_id),
     constraint lot_city_or_district_city_or_district_id_fk
         foreign key (city_or_district_id) references city_or_district (city_or_district_id),
     constraint lot_fk0
-        foreign key (owner_id) references app_user (user_id),
+        foreign key (owner_id) references app_user (user_id)
+            on delete cascade,
     constraint lot_fk1
         foreign key (category_id) references category (category_id),
     constraint lot_lot_product_condition_product_condition_id_fk
@@ -164,14 +163,17 @@ create table cart_item
 
 create table lot_image
 (
-    image_id   int auto_increment
+    image_id    int auto_increment
         primary key,
-    lot_id     int                  not null,
-    image_path varchar(256)         not null,
-    main_image tinyint(1) default 0 not null,
-    constraint lot_image_fk0
+    lot_id      int                          null,
+    image_path  varchar(256)                 not null,
+    main_image  tinyint(1) default 0         not null,
+    insert_date date       default curdate() not null,
+    constraint lot_image_image_path_uindex
+        unique (image_path),
+    constraint lot_image_lot_lot_id_fk
         foreign key (lot_id) references lot (lot_id)
-            on delete cascade
+            on delete set null
 );
 
 create table user_info
@@ -190,7 +192,8 @@ create table user_info
     constraint user_info_address_address_id_fk
         foreign key (address_id) references address (address_id),
     constraint user_info_fk0
-        foreign key (user_id) references app_user (user_id),
+        foreign key (user_id) references app_user (user_id)
+            on delete cascade,
     constraint user_info_postal_code_postal_code_id_fk
         foreign key (postal_code_id) references postal_code (postal_code_id),
     constraint user_info_region_region_id_fk
@@ -269,4 +272,3 @@ BEGIN
     RETURN (SELECT postal_code_id FROM postal_code WHERE postal_code_name = new_postal_code_name);
 
 END;
-
