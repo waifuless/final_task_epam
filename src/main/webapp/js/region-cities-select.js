@@ -2,6 +2,11 @@ function placeCitiesOrDistricts(regionSelectId, cityOrDistrictSelectId) {
 
     $(`#${cityOrDistrictSelectId} option:not(:first)`).remove();
 
+    if($(`#${regionSelectId}`).children('option:first-child').is(':selected')){
+        $(`#${cityOrDistrictSelectId}`).prop('disabled', true);
+        return;
+    }
+
     $.ajax({
         url: "ControllerServlet",
         type: "POST",
@@ -20,7 +25,7 @@ function placeCitiesOrDistricts(regionSelectId, cityOrDistrictSelectId) {
                     + cityOrDistrict.cityOrDistrictName
                     + '</option>');
             });
-            $(`#${cityOrDistrictSelectId}`).removeAttr('disabled');
+            $(`#${cityOrDistrictSelectId}`).prop('disabled', false);
         }
     });
 }

@@ -36,9 +36,10 @@
                     <fmt:message bundle="${loc}" key="container.filter.label.auction_type"/>
                 </label>
                 <select id="auction-type-filter" class="form-select" aria-label="Default select example">
-                    <option value="" selected>Любой</option>
-                    <option value="FORWARD">Прямой</option>
-                    <option value="REVERSE">Обратный</option>
+                    <option value="" selected><fmt:message bundle="${loc}"
+                                                                    key="container.filter.type.any"/></option>
+                    <option value="FORWARD"><fmt:message bundle="${loc}" key="filter.auction_type.forward"/></option>
+                    <option value="REVERSE"><fmt:message bundle="${loc}" key="filter.auction_type.reverse"/></option>
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
@@ -46,10 +47,12 @@
                     <fmt:message bundle="${loc}" key="container.filter.label.category"/>
                 </label>
                 <select id="category-filter" class="form-select" aria-label="Default select example">
-                    <option value="" selected>Любая</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                    <option value="" selected><fmt:message bundle="${loc}" key="filter.category.any"/></option>
+                    <jsp:useBean id="categories" scope="request"
+                                 type="java.util.List<by.epam.finaltask.model.Category>"/>
+                    <c:forEach items="${categories}" var="category">
+                        <option value="${category.categoryName}">${category.categoryName}</option>
+                    </c:forEach>
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
@@ -57,35 +60,41 @@
                                                                      key="container.filter.label.region"/></label>
                 <select id="region-filter" class="form-select" aria-label="Default select example"
                         onchange="placeCitiesOrDistricts('region-filter','city-filter')">
-                    <option value="" selected>Любой</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                    <option value="" selected><fmt:message bundle="${loc}" key="filter.region.any"/></option>
+                    <jsp:useBean id="regions" scope="request" type="java.util.List<by.epam.finaltask.model.Region>"/>
+                    <c:forEach items="${regions}" var="region">
+                        <option value="${region.regionName}">${region.regionName}</option>
+                    </c:forEach>
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}"
                                                                    key="container.filter.label.city"/></label>
                 <select disabled id="city-filter" class="form-select" aria-label="Default select example">
-                    <option value="" selected>Любой</option>
+                    <option value="" selected>
+                        <fmt:message bundle="${loc}" key="filter.city_or_district.any"/>
+                    </option>
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="condition-filter"><fmt:message bundle="${loc}"
                                                                         key="container.filter.label.condition"/></label>
                 <select id="condition-filter" class="form-select" aria-label="Default select example">
-                    <option selected>Любое</option>
-                    <option value="NEW">NEW</option>
-                    <option value="USED">USED</option>
-                    <option value="NOT_SPECIFIED">NOT_SPECIFIED</option>
+                    <option value="NOT_SPECIFIED" selected>
+                        <fmt:message bundle="${loc}" key="filter.condition.not_specified"/>
+                    </option>
+                    <option value="NEW"><fmt:message bundle="${loc}" key="filter.condition.new"/></option>
+                    <option value="USED"><fmt:message bundle="${loc}" key="filter.condition.used"/></option>
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="price-filter"><fmt:message bundle="${loc}"
                                                                     key="container.filter.label.price"/></label>
                 <div id="price-filter" class="input-group">
-                    <input type="text" aria-label="from" class="form-control" placeholder="от" id="price-from">
-                    <input type="text" aria-label="to" class="form-control" placeholder="до" id="price-to">
+                    <input type="text" aria-label="from"
+                           class="form-control"
+                           placeholder="<fmt:message bundle="${loc}" key="filter.price.from"/>" id="price-from">
+                    <input type="text" aria-label="to" class="form-control" placeholder="<fmt:message bundle="${loc}" key="filter.price.to"/>" id="price-to">
                 </div>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
@@ -120,7 +129,8 @@
                                     <h5 class="card-title">${lot.title}</h5>
                                     <p class="card-text category">${lot.category}</p>
                                     <p class="card-text auction-type">
-                                        <fmt:message bundle="${loc}" key="container.lot.auction_type"/> ${lot.auctionType}
+                                        <fmt:message bundle="${loc}"
+                                                     key="container.lot.auction_type"/> ${lot.auctionType}
                                     </p>
                                     <p class="card-text region">
                                         <fmt:message bundle="${loc}" key="container.lot.region"/> ${lot.region}

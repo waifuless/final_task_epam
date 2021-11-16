@@ -4,7 +4,9 @@ import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.controller.PagePath;
 import by.epam.finaltask.model.Role;
+import by.epam.finaltask.service.CategoryService;
 import by.epam.finaltask.service.LotService;
+import by.epam.finaltask.service.RegionService;
 import by.epam.finaltask.service.ServiceFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +23,8 @@ public class ShowMainPageCommand implements SyncCommand {
             .asList(Role.NOT_AUTHORIZED, Role.ADMIN, Role.USER));
 
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
+    private final RegionService regionService = ServiceFactory.getFactoryInstance().regionService();
+    private final CategoryService categoryService = ServiceFactory.getFactoryInstance().categoryService();
 
     ShowMainPageCommand() {
     }
@@ -29,6 +33,8 @@ public class ShowMainPageCommand implements SyncCommand {
     public SyncCommandResponse execute(CommandRequest request) {
         String pageNumberParam = request.getParameter("pageNum");
         try {
+            request.setAttribute("regions", regionService.findAllRegions());
+            request.setAttribute("categories", categoryService.findAllCategories());
             //todo:validation
             int pageNumber = pageNumberParam == null ? 1 : Integer.parseInt(pageNumberParam);
             request.setAttribute("lots", lotService.findLotsByPage(pageNumber));
