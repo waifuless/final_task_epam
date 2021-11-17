@@ -33,14 +33,19 @@
             <div class="col-xl-4 col-md-6 col-9 mx-auto my-3">
                 <form action="${pageContext.request.contextPath}/ControllerServlet?command=sign_in" method="post">
                     <div class="form-floating my-2">
-                        <input type="email" class="form-control" id="floatingInput" name="email"
+                        <input type="email" class="form-control <c:if test="${requestScope.containsKey('EMAIL_OR_PASSWORD_INVALID')}">
+                is-invalid</c:if>" id="floatingInput" name="email"
                                placeholder="name@example.com" required>
                         <label for="floatingInput"><fmt:message bundle="${loc}" key="email.label"/></label>
                     </div>
                     <div class="form-floating my-2">
-                        <input type="password" class="form-control" id="floatingPassword" name="password"
+                        <input type="password" class="form-control <c:if test="${requestScope.containsKey('EMAIL_OR_PASSWORD_INVALID')}">
+                is-invalid</c:if>" id="floatingPassword" name="password"
                                placeholder="Password" required>
                         <label for="floatingPassword"><fmt:message bundle="${loc}" key="password.label"/></label>
+                        <div class="invalid-feedback">
+                            <fmt:message bundle="${loc}" key="email_or_password.invalid"/>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">
                         <fmt:message bundle="${loc}" key="sign_in.button"/>

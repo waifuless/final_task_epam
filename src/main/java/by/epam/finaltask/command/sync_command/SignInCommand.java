@@ -9,7 +9,6 @@ import by.epam.finaltask.exception.CommandExecutionException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.model.User;
-import by.epam.finaltask.service.CommonUserService;
 import by.epam.finaltask.service.ServiceFactory;
 import by.epam.finaltask.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -27,8 +26,7 @@ public class SignInCommand implements SyncCommand {
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.NOT_AUTHORIZED));
-    private final static String ERROR_ATTRIBUTE_NAME = "sign_in_error";
-    private final static String CAN_NOT_SIGN_IN_MCG = "email_or_password_incorrect";
+    private final static String EMAIL_OR_PASSWORD_INVALID_MCG = "EMAIL_OR_PASSWORD_INVALID";
 
     private final UserService userService = ServiceFactory.getFactoryInstance().userService();
 
@@ -49,8 +47,8 @@ public class SignInCommand implements SyncCommand {
                 SignInUser(optionalUser.get(), request);
                 return new SyncCommandResponse(true, PagePath.START_PAGE.getPath());
             } else {
-                LOG.debug(CAN_NOT_SIGN_IN_MCG);
-                request.setAttribute(ERROR_ATTRIBUTE_NAME, CAN_NOT_SIGN_IN_MCG);
+                LOG.debug(EMAIL_OR_PASSWORD_INVALID_MCG);
+                request.setAttribute(EMAIL_OR_PASSWORD_INVALID_MCG, EMAIL_OR_PASSWORD_INVALID_MCG);
                 return new SyncCommandResponse(false, PagePath.SIGN_IN.getPath());
             }
         } catch (Exception ex) {
