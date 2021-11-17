@@ -3,13 +3,14 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
+<fmt:setBundle basename="l10n.page.signin" var="loc"/>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="images/dollar-symbol.png" type="image/x-icon">
-    <title>Sing in</title>
+    <title><fmt:message bundle="${loc}" key="head.title"/></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
@@ -26,7 +27,7 @@
 
     <div class="container-xl text-center w-100 my-5">
         <div class="row mb-2">
-            <h1>Sign in</h1>
+            <h1><fmt:message bundle="${loc}" key="header"/></h1>
         </div>
         <div class="row">
             <div class="col-xl-4 col-md-6 col-9 mx-auto my-3">
@@ -34,24 +35,34 @@
                     <div class="form-floating my-2">
                         <input type="email" class="form-control" id="floatingInput" name="email"
                                placeholder="name@example.com" required>
-                        <label for="floatingInput">Email address</label>
+                        <label for="floatingInput"><fmt:message bundle="${loc}" key="email.label"/></label>
                     </div>
                     <div class="form-floating my-2">
                         <input type="password" class="form-control" id="floatingPassword" name="password"
                                placeholder="Password" required>
-                        <label for="floatingPassword">Password</label>
+                        <label for="floatingPassword"><fmt:message bundle="${loc}" key="password.label"/></label>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Sign in</button>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <fmt:message bundle="${loc}" key="sign_in.button"/>
+                    </button>
                 </form>
             </div>
         </div>
         <div class="row">
-            <div class="mb-1">First time? <a class="link-primary"
-                                             href="${pageContext.request.contextPath}/ControllerServlet?command=show_registration">Create
-                an account.</a></div>
-            <div>Forgot password? <a class="link-primary"
-                                     href="${pageContext.request.contextPath}/ControllerServlet?command=show_restore_password">Click
-                here.</a></div>
+            <div class="mb-1">
+                <fmt:message bundle="${loc}" key="not_have_account"/>
+                <a class="link-primary"
+                   href="${pageContext.request.contextPath}/ControllerServlet?command=show_registration">
+                    <fmt:message bundle="${loc}" key="registration.link"/>
+                </a>
+            </div>
+            <div>
+                <fmt:message bundle="${loc}" key="forgot_password"/>
+                <a class="link-primary"
+                   href="${pageContext.request.contextPath}/ControllerServlet?command=show_restore_password">
+                    <fmt:message bundle="${loc}" key="forgot_password.link"/>
+                </a>
+            </div>
         </div>
     </div>
 
