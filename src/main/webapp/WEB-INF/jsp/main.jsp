@@ -30,12 +30,13 @@
         <h2 style="border-bottom: 1px solid green; margin-top: 30px">
             <fmt:message bundle="${loc}" key="container.filters.header"/>
         </h2>
+        <form method="post" href="${pageContext.request.contextPath}/ControllerServlet?command=show_main_page">
         <div class="row mt-4">
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="auction-type-filter">
                     <fmt:message bundle="${loc}" key="container.filter.label.auction_type"/>
                 </label>
-                <select id="auction-type-filter" class="form-select" aria-label="Default select example">
+                <select id="auction-type-filter" name="auction-type" class="form-select" aria-label="Default select example">
                     <option value="" selected><fmt:message bundle="${loc}"
                                                                     key="container.filter.type.any"/></option>
                     <option value="FORWARD"><fmt:message bundle="${loc}" key="filter.auction_type.forward"/></option>
@@ -46,7 +47,7 @@
                 <label class="mb-2" for="category-filter">
                     <fmt:message bundle="${loc}" key="container.filter.label.category"/>
                 </label>
-                <select id="category-filter" class="form-select" aria-label="Default select example">
+                <select id="category-filter" name="category" class="form-select" aria-label="Default select example">
                     <option value="" selected><fmt:message bundle="${loc}" key="filter.category.any"/></option>
                     <jsp:useBean id="categories" scope="request"
                                  type="java.util.List<by.epam.finaltask.model.Category>"/>
@@ -58,7 +59,7 @@
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="region-filter"><fmt:message bundle="${loc}"
                                                                      key="container.filter.label.region"/></label>
-                <select id="region-filter" class="form-select" aria-label="Default select example"
+                <select id="region-filter" name="region" class="form-select" aria-label="Default select example"
                         onchange="placeCitiesOrDistricts('region-filter','city-filter')">
                     <option value="" selected><fmt:message bundle="${loc}" key="filter.region.any"/></option>
                     <jsp:useBean id="regions" scope="request" type="java.util.List<by.epam.finaltask.model.Region>"/>
@@ -70,7 +71,7 @@
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="city-filter"><fmt:message bundle="${loc}"
                                                                    key="container.filter.label.city"/></label>
-                <select disabled id="city-filter" class="form-select" aria-label="Default select example">
+                <select disabled id="city-filter" name="city-or-district" class="form-select" aria-label="Default select example">
                     <option value="" selected>
                         <fmt:message bundle="${loc}" key="filter.city_or_district.any"/>
                     </option>
@@ -79,26 +80,29 @@
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="condition-filter"><fmt:message bundle="${loc}"
                                                                         key="container.filter.label.condition"/></label>
-                <select id="condition-filter" class="form-select" aria-label="Default select example">
-                    <option value="NOT_SPECIFIED" selected>
-                        <fmt:message bundle="${loc}" key="filter.condition.not_specified"/>
+                <select id="condition-filter" name="product-condition" class="form-select" aria-label="Default select example">
+                    <option value="" selected>
+                        <fmt:message bundle="${loc}" key="filter.condition.any"/>
                     </option>
                     <option value="NEW"><fmt:message bundle="${loc}" key="filter.condition.new"/></option>
                     <option value="USED"><fmt:message bundle="${loc}" key="filter.condition.used"/></option>
+                    <option value="NOT_SPECIFIED">
+                        <fmt:message bundle="${loc}" key="filter.condition.not_specified"/>
+                    </option>
                 </select>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3">
                 <label class="mb-2" for="price-filter"><fmt:message bundle="${loc}"
                                                                     key="container.filter.label.price"/></label>
                 <div id="price-filter" class="input-group">
-                    <input type="text" aria-label="from"
+                    <input type="text" name="price-from" aria-label="from"
                            class="form-control"
                            placeholder="<fmt:message bundle="${loc}" key="filter.price.from"/>" id="price-from">
-                    <input type="text" aria-label="to" class="form-control" placeholder="<fmt:message bundle="${loc}" key="filter.price.to"/>" id="price-to">
+                    <input type="text" name="price-to" aria-label="to" class="form-control" placeholder="<fmt:message bundle="${loc}" key="filter.price.to"/>" id="price-to">
                 </div>
             </div>
             <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
-                <button type="button" class="btn btn-success w-100">
+                <button type="submit" class="btn btn-success w-100">
                     <fmt:message bundle="${loc}" key="container.filters.apply"/>
                 </button>
             </div>
@@ -108,6 +112,7 @@
                 </button>
             </div>
         </div>
+        </form>
 
 
         <h2 style="border-bottom: 1px solid green; margin-top: 30px">

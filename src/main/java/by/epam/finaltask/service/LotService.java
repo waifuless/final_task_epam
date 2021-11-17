@@ -1,6 +1,7 @@
 package by.epam.finaltask.service;
 
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
+import by.epam.finaltask.model.LotContext;
 import by.epam.finaltask.model.LotWithImages;
 
 import java.util.List;
@@ -15,5 +16,8 @@ public interface LotService {
     void createAndSaveLot(long userId, String maimImagePath, String[] otherImagePaths, String title, String category,
                           String auctionType, String condition, String description, String initPrice,
                           String auctionStart, String duration, String region, String cityOrDistrict)
+            throws ServiceCanNotCompleteCommandRequest;
+
+    List<LotWithImages> findLotsByPageAndContext(int pageNumber, LotContext context)
             throws ServiceCanNotCompleteCommandRequest;
 }

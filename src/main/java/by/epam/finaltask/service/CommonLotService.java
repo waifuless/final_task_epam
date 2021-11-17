@@ -4,7 +4,6 @@ import by.epam.finaltask.dao.ImagesManager;
 import by.epam.finaltask.dao.LotManager;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
-import com.sun.xml.internal.ws.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +15,7 @@ public class CommonLotService implements LotService {
 
     private final static Logger LOG = LogManager.getLogger(CommonLotService.class);
 
-    private final static int LOTS_PER_PAGE = 9;
+    private final static int LOTS_PER_PAGE = 8;
 
     private final LotManager lotManager;
     private final ImagesManager imagesManager;
@@ -46,12 +45,7 @@ public class CommonLotService implements LotService {
     public List<LotWithImages> findLotsByPage(int pageNumber) throws ServiceCanNotCompleteCommandRequest {
         try {
             List<Lot> lots = lotManager.find((long) (pageNumber - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
-            List<LotWithImages> lotsWithImages = new LinkedList<>();
-            for (Lot lot : lots) {
-                lotsWithImages.add(new LotWithImages(lot, imagesManager.find(lot.getLotId()).orElse(null)));
-            }
-            LOG.debug("Lots: {}",lotsWithImages);
-            return lotsWithImages;
+            return findLotsWithImages(lots);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
@@ -85,6 +79,29 @@ public class CommonLotService implements LotService {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
         }
+    }
+
+    @Override
+    public List<LotWithImages> findLotsByPageAndContext(int pageNumber, LotContext context)
+            throws ServiceCanNotCompleteCommandRequest {
+        try {
+            List<Lot> lots = lotManager.findByLotContext(context,
+                    (long) (pageNumber - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
+            return findLotsWithImages(lots);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    private List<LotWithImages> findLotsWithImages(List<Lot> lots)
+            throws java.sql.SQLException, InterruptedException {
+        List<LotWithImages> lotsWithImages = new LinkedList<>();
+        for (Lot lot : lots) {
+            lotsWithImages.add(new LotWithImages(lot, imagesManager.find(lot.getLotId()).orElse(null)));
+        }
+        LOG.debug("LotsWithImages: {}",lotsWithImages);
+        return lotsWithImages;
     }
 
     private String reformatForTimestamp(String time){

@@ -2,6 +2,7 @@ package by.epam.finaltask.dao;
 
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.model.Lot;
+import by.epam.finaltask.model.LotContext;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -14,9 +15,6 @@ public interface LotManager extends Dao<Lot> {
 
     List<Lot> find(long offset, long count) throws SQLException, DataSourceDownException, InterruptedException;
 
-    List<Lot> findByCategory(String category, long offset, long count)
-            throws SQLException, DataSourceDownException, InterruptedException;
-
-    List<Lot> findByUserId(long userId, long offset, long count)
+    List<Lot> findByLotContext(LotContext context, long offset, long count)
             throws SQLException, DataSourceDownException, InterruptedException;
 }

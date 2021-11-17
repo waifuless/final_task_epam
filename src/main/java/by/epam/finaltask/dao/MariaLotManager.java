@@ -3,18 +3,14 @@ package by.epam.finaltask.dao;
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
-import by.epam.finaltask.model.AuctionStatus;
-import by.epam.finaltask.model.AuctionType;
-import by.epam.finaltask.model.Lot;
-import by.epam.finaltask.model.ProductCondition;
+import by.epam.finaltask.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MariaLotManager extends GenericDao<Lot> implements LotManager {
 
@@ -26,7 +22,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     private final static String AUCTION_TYPE_NAME_COLUMN = "auction_type_name";
     private final static String TITLE_COLUMN = "title";
     private final static String START_DATETIME_COLUMN = "start_datetime";
-    private final static String END_DATETIME = "end_datetime";
+    private final static String END_DATETIME_COLUMN = "end_datetime";
     private final static String INITIAL_PRICE_COLUMN = "initial_price";
     private final static String REGION_NAME_COLUMN = "region_name";
     private final static String CITY_OR_DISTRICT_NAME_COLUMN = "city_or_district_name";
@@ -58,9 +54,6 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     private final static String FIND_LOT_BY_ID_QUERY = FIND_ALL_LOTS_QUERY + " WHERE lot.lot_id=?;";
     private final static String FIND_LOT_OFFSET_QUERY =
             FIND_ALL_LOTS_QUERY + " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
-    private final static String FIND_LOT_OFFSET_BY_CATEGORY_QUERY =
-            FIND_ALL_LOTS_QUERY + " WHERE lot.category_id = findCategoryId(?)" +
-                    " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
     private final static String FIND_LOT_OFFSET_BY_USER_ID_QUERY =
             FIND_ALL_LOTS_QUERY + " WHERE owner_id = ?" +
                     " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
@@ -73,6 +66,9 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     " WHERE lot_id = ?";
     private final static String DELETE_LOT_QUERY =
             "DELETE FROM lot WHERE lot_id = ?;";
+    private final static String EQUALS_TEMPLATE = " %s = ? ";
+    private final static String GREATER_THAN_OR_EQUALS_TEMPLATE = " %s>=? ";
+    private final static String LESS_THAN_OR_EQUALS_TEMPLATE = " %s<=? ";
 
     private static volatile MariaLotManager instance;
 
@@ -134,7 +130,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     AuctionType.valueOf(resultSet.getString(AUCTION_TYPE_NAME_COLUMN)),
                     resultSet.getString(TITLE_COLUMN),
                     resultSet.getTimestamp(START_DATETIME_COLUMN),
-                    resultSet.getTimestamp(END_DATETIME),
+                    resultSet.getTimestamp(END_DATETIME_COLUMN),
                     resultSet.getBigDecimal(INITIAL_PRICE_COLUMN),
                     resultSet.getString(REGION_NAME_COLUMN),
                     resultSet.getString(CITY_OR_DISTRICT_NAME_COLUMN),
@@ -156,25 +152,59 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     }
 
     @Override
-    public List<Lot> findByCategory(String category, long offset, long count)
+    public List<Lot> findByLotContext(LotContext context, long offset, long count)
             throws SQLException, DataSourceDownException, InterruptedException {
-        return findListWithPreparator(FIND_LOT_OFFSET_BY_CATEGORY_QUERY, statement ->
+        LinkedHashMap<Object, Integer> params = new LinkedHashMap<>();
+        String findByContextQuery = FIND_ALL_LOTS_QUERY + createFilterByContextAndFillParamsMap(context, params)+
+                " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
+        return findListWithPreparator(findByContextQuery, statement ->
         {
-            statement.setString(1, category);
-            statement.setLong(2, count);
-            statement.setLong(3, offset);
+            int i=0;
+            for (Map.Entry<Object, Integer> entry : params.entrySet()) {
+                statement.setObject(++i, entry.getKey(), entry.getValue());
+            }
+            statement.setLong(++i, count);
+            statement.setLong(++i, offset);
         });
     }
 
-    @Override
-    public List<Lot> findByUserId(long userId, long offset, long count)
-            throws SQLException, DataSourceDownException, InterruptedException {
-        return findListWithPreparator(FIND_LOT_OFFSET_BY_USER_ID_QUERY, statement ->
-        {
-            statement.setLong(1, userId);
-            statement.setLong(2, count);
-            statement.setLong(3, offset);
-        });
+    private String createFilterByContextAndFillParamsMap(LotContext context, LinkedHashMap<Object, Integer> params) {
+        StringBuilder filter = new StringBuilder(" WHERE ");
+        if (context.getOwnerId() != null) {
+            filter.append(String.format(" %s = ? ", OWNER_ID_COLUMN));
+            params.put(context.getOwnerId(), Types.INTEGER);
+        }
+        checkParamAndFillFilterAndParamMap(context.getCategory(), Types.VARCHAR, EQUALS_TEMPLATE,
+                "category.category_name", filter, params);
+        checkParamAndFillFilterAndParamMap(context.getAuctionType(), Types.VARCHAR, EQUALS_TEMPLATE,
+                "auction_type.type_name", filter, params);
+        checkParamAndFillFilterAndParamMap(context.getTitle(), Types.VARCHAR, EQUALS_TEMPLATE, "title",
+                filter, params);
+        checkParamAndFillFilterAndParamMap(context.getMinInitialPrice(), Types.DECIMAL, GREATER_THAN_OR_EQUALS_TEMPLATE,
+                "initial_price", filter, params);
+        checkParamAndFillFilterAndParamMap(context.getMaxInitialPrice(), Types.DECIMAL, LESS_THAN_OR_EQUALS_TEMPLATE,
+                "initial_price", filter, params);
+        checkParamAndFillFilterAndParamMap(context.getRegion(), Types.VARCHAR, EQUALS_TEMPLATE,
+                "region_name", filter, params);
+        checkParamAndFillFilterAndParamMap(context.getCityOrDistrict(), Types.VARCHAR, EQUALS_TEMPLATE,
+                "city_or_district_name", filter, params);
+        checkParamAndFillFilterAndParamMap(context.getAuctionStatus(), Types.VARCHAR, EQUALS_TEMPLATE,
+                "auction_status.status_name", filter, params);
+        checkParamAndFillFilterAndParamMap(context.getProductCondition(), Types.VARCHAR, EQUALS_TEMPLATE,
+                "pc.product_condition_name", filter, params);
+        return new String(filter);
+    }
+
+    private void checkParamAndFillFilterAndParamMap(Object param, Integer paramType, String filterPartTemplate,
+                                                    String columnName, StringBuilder filter,
+                                                    LinkedHashMap<Object, Integer> params) {
+        if (param != null) {
+            if (!params.isEmpty()) {
+                filter.append(" AND ");
+            }
+            filter.append(String.format(filterPartTemplate, columnName));
+            params.put(param, paramType);
+        }
     }
 
     private List<Lot> findListWithPreparator(String query, StatementPreparator preparator)
