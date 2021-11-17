@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="images/dollar-symbol.png" type="image/x-icon">
     <title>Title</title>
+    <link rel="stylesheet" href="css/page-wrapper.css">
 </head>
 <body>
 <p>Page haven`t done</p>

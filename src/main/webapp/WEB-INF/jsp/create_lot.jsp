@@ -17,7 +17,7 @@
             integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/main-page.css">
+    <link rel="stylesheet" href="css/page-wrapper.css">
     <link rel="stylesheet" href="css/add-lot.css">
     <script src="js/add-lot.js"></script>
     <script src="js/region-cities-select.js"></script>

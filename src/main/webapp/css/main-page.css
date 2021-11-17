@@ -1,21 +1,3 @@
-html, body {
-    height: 100%;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-}
-
-.page-wrapper {
-    min-height: 100%;
-    margin-bottom: -50px;
-}
-
-* html .page-wrapper {
-    height: 100%;
-}
-
 #accountDropDownMenu{
     max-width: 250px;
 }
@@ -24,17 +6,6 @@ html, body {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-}
-
-.page-buffer {
-    height: 50px;
-}
-
-.page-footer {
-    border: 1px solid white;
-    background-color: #e3f2fd;
-    padding: 0;
-    margin: 0;
 }
 
 .container__row__a:active,
