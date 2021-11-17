@@ -4,6 +4,8 @@ import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.controller.PagePath;
+import by.epam.finaltask.exception.CommandError;
+import by.epam.finaltask.exception.CommandExecutionException;
 import by.epam.finaltask.model.AuctionStatus;
 import by.epam.finaltask.model.LotContext;
 import by.epam.finaltask.model.Role;
@@ -29,15 +31,15 @@ public class SetMainPageLotContextCommand implements SyncCommand {
     }
 
     @Override
-    public SyncCommandResponse execute(CommandRequest request) {
+    public SyncCommandResponse execute(CommandRequest request) throws CommandExecutionException {
         try {
             LotContext context = findLotContext(request);
             request.getSession().setAttribute(UserSessionAttribute.MAIN_PAGE_LOT_CONTEXT.name(), context);
             return new SyncCommandResponse(true, request.createCommandPath(SyncCommandVariant.SHOW_MAIN));
-        } catch (Exception ex) {
+        }
+        catch (NumberFormatException ex){
             LOG.warn(ex.getMessage(), ex);
-            request.setAttribute("errorMessage", ex.getMessage());
-            return new SyncCommandResponse(false, PagePath.ERROR.getPath());
+            throw new CommandExecutionException(CommandError.INVALID_NUMBER);
         }
     }
 
@@ -46,7 +48,7 @@ public class SetMainPageLotContextCommand implements SyncCommand {
         return ALLOWED_ROLES;
     }
 
-    private LotContext findLotContext(CommandRequest request) {
+    private LotContext findLotContext(CommandRequest request) throws NumberFormatException{
         return LotContext.builder()
                 .setCategory(retrieveNullIfEmpty(request.getParameter("category")))
                 .setAuctionType(retrieveNullIfEmpty(request.getParameter("auction-type")))

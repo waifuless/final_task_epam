@@ -4,6 +4,9 @@ import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.controller.PagePath;
+import by.epam.finaltask.exception.CommandError;
+import by.epam.finaltask.exception.CommandExecutionException;
+import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.model.User;
 import by.epam.finaltask.service.CommonUserService;
@@ -33,10 +36,14 @@ public class SignInCommand implements SyncCommand {
     }
 
     @Override
-    public SyncCommandResponse execute(CommandRequest request) {
+    public SyncCommandResponse execute(CommandRequest request) throws CommandExecutionException,
+            ServiceCanNotCompleteCommandRequest {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         try {
+            if(isStringEmpty(email) || isStringEmpty(password)){
+                throw new CommandExecutionException(CommandError.EMPTY_ARGUMENTS);
+            }
             Optional<User> optionalUser = userService.authenticate(email, password);
             if (optionalUser.isPresent()) {
                 SignInUser(optionalUser.get(), request);
@@ -48,14 +55,17 @@ public class SignInCommand implements SyncCommand {
             }
         } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
-            request.setAttribute("errorMessage", ex.getMessage());
-            return new SyncCommandResponse(false, PagePath.ERROR.getPath());
+            throw ex;
         }
     }
 
     @Override
     public List<Role> getAllowedRoles() {
         return ALLOWED_ROLES;
+    }
+
+    private boolean isStringEmpty(String str) {
+        return str == null || str.trim().isEmpty();
     }
 
     private void SignInUser(User user, CommandRequest request) {

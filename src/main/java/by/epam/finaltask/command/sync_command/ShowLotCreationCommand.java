@@ -3,6 +3,7 @@ package by.epam.finaltask.command.sync_command;
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.controller.PagePath;
+import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Category;
 import by.epam.finaltask.model.LotWithImages;
 import by.epam.finaltask.model.Region;
@@ -30,15 +31,14 @@ public class ShowLotCreationCommand implements SyncCommand{
     private final CategoryService categoryService = ServiceFactory.getFactoryInstance().categoryService();
 
     @Override
-    public SyncCommandResponse execute(CommandRequest request) {
+    public SyncCommandResponse execute(CommandRequest request) throws ServiceCanNotCompleteCommandRequest {
         try {
             request.setAttribute("regions", regionService.findAllRegions());
             request.setAttribute("categories", categoryService.findAllCategories());
             return new SyncCommandResponse(false, PagePath.LOT_CREATION.getPath());
         } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
-            request.setAttribute("errorMessage", ex.getMessage());
-            return new SyncCommandResponse(false, PagePath.ERROR.getPath());
+            throw ex;
         }
     }
 

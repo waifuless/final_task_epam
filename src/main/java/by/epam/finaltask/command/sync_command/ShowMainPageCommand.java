@@ -52,7 +52,6 @@ public class ShowMainPageCommand implements SyncCommand {
         } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
             request.setAttribute("errorMessage", ex.getMessage());
-            return new SyncCommandResponse(false, PagePath.ERROR.getPath());
         }
         return new SyncCommandResponse(false, PagePath.MAIN.getPath());
     }

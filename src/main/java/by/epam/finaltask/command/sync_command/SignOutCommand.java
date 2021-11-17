@@ -20,13 +20,8 @@ public class SignOutCommand implements SyncCommand {
 
     @Override
     public SyncCommandResponse execute(CommandRequest request) {
-        try {
-            destroySession(request);
-            return new SyncCommandResponse(true, PagePath.START_PAGE.getPath());
-        } catch (Exception ex) {
-            request.setAttribute("errorMessage", ex.getMessage());
-            return new SyncCommandResponse(false, PagePath.ERROR.getPath());
-        }
+        destroySession(request);
+        return new SyncCommandResponse(true, PagePath.START_PAGE.getPath());
     }
 
     @Override

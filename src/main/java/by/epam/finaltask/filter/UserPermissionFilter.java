@@ -17,14 +17,17 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Optional;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+
 @WebFilter(filterName = "UserPermissionFilter")
 public class UserPermissionFilter implements Filter {
 
     private final static Logger LOG = LoggerFactory.getLogger(UserPermissionFilter.class);
-    private final static String FORBIDDEN_MCG = "forbidden {} to access {} command";
-    private final static int FORBIDDEN_STATUS_CODE = 403;
-    private final static String BAD_REQUEST_MCG = "Command {} does not exist";
-    private final static int BAD_REQUEST_STATUS_CODE = 400;
+    private final static String BAD_REQUEST_ERROR_MESSAGE = "Unknown command received %s";
+    private final static String FORBIDDEN_ERROR_MESSAGE = "Forbidden to access %s";
+    private final static String FORBIDDEN_LOG_MCG = "forbidden {} to access {} command";
+    private final static String BAD_REQUEST_LOG_MCG = "Command {} does not exist";
     private final SyncCommandFactory syncCommandFactory = SyncCommandFactory.getInstance();
     private final AjaxCommandFactory ajaxCommandFactory = AjaxCommandFactory.getInstance();
     private final HandlerFactory handlerFactory = HandlerFactory.getInstance();
@@ -44,13 +47,13 @@ public class UserPermissionFilter implements Filter {
         Optional<RoledCommand> roledCommand = findCommand(commandName, request);
 
         if (!roledCommand.isPresent()) {
-            LOG.warn(BAD_REQUEST_MCG, commandName);
-            response.sendError(BAD_REQUEST_STATUS_CODE);
+            LOG.warn(BAD_REQUEST_LOG_MCG, commandName);
+            response.sendError(SC_BAD_REQUEST, String.format(BAD_REQUEST_ERROR_MESSAGE, commandName));
             return;
         }
         if (!roledCommand.get().getAllowedRoles().contains(userRole)) {
-            LOG.warn(FORBIDDEN_MCG, userRole, roledCommand.get());
-            response.sendError(FORBIDDEN_STATUS_CODE);
+            LOG.warn(FORBIDDEN_LOG_MCG, userRole, roledCommand.get());
+            response.sendError(SC_FORBIDDEN, String.format(FORBIDDEN_ERROR_MESSAGE, commandName));
             return;
         }
         chain.doFilter(req, res);

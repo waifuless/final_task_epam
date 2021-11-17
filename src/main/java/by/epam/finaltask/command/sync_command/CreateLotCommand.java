@@ -4,6 +4,9 @@ import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.controller.PagePath;
+import by.epam.finaltask.exception.CommandError;
+import by.epam.finaltask.exception.CommandExecutionException;
+import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
@@ -24,7 +27,8 @@ public class CreateLotCommand implements SyncCommand {
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
 
     @Override
-    public SyncCommandResponse execute(CommandRequest request) {
+    public SyncCommandResponse execute(CommandRequest request) throws ServiceCanNotCompleteCommandRequest,
+            CommandExecutionException {
         try {
             long userId = (Long)request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
             String mainImagePath = request.getParameter("mainImage");
@@ -36,7 +40,6 @@ public class CreateLotCommand implements SyncCommand {
             String description = request.getParameter("description");
             String initPrice = request.getParameter("init-price");
             String auctionStart = request.getParameter("auction-start");
-            LOG.debug("auctionStart: {}", auctionStart);
             String duration = request.getParameter("duration");
             String region = request.getParameter("region");
             String cityOrDistrict = request.getParameter("city-or-district");
@@ -45,8 +48,7 @@ public class CreateLotCommand implements SyncCommand {
                     || isStringEmpty(initPrice) || isStringEmpty(auctionStart) || isStringEmpty(duration)
                     || isStringEmpty(region) || isStringEmpty(cityOrDistrict)) {
                 LOG.debug("One of required fields is empty");
-                request.setAttribute("errorMessage","One of required fields is empty");
-                return new SyncCommandResponse(false, PagePath.LOT_CREATION.getPath());
+                throw new CommandExecutionException(CommandError.EMPTY_ARGUMENTS);
             }
             lotService.createAndSaveLot(userId, mainImagePath, otherImagePaths, title, category, auctionType,
                     condition, description, initPrice, auctionStart, duration, region, cityOrDistrict);
@@ -54,8 +56,7 @@ public class CreateLotCommand implements SyncCommand {
                     .createCommandPath(SyncCommandFactory.SyncCommandVariant.SHOW_MAIN));
         } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
-            request.setAttribute("errorMessage", ex.getMessage());
-            return new SyncCommandResponse(false, PagePath.ERROR.getPath());
+            throw ex;
         }
     }
 

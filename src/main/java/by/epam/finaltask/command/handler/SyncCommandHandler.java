@@ -4,8 +4,10 @@ import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.sync_command.SyncCommand;
 import by.epam.finaltask.command.sync_command.SyncCommandFactory;
+import by.epam.finaltask.exception.CommandExecutionException;
 import by.epam.finaltask.exception.InvalidArgumentException;
 import by.epam.finaltask.exception.OperationNotSupportedException;
+import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +20,8 @@ public class SyncCommandHandler implements CommandHandler {
 
     private final static Logger LOG = LogManager.getLogger(SyncCommandHandler.class);
     private final static String OPERATION_NOT_FOUND_MCG = "Operation %s not found";
+    private final static String SERVICE_ERROR_MCG = "An error occurred during service execution";
+    private final static String UNKNOWN_ERROR_MCG = "An unknown error occurred on server";
 
     private final SyncCommandFactory syncCommandFactory = SyncCommandFactory.getInstance();
 
@@ -39,11 +43,15 @@ public class SyncCommandHandler implements CommandHandler {
             } else {
                 request.getRequestDispatcher(syncCommandResponse.getPath()).forward(request, response);
             }
-        } catch (Exception ex) {
+        } catch (CommandExecutionException ex) {
             LOG.warn(ex.getMessage(), ex);
-            request.setAttribute("errorMessage", ex.getMessage());
-            request.getRequestDispatcher(by.epam.finaltask.controller.PagePath.ERROR.getPath())
-                    .forward(request, response);
+            response.sendError(ex.getErrorStatus(), ex.getMessage());
+        } catch (ServiceCanNotCompleteCommandRequest ex){
+            LOG.warn(ex.getMessage(), ex);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, SERVICE_ERROR_MCG);
+        } catch (Exception ex){
+            LOG.warn(ex.getMessage(), ex);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR_MCG);
         }
     }
 }

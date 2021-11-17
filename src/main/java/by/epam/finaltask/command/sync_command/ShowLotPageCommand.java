@@ -3,6 +3,9 @@ package by.epam.finaltask.command.sync_command;
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.controller.PagePath;
+import by.epam.finaltask.exception.CommandError;
+import by.epam.finaltask.exception.CommandExecutionException;
+import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.LotWithImages;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.LotService;
@@ -28,22 +31,24 @@ public class ShowLotPageCommand implements SyncCommand {
     }
 
     @Override
-    public SyncCommandResponse execute(CommandRequest request) {
+    public SyncCommandResponse execute(CommandRequest request) throws CommandExecutionException,
+            ServiceCanNotCompleteCommandRequest {
         try {
-            //todo: validate parsing string to int
             int lot_id = Integer.parseInt(request.getParameter("lot_id"));
             Optional<LotWithImages> optionalLotWithImages = lotService.findLot(lot_id);
             if (optionalLotWithImages.isPresent()) {
                 request.setAttribute("lot", optionalLotWithImages.get());
             } else {
-                //todo: remake
-                throw new RuntimeException();
+                throw new CommandExecutionException(CommandError.NOT_FOUND);
             }
             return new SyncCommandResponse(false, PagePath.LOT.getPath());
-        } catch (Exception ex) {
+        }catch (NumberFormatException ex){
             LOG.warn(ex.getMessage(), ex);
-            request.setAttribute("errorMessage", ex.getMessage());
-            return new SyncCommandResponse(false, PagePath.ERROR.getPath());
+            throw new CommandExecutionException(CommandError.INVALID_NUMBER);
+        }
+        catch (Exception ex) {
+            LOG.warn(ex.getMessage(), ex);
+            throw ex;
         }
     }
 

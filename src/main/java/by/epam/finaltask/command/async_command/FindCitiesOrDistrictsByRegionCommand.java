@@ -2,6 +2,8 @@ package by.epam.finaltask.command.async_command;
 
 import by.epam.finaltask.command.AjaxCommandResponse;
 import by.epam.finaltask.command.CommandRequest;
+import by.epam.finaltask.exception.CommandError;
+import by.epam.finaltask.exception.CommandExecutionException;
 import by.epam.finaltask.model.CityOrDistrict;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.CityOrDistrictService;
@@ -35,6 +37,9 @@ public class FindCitiesOrDistrictsByRegionCommand implements AjaxCommand {
     @Override
     public AjaxCommandResponse execute(CommandRequest request) throws Exception {
         String region = request.getParameter("region");
+        if(region==null || region.trim().isEmpty()){
+            throw new CommandExecutionException(CommandError.EMPTY_ARGUMENTS);
+        }
         List<CityOrDistrict> citiesOrDistricts = cityOrDistrictService.findCityOrDistrictsByRegion(region);
         String jsonCitiesOrDistricts = new Gson().toJson(citiesOrDistricts);
         return new AjaxCommandResponse("application/json", jsonCitiesOrDistricts);
