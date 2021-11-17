@@ -133,11 +133,11 @@
                    class="container__row__a col-12 col-lg-6 mb-3 mb-3">
                     <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
                         <div class="row g-0">
-                            <div class="col-md-4 div-image">
+                            <div class="col-4 div-image">
                                 <img src="${lot.images.mainImage.path}" class="img-fluid rounded-start"
                                      alt="...">
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-8">
                                 <div class="card-body">
                                     <h5 class="card-title">${lot.title}</h5>
                                     <p class="card-text category">${lot.category}</p>
