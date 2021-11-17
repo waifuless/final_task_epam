@@ -5,6 +5,8 @@
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.main" var="loc"/>
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">

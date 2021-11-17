@@ -5,6 +5,7 @@
 
 <fmt:setBundle basename="path-to-images-folder" var="imgFolderPath"/>
 
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
