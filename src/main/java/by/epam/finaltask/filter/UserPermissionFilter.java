@@ -40,6 +40,7 @@ public class UserPermissionFilter implements Filter {
         final Role userRole = getCurrentRole(request);
 
         String commandName = request.getParameter("command");
+        LOG.debug("Command: {}", commandName);
         Optional<RoledCommand> roledCommand = findCommand(commandName, request);
 
         if (!roledCommand.isPresent()) {
@@ -58,6 +59,7 @@ public class UserPermissionFilter implements Filter {
     private Role getCurrentRole(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session == null) {
+            request.getSession(true).setAttribute(UserSessionAttribute.USER_ROLE.name(), Role.NOT_AUTHORIZED);
             return Role.NOT_AUTHORIZED;
         }
         Role role = (Role) session.getAttribute(UserSessionAttribute.USER_ROLE.name());

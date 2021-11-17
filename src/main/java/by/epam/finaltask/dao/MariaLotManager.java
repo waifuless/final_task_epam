@@ -192,6 +192,11 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                 "auction_status.status_name", filter, params);
         checkParamAndFillFilterAndParamMap(context.getProductCondition(), Types.VARCHAR, EQUALS_TEMPLATE,
                 "pc.product_condition_name", filter, params);
+        LOG.debug("Filter query: {}", filter);
+        LOG.debug("Params map: {}", params);
+        if(params.isEmpty()){
+            return "";
+        }
         return new String(filter);
     }
 

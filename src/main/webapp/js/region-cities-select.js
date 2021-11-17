@@ -1,4 +1,4 @@
-function placeCitiesOrDistricts(regionSelectId, cityOrDistrictSelectId) {
+function placeCitiesOrDistricts(regionSelectId, cityOrDistrictSelectId, funcAfterSuccess) {
 
     $(`#${cityOrDistrictSelectId} option:not(:first)`).remove();
 
@@ -17,7 +17,6 @@ function placeCitiesOrDistricts(regionSelectId, cityOrDistrictSelectId) {
             region: $(`#${regionSelectId} option:selected`).val()
         },
         success: function (response) {
-            console.log(response);
             response.forEach((cityOrDistrict)=>{
                 $(`#${cityOrDistrictSelectId}`).append('<option value="'
                     + cityOrDistrict.cityOrDistrictName
@@ -26,6 +25,7 @@ function placeCitiesOrDistricts(regionSelectId, cityOrDistrictSelectId) {
                     + '</option>');
             });
             $(`#${cityOrDistrictSelectId}`).prop('disabled', false);
+            funcAfterSuccess();
         }
     });
 }

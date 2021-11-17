@@ -66,7 +66,10 @@ public class SyncCommandFactory {
         SHOW_LOT("show_lot_page", ShowLotPageCommand.class),
         SHOW_RESTORE_PASSWORD("show_restore_password", ShowRestorePasswordPageCommand.class),
         SHOW_LOT_CREATION("show_lot_creation", ShowLotCreationCommand.class),
-        CREATE_LOT("create_lot", CreateLotCommand.class);
+        CREATE_LOT("create_lot", CreateLotCommand.class),
+        SET_MAIN_PAGE_LOT_CONTEXT("set_main_page_lot_context", SetMainPageLotContextCommand.class),
+        REMOVE_MAIN_PAGE_LOT_CONTEXT("remove_main_page_lot_context",
+                RemoveMainPageLotContextCommand.class);
 
         private final String commandName;
         private final Class<? extends SyncCommand> commandClass;
