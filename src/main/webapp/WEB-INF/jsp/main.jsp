@@ -179,6 +179,13 @@
 <script src="js/jquery-3.6.0.js" type="text/javascript"></script>
 <script src="js/region-cities-select.js" type="text/javascript"></script>
 
+<script src="js/nav-link.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        selectActiveNavPage('main-link');
+    });
+</script>
+
 <script type="text/javascript">
     $(document).ready(function () {
 

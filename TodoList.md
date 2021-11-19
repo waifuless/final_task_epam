@@ -6,3 +6,6 @@ more than two days ago.(DATEDIFF()>=2)
 3.Make adaptive main page
 
 4.Set lotContext in some context like session?)
+Done
+
+5.Change 'Personal' to 'Profile' 

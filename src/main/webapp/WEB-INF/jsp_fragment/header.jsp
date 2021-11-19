@@ -19,18 +19,21 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page"
+                        <a class="nav-link" id="main-link" aria-current="page"
                            href="${pageContext.request.contextPath}/ControllerServlet?command=show_main_page">
                             <fmt:message bundle="${headerLoc}" key="link.main"/>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link"
-                           href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_creation"><fmt:message
-                                bundle="${headerLoc}" key="link.add_lot"/></a>
+                        <a class="nav-link" id="lot-creation-link"
+                           href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_creation">
+                            <fmt:message bundle="${headerLoc}" key="link.add_lot"/>
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><fmt:message bundle="${headerLoc}" key="link.cart"/></a>
+                        <a class="nav-link" id="cart" href="#">
+                            <fmt:message bundle="${headerLoc}" key="link.cart"/>
+                        </a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"

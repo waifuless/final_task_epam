@@ -22,6 +22,13 @@
     <link rel="stylesheet" href="css/add-lot.css">
     <script src="js/add-lot.js"></script>
     <script src="js/region-cities-select.js"></script>
+
+    <script src="js/nav-link.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            selectActiveNavPage('lot-creation-link');
+        });
+    </script>
 </head>
 <body>
 <div class="page-wrapper">
