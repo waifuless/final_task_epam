@@ -1,6 +1,9 @@
 package by.epam.finaltask.exception;
 
-public enum CommandError {
+/**
+ * Enum with common client errors
+ */
+public enum ClientError {
     EMPTY_ARGUMENTS(400,"One or more arguments are empty"),
     INVALID_NUMBER(400, "Invalid number format"),
     INVALID_IMAGE(400, "Image is invalid"),
@@ -9,7 +12,7 @@ public enum CommandError {
     private final int errorStatus;
     private final String message;
 
-    CommandError(int errorStatus, String message) {
+    ClientError(int errorStatus, String message) {
         this.errorStatus = errorStatus;
         this.message = message;
     }

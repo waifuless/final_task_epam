@@ -1,6 +1,8 @@
 package by.epam.finaltask.service;
 
 import by.epam.finaltask.dao.ImagesManager;
+import by.epam.finaltask.exception.ClientError;
+import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
@@ -47,10 +49,10 @@ public class CommonImagesService implements ImagesService {
     }
 
     @Override
-    public String saveImage(Part image, long userId) throws ServiceCanNotCompleteCommandRequest {
+    public String saveImage(Part image, long userId) throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
             LOG.debug("Image file name: {}", image.getSubmittedFileName());
-
+            validateImage(image);
             BufferedImage preparedImage = prepareImageToSave(image);
 
             String oldImageFileName = image.getSubmittedFileName();
@@ -68,10 +70,21 @@ public class CommonImagesService implements ImagesService {
             LOG.debug("Image context path: {}", imageContextPath);
             imagesManager.saveImagePath(imageContextPath);
             return imageContextPath;
-        } catch (Exception ex) {
+        } catch (ClientErrorException ex){
+            LOG.warn(ex.getMessage(), ex);
+            throw ex;
+        }
+        catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
         }
+    }
+
+    private void validateImage(Part image) throws ClientErrorException{
+        if(image.getSize()>5242880){
+            throw new ClientErrorException(ClientError.INVALID_IMAGE);
+        }
+        //todo: other validation
     }
 
     private BufferedImage prepareImageToSave(Part image) throws IOException, ImageProcessingException,

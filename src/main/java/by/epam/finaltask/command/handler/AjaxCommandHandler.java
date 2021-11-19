@@ -4,8 +4,7 @@ import by.epam.finaltask.command.AjaxCommandResponse;
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.async_command.AjaxCommand;
 import by.epam.finaltask.command.async_command.AjaxCommandFactory;
-import by.epam.finaltask.exception.CommandExecutionException;
-import by.epam.finaltask.exception.InvalidArgumentException;
+import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.OperationNotSupportedException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +39,7 @@ public class AjaxCommandHandler implements CommandHandler {
             try (PrintWriter writer = response.getWriter()) {
                 writer.write(ajaxCommandResponse.getResponse());
             }
-        } catch (CommandExecutionException ex) {
+        } catch (ClientErrorException ex) {
             LOG.warn(ex.getMessage(), ex);
             response.setStatus(ex.getErrorStatus());
             try (PrintWriter writer = response.getWriter()) {

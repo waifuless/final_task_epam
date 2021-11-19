@@ -2,6 +2,8 @@ package by.epam.finaltask.service;
 
 import by.epam.finaltask.dao.ImagesManager;
 import by.epam.finaltask.dao.LotManager;
+import by.epam.finaltask.exception.ClientError;
+import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
 import org.apache.logging.log4j.LogManager;
@@ -53,12 +55,14 @@ public class CommonLotService implements LotService {
     }
 
     @Override
-    public void createAndSaveLot(long userId, String maimImagePath, String[] otherImagePaths, String title,
+    public void createAndSaveLot(long userId, String mainImagePath, String[] otherImagePaths, String title,
                                  String category, String auctionType, String condition, String description,
                                  String initPrice, String auctionStart, String duration, String region,
                                  String cityOrDistrict)
-            throws ServiceCanNotCompleteCommandRequest {
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
+            validateCreationParams(mainImagePath, otherImagePaths, title, category, auctionType, condition,
+                    description, initPrice, auctionStart, duration, region, cityOrDistrict);
             Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
             Timestamp endDatetime =
                     new Timestamp(startDatetime.getTime() + (long) Integer.parseInt(duration) * 60 * 60 * 1000);
@@ -70,11 +74,14 @@ public class CommonLotService implements LotService {
                 Lot savedLot = optionalLot.get();
                 List<String> imagePaths = otherImagePaths == null ? Collections.emptyList()
                         : Arrays.asList(otherImagePaths);
-                Images images = new Images(savedLot.getLotId(), maimImagePath, imagePaths);
+                Images images = new Images(savedLot.getLotId(), mainImagePath, imagePaths);
                 imagesManager.save(images);
             } else {
                 //throw exception
             }
+        } catch (ClientErrorException ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw ex;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
@@ -100,12 +107,30 @@ public class CommonLotService implements LotService {
         for (Lot lot : lots) {
             lotsWithImages.add(new LotWithImages(lot, imagesManager.find(lot.getLotId()).orElse(null)));
         }
-        LOG.debug("LotsWithImages: {}",lotsWithImages);
+        LOG.debug("LotsWithImages: {}", lotsWithImages);
         return lotsWithImages;
     }
 
-    private String reformatForTimestamp(String time){
+    private void validateCreationParams(String mainImagePath, String[] otherImagePaths, String title,
+                                        String category, String auctionType, String condition, String description,
+                                        String initPrice, String auctionStart, String duration, String region,
+                                        String cityOrDistrict) throws ClientErrorException {
+        //todo: add validation to date and images(should be in database)
+        if (isStringEmpty(mainImagePath) || isStringEmpty(title) || isStringEmpty(category)
+                || isStringEmpty(auctionType) || isStringEmpty(condition) || isStringEmpty(description)
+                || isStringEmpty(initPrice) || isStringEmpty(auctionStart) || isStringEmpty(duration)
+                || isStringEmpty(region) || isStringEmpty(cityOrDistrict)) {
+            LOG.debug("One of required fields is empty");
+            throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
+        }
+    }
+
+    private boolean isStringEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
+    private String reformatForTimestamp(String time) {
         time = time.replace("T", " ");
-        return time.indexOf(':')==time.lastIndexOf(':') ?  time.concat(":00") : time;
+        return time.indexOf(':') == time.lastIndexOf(':') ? time.concat(":00") : time;
     }
 }

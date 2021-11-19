@@ -3,9 +3,8 @@ package by.epam.finaltask.command.sync_command;
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.UserSessionAttribute;
-import by.epam.finaltask.controller.PagePath;
-import by.epam.finaltask.exception.CommandError;
-import by.epam.finaltask.exception.CommandExecutionException;
+import by.epam.finaltask.exception.ClientError;
+import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.LotService;
@@ -28,7 +27,7 @@ public class CreateLotCommand implements SyncCommand {
 
     @Override
     public SyncCommandResponse execute(CommandRequest request) throws ServiceCanNotCompleteCommandRequest,
-            CommandExecutionException {
+            ClientErrorException {
         try {
             long userId = (Long)request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
             String mainImagePath = request.getParameter("mainImage");
@@ -43,13 +42,6 @@ public class CreateLotCommand implements SyncCommand {
             String duration = request.getParameter("duration");
             String region = request.getParameter("region");
             String cityOrDistrict = request.getParameter("city-or-district");
-            if (isStringEmpty(mainImagePath) || isStringEmpty(title) || isStringEmpty(category)
-                    || isStringEmpty(auctionType) || isStringEmpty(condition) || isStringEmpty(description)
-                    || isStringEmpty(initPrice) || isStringEmpty(auctionStart) || isStringEmpty(duration)
-                    || isStringEmpty(region) || isStringEmpty(cityOrDistrict)) {
-                LOG.debug("One of required fields is empty");
-                throw new CommandExecutionException(CommandError.EMPTY_ARGUMENTS);
-            }
             lotService.createAndSaveLot(userId, mainImagePath, otherImagePaths, title, category, auctionType,
                     condition, description, initPrice, auctionStart, duration, region, cityOrDistrict);
             return new SyncCommandResponse(true, request
@@ -65,7 +57,4 @@ public class CreateLotCommand implements SyncCommand {
         return ALLOWED_ROLES;
     }
 
-    private boolean isStringEmpty(String str) {
-        return str == null || str.trim().isEmpty();
-    }
 }

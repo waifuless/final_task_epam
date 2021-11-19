@@ -4,8 +4,8 @@ import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.controller.PagePath;
-import by.epam.finaltask.exception.CommandError;
-import by.epam.finaltask.exception.CommandExecutionException;
+import by.epam.finaltask.exception.ClientError;
+import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.model.User;
@@ -34,13 +34,13 @@ public class SignInCommand implements SyncCommand {
     }
 
     @Override
-    public SyncCommandResponse execute(CommandRequest request) throws CommandExecutionException,
+    public SyncCommandResponse execute(CommandRequest request) throws ClientErrorException,
             ServiceCanNotCompleteCommandRequest {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         try {
             if(isStringEmpty(email) || isStringEmpty(password)){
-                throw new CommandExecutionException(CommandError.EMPTY_ARGUMENTS);
+                throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
             }
             Optional<User> optionalUser = userService.authenticate(email, password);
             if (optionalUser.isPresent()) {

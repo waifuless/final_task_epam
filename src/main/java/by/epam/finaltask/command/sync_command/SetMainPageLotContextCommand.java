@@ -3,9 +3,8 @@ package by.epam.finaltask.command.sync_command;
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.UserSessionAttribute;
-import by.epam.finaltask.controller.PagePath;
-import by.epam.finaltask.exception.CommandError;
-import by.epam.finaltask.exception.CommandExecutionException;
+import by.epam.finaltask.exception.ClientError;
+import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.model.AuctionStatus;
 import by.epam.finaltask.model.LotContext;
 import by.epam.finaltask.model.Role;
@@ -16,7 +15,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static by.epam.finaltask.command.sync_command.SyncCommandFactory.SyncCommandVariant;
 
@@ -31,7 +29,7 @@ public class SetMainPageLotContextCommand implements SyncCommand {
     }
 
     @Override
-    public SyncCommandResponse execute(CommandRequest request) throws CommandExecutionException {
+    public SyncCommandResponse execute(CommandRequest request) throws ClientErrorException {
         try {
             LotContext context = findLotContext(request);
             request.getSession().setAttribute(UserSessionAttribute.MAIN_PAGE_LOT_CONTEXT.name(), context);
@@ -39,7 +37,7 @@ public class SetMainPageLotContextCommand implements SyncCommand {
         }
         catch (NumberFormatException ex){
             LOG.warn(ex.getMessage(), ex);
-            throw new CommandExecutionException(CommandError.INVALID_NUMBER);
+            throw new ClientErrorException(ClientError.INVALID_NUMBER);
         }
     }
 
