@@ -40,7 +40,7 @@
                             <fmt:message bundle="${loc}" key="photos.input.label"/>
                         </label>
                         <input type="file" id="gallery-photo-add-input"
-                               accept="image/png, image/gif, image/jpeg, image/jpg" name="imageInput">
+                               accept="image/png, image/jpeg, image/jpg" name="imageInput">
                     </form>
                     <p class="px-3 mb-2">
                         <fmt:message bundle="${loc}" key="photos.prompt"/>

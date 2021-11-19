@@ -3,6 +3,8 @@ package by.epam.finaltask.command.async_command;
 import by.epam.finaltask.command.AjaxCommandResponse;
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.UserSessionAttribute;
+import by.epam.finaltask.exception.CommandError;
+import by.epam.finaltask.exception.CommandExecutionException;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.ImagesService;
 import by.epam.finaltask.service.ServiceFactory;
@@ -35,6 +37,10 @@ public class UploadImageCommand implements AjaxCommand {
     @Override
     public AjaxCommandResponse execute(CommandRequest request) throws Exception {
         Part image = request.getPart("imageInput");
+        //todo: move it to service
+        if(image.getSize()>5242880){
+            throw new CommandExecutionException(CommandError.INVALID_IMAGE);
+        }
         long userId = (Long)request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
         String imageContextPath = imagesService.saveImage(image, userId);
         return new AjaxCommandResponse("text", imageContextPath);

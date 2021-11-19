@@ -5,7 +5,7 @@ $(document).ready(function () {
     let validateFile = function (file) {
         let maxFileSize = 5242880;
         return ((file.size <= maxFileSize) && ((file.type === 'image/png') || (file.type === 'image/jpeg')
-            || (file.type === 'image/jpg') || (file.type === 'image/gif')));
+            || (file.type === 'image/jpg')));
     }
 
     let placeImage = function (path, imageName) {
@@ -36,8 +36,8 @@ $(document).ready(function () {
                 let imageName = $('.div__added-image').length>0 ? 'otherImage[]' : 'mainImage';
                 placeImage(path, imageName);
             },
-            error: function (error){
-                alert(error);
+            error: function (xhr, textStatus, thrownError){
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
             }
         });
     }

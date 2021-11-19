@@ -3,6 +3,7 @@ package by.epam.finaltask.exception;
 public enum CommandError {
     EMPTY_ARGUMENTS(400,"One or more arguments are empty"),
     INVALID_NUMBER(400, "Invalid number format"),
+    INVALID_IMAGE(400, "Image is invalid"),
     NOT_FOUND(404, "Resource not found");
 
     private final int errorStatus;
