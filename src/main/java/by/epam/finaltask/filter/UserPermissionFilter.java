@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Optional;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -44,19 +45,33 @@ public class UserPermissionFilter implements Filter {
 
         String commandName = request.getParameter("command");
         LOG.debug("Command: {}", commandName);
-        Optional<RoledCommand> roledCommand = findCommand(commandName, request);
+        boolean requestIsAjax = handlerFactory.isRequestAjax(request);
+        Optional<RoledCommand> roledCommand = findCommand(commandName, requestIsAjax);
 
         if (!roledCommand.isPresent()) {
             LOG.warn(BAD_REQUEST_LOG_MCG, commandName);
-            response.sendError(SC_BAD_REQUEST, String.format(BAD_REQUEST_ERROR_MESSAGE, commandName));
+            sendError(SC_BAD_REQUEST, String.format(BAD_REQUEST_ERROR_MESSAGE, commandName), requestIsAjax, response);
             return;
         }
         if (!roledCommand.get().getAllowedRoles().contains(userRole)) {
             LOG.warn(FORBIDDEN_LOG_MCG, userRole, roledCommand.get());
-            response.sendError(SC_FORBIDDEN, String.format(FORBIDDEN_ERROR_MESSAGE, commandName));
+            sendError(SC_FORBIDDEN, String.format(FORBIDDEN_ERROR_MESSAGE, commandName), requestIsAjax, response);
             return;
         }
         chain.doFilter(req, res);
+    }
+
+    private void sendError(int status, String message, boolean requestIsAjax, HttpServletResponse response)
+            throws IOException {
+        if(requestIsAjax){
+            response.setStatus(status);
+            try (PrintWriter writer = response.getWriter()) {
+                writer.print(message);
+                writer.flush();
+            }
+        }else{
+            response.sendError(status, message);
+        }
     }
 
     private Role getCurrentRole(HttpServletRequest request) {
@@ -69,8 +84,8 @@ public class UserPermissionFilter implements Filter {
         return role != null ? role : Role.NOT_AUTHORIZED;
     }
 
-    private Optional<RoledCommand> findCommand(String commandName, HttpServletRequest request) {
-        if (handlerFactory.isRequestAjax(request)) {
+    private Optional<RoledCommand> findCommand(String commandName, boolean requestIsAjax) {
+        if (requestIsAjax) {
             return Optional.ofNullable(ajaxCommandFactory.findCommand(commandName).orElse(null));
         } else {
             return Optional.ofNullable(syncCommandFactory.findCommand(commandName).orElse(null));

@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="by.epam.finaltask.model.Role" %>
-<script src="js/header.js"></script>
+<script src="js/language-switch.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="css/account-drop-down-menu.css">
 
 <fmt:setBundle basename="l10n.page.header" var="headerLoc"/>
 
@@ -90,7 +92,7 @@
                                           d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
                                 </svg>
                             </div>
-                            <ul class="dropdown-menu dropdown-menu-lg-end" id="accountDropDownMenu"
+                            <ul class="dropdown-menu dropdown-menu-lg-end accountDropDownMenu" id="accountDropDownMenu"
                                 aria-labelledby="accountDropDown">
                                 <li><a style="font-size: 0.75em" class="dropdown-item disabled" href="#">
                                         ${sessionScope.get('USER_EMAIL')}
@@ -99,7 +101,7 @@
                                     <fmt:message bundle="${headerLoc}" key="account.personal_link"/>
                                 </a></li>
                                 <c:if test="${sessionScope.get('USER_ROLE') eq Role.ADMIN}">
-                                    <li><a class="dropdown-item" href="#">
+                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/ControllerServlet?command=show_admin_tools">
                                         <fmt:message bundle="${headerLoc}" key="account.admin_link"/>
                                     </a></li>
                                 </c:if>

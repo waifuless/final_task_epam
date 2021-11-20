@@ -23,7 +23,7 @@ public class FindCitiesOrDistrictsByRegionCommand implements AjaxCommand {
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.NOT_AUTHORIZED, Role.ADMIN, Role.USER));
 
-    private final static CityOrDistrictService cityOrDistrictService = ServiceFactory
+    private final CityOrDistrictService cityOrDistrictService = ServiceFactory
             .getFactoryInstance().cityOrDistrictService();
 
     FindCitiesOrDistrictsByRegionCommand() {

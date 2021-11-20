@@ -9,3 +9,5 @@ more than two days ago.(DATEDIFF()>=2)
 Done
 
 5.Change 'Personal' to 'Profile' 
+
+6. Check admin role in filter? It can change after user authorization and application will use old role from session

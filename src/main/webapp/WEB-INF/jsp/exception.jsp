@@ -25,8 +25,8 @@
     <%@include file="/WEB-INF/jsp_fragment/header.jsp"%>
 
     <div class="container-lg">
-        <h2>Error status: ${requestScope.get('jakarta.servlet.error.status_code')}</h2>
-        <h2>Message: ${requestScope.get('jakarta.servlet.error.message')}</h2>
+        <h2 id="errorStatus">Error status: ${requestScope.get('jakarta.servlet.error.status_code')}</h2>
+        <h2 id="errorMessage">Message: ${requestScope.get('jakarta.servlet.error.message')}</h2>
     </div>
 
     <div class="page-buffer"></div>

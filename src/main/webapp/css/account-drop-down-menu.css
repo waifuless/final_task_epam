@@ -1,0 +1,9 @@
+.accountDropDownMenu{
+    max-width: 250px;
+}
+
+.accountDropDownMenu *{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

@@ -69,7 +69,8 @@ public class SyncCommandFactory {
         CREATE_LOT("create_lot", CreateLotCommand.class),
         SET_MAIN_PAGE_LOT_CONTEXT("set_main_page_lot_context", SetMainPageLotContextCommand.class),
         REMOVE_MAIN_PAGE_LOT_CONTEXT("remove_main_page_lot_context",
-                RemoveMainPageLotContextCommand.class);
+                RemoveMainPageLotContextCommand.class),
+        SHOW_ADMIN_LOTS("show_admin_tools", ShowAdminLotsCommand.class);
 
         private final String commandName;
         private final Class<? extends SyncCommand> commandClass;
