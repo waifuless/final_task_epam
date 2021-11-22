@@ -1,7 +1,7 @@
 <jsp:useBean id="lot" scope="request" type="by.epam.finaltask.model.LotWithImages"/>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="by.epam.finaltask.model.AuctionStatus" %>
 
 <fmt:setBundle basename="path-to-images-folder" var="imgFolderPath"/>
 
@@ -19,75 +19,113 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/page-wrapper.css">
-    <link rel="stylesheet" href="css/lot.css">
+    <link rel="stylesheet" href="css/lot-page.css">
 </head>
 <body>
 <div class="page-wrapper">
 
-    <%@include file="/WEB-INF/jsp_fragment/header.jsp"%>
+    <%@include file="/WEB-INF/jsp_fragment/header.jsp" %>
 
     <div class="container-lg">
 
-        <div class="row">
+        <div class="row my-3">
             <h1>${lot.title}</h1>
         </div>
 
-        <div id="row">
-            <h5>Фотографии</h5>
-            <div class="gallery">
-                <div class="lot-image lot-main-image">
-                    <img src="${lot.images.mainImage.path}" alt=""/>
-                </div>
-                <c:forEach var="image" items="${lot.images.otherImages}">
-                    <div class="lot-image">
-                        <img src="${image.path}" alt=""/>
+        <div class="row">
+            <div id="carouselExampleControls" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                <div class="carousel-inner wrapper-div-image">
+                    <div class="carousel-item div-image active">
+                        <img src="${lot.images.mainImage.path}" class="d-block w-100" alt=""/>
                     </div>
-                </c:forEach>
+                    <c:forEach var="image" items="${lot.images.otherImages}">
+                        <div class="carousel-item div-image">
+                            <img src="${image.path}" class="d-block w-100" alt=""/>
+                        </div>
+                    </c:forEach>
+                </div>
+                <c:if test="${lot.images.otherImages.size() > 0}">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                            data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                            data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </c:if>
             </div>
         </div>
 
-        <div class="row">
-            <h5>Категория: ${lot.category}</h5>
+        <div class="row col-9">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Параметры</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">Категория</th>
+                    <td>${lot.category}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Тип аукциона</th>
+                    <td>${lot.auctionType}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Состояние</th>
+                    <td>${lot.productCondition}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Начало аукциона</th>
+                    <td>${lot.startDatetime}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Окончание аукциона</th>
+                    <td>${lot.endDatetime}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Регион</th>
+                    <td>${lot.region}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Город(район)</th>
+                    <td>${lot.cityOrDistrict}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Статус аукциона</th>
+                    <td>${lot.auctionStatus}</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="row">
-            <h5>Тип аукциона: ${lot.auctionType}</h5>
+            <h2>Описание</h2>
+        </div>
+        <div class="row col-9">
+            <p id="description">${lot.description}</p>
         </div>
 
-        <div class="row">
-            <h5>Состояние: ${lot.productCondition}</h5>
+        <div class="row col-9">
+            <h2>Начальная цена: ${lot.initialPrice}р</h2>
         </div>
 
-        <div class="row">
-            <h5>Начальная цена: ${lot.initialPrice}</h5>
-        </div>
-
-        <div class="row">
-            <label for="description">Описание</label><br>
-            <textarea style="resize: none" disabled id="description">${lot.description}</textarea>
-        </div>
-
-        <div class="row">
-            <h5>Начало аукциона: ${lot.startDatetime}</h5>
-        </div>
-
-        <div class="row">
-            <h5>Окончание аукциона: ${lot.endDatetime}</h5>
-        </div>
-
-        <div class="row">
-            <h5>Регион: ${lot.region}</h5>
-        </div>
-
-        <div class="row">
-            <h5>Город(район): ${lot.cityOrDistrict}</h5>
-        </div>
+        <c:if test="${lot.auctionStatus eq AuctionStatus.APPROVED_BY_ADMIN}">
+            <div class="row col-9 my-5">
+                <button type="button" class="btn btn-success w-100">Записаться на участие</button>
+            </div>
+        </c:if>
 
         <div class="page-buffer"></div>
     </div>
 </div>
 
-<%@include file="/WEB-INF/jsp_fragment/footer.jsp"%>
+<%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
 </body>
 </html>

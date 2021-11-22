@@ -1,0 +1,33 @@
+.carousel{
+    height: 500px;
+    width: 800px;
+    background-color: whitesmoke;
+    border: 1px solid grey;
+    border-radius: 15px;
+}
+
+.div-image img {
+    padding: 3px;
+    object-fit: contain;
+    height:500px;
+    width: auto;
+    margin: auto auto;
+}
+
+.carousel-control-prev, .carousel-control-next{
+    background-color: gainsboro;
+}
+
+.carousel-control-next{
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.carousel-control-prev{
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+.lot-field{
+    margin: 10px 0;
+}
