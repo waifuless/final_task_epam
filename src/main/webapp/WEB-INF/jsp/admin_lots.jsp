@@ -184,10 +184,9 @@
                             </button>
                         </div>
                         <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
-                            <a class="btn btn-danger w-100"
-                               href="${pageContext.request.contextPath}/ControllerServlet?command=remove_main_page_lot_context">
+                            <button type="button" id="reset-button" class="btn btn-danger w-100">
                                 <fmt:message bundle="${loc}" key="container.filters.reset"/>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -207,6 +206,10 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+
+        $('#reset-button').click(function (){
+            window.location.replace(window.location.href)
+        });
 
         let form = $('#filters-form');
         form.submit(e=>requestLots(e));
