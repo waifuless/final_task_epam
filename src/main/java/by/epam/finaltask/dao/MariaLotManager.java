@@ -69,6 +69,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     private final static String EQUALS_TEMPLATE = " %s = ? ";
     private final static String GREATER_THAN_OR_EQUALS_TEMPLATE = " %s>=? ";
     private final static String LESS_THAN_OR_EQUALS_TEMPLATE = " %s<=? ";
+    private final static String LIKE_STRING_TEMPLATE = " %s LIKE ? ";
 
     private static volatile MariaLotManager instance;
 
@@ -178,7 +179,9 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                 "category.category_name", filter, params);
         checkParamAndFillFilterAndParamMap(context.getAuctionType(), Types.VARCHAR, EQUALS_TEMPLATE,
                 "auction_type.type_name", filter, params);
-        checkParamAndFillFilterAndParamMap(context.getTitle(), Types.VARCHAR, EQUALS_TEMPLATE, "title",
+        String title = context.getTitle();
+        title = title!=null? "%"+title+"%" : null;
+        checkParamAndFillFilterAndParamMap(title, Types.VARCHAR, LIKE_STRING_TEMPLATE, "title",
                 filter, params);
         checkParamAndFillFilterAndParamMap(context.getMinInitialPrice(), Types.DECIMAL, GREATER_THAN_OR_EQUALS_TEMPLATE,
                 "initial_price", filter, params);
