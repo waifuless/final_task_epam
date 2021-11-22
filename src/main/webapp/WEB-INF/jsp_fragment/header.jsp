@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="by.epam.finaltask.model.Role" %>
-<script src="js/language-switch.js" type="text/javascript"></script>
 
+<script src="js/language-switch.js" type="text/javascript"></script>
 <link rel="stylesheet" href="css/account-drop-down-menu.css">
 
 <fmt:setBundle basename="l10n.page.header" var="headerLoc"/>

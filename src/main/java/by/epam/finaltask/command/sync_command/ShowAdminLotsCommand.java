@@ -36,7 +36,7 @@ public class ShowAdminLotsCommand implements SyncCommand{
             LOG.warn(ex.getMessage(), ex);
             request.setAttribute("errorMessage", ex.getMessage());
         }
-        return new SyncCommandResponse(false, PagePath.ADMIN_LOTS.getPath());
+        return new SyncCommandResponse(false, PagePath.ADMIN_ALL_LOTS.getPath());
     }
 
     @Override
