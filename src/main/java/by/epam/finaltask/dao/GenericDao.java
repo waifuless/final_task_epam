@@ -105,6 +105,7 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(updateQuery);
             prepareUpdateStatement(statement, t);
+            statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
             throw e;
@@ -120,6 +121,7 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(deleteQuery);
             prepareDeleteStatement(statement, id);
+            statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
             throw e;

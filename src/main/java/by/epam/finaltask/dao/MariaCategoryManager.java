@@ -4,13 +4,19 @@ import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MariaCategoryManager extends GenericDao<Category> implements CategoryManager {
 
+    private final static Logger LOG = LoggerFactory.getLogger(MariaCategoryManager.class);
+
+    private final static String CATEGORY_EXISTENCE_COLUMN = "category_existence";
     private final static String CATEGORY_ID_COLUMN = "category_id";
     private final static String CATEGORY_NAME_COLUMN = "category_name";
     private final static String TABLE_NAME = "category";
@@ -24,6 +30,8 @@ public class MariaCategoryManager extends GenericDao<Category> implements Catego
             "UPDATE category SET category_name = ? WHERE category_id = ?";
     private final static String DELETE_CATEGORY_QUERY =
             "DELETE FROM category WHERE category_id = ?";
+    private final static String IS_CATEGORY_EXISTS_QUERY =
+            "SELECT EXISTS(SELECT 1 FROM category WHERE category_name=?) AS category_existence";
 
     private static volatile MariaCategoryManager instance;
 
@@ -41,6 +49,24 @@ public class MariaCategoryManager extends GenericDao<Category> implements Catego
             }
         }
         return instance;
+    }
+
+    @Override
+    public boolean isCategoryExists(String category) throws SQLException, DataSourceDownException, InterruptedException {
+        try (Connection connection = connectionPool.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(IS_CATEGORY_EXISTS_QUERY);
+            statement.setString(1, category);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getBoolean(CATEGORY_EXISTENCE_COLUMN);
+        } catch (SQLException | DataSourceDownException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw e;
+        }
     }
 
     @Override

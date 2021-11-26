@@ -12,7 +12,7 @@ public interface UserManager extends Dao<User> {
         return MariaUserManager.getInstance();
     }
 
-    boolean isUserExist(String email) throws SQLException, DataSourceDownException, InterruptedException;
+    boolean isUserExists(String email) throws SQLException, DataSourceDownException, InterruptedException;
 
     Optional<User> findUserByEmailAndPassword(String email, String password)
             throws SQLException, DataSourceDownException, InterruptedException;

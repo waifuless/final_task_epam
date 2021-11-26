@@ -80,7 +80,7 @@ public class CommonLotService implements LotService {
                 //throw exception
             }
         } catch (ClientErrorException ex) {
-            LOG.error(ex.getMessage(), ex);
+            LOG.warn(ex.getMessage());
             throw ex;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);

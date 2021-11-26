@@ -9,7 +9,8 @@ public enum PagePath {
     ERROR("WEB-INF/jsp/exception.jsp"),
     START_PAGE("index.jsp"),
     ADMIN_ALL_LOTS("WEB-INF/jsp/admin_all_lots.jsp"),
-    LOT_CREATION("WEB-INF/jsp/create_lot.jsp");
+    LOT_CREATION("WEB-INF/jsp/create_lot.jsp"),
+    ADMIN_CATEGORIES("WEB-INF/jsp/admin_categories.jsp");
 
     private final String path;
 

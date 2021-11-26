@@ -4,6 +4,7 @@ import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.controller.PagePath;
+import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
 import by.epam.finaltask.service.CategoryService;
 import by.epam.finaltask.service.LotService;
@@ -37,7 +38,7 @@ public class ShowMainPageCommand implements SyncCommand {
     }
 
     @Override
-    public SyncCommandResponse execute(CommandRequest request) {
+    public SyncCommandResponse execute(CommandRequest request) throws ServiceCanNotCompleteCommandRequest {
         String pageNumberParam = request.getParameter("pageNum");
         try {
             request.setAttribute("regions", regionService.findAllRegions());
@@ -49,11 +50,11 @@ public class ShowMainPageCommand implements SyncCommand {
             request.setAttribute("lotContextJson", new Gson().toJson(context));
             int pageNumber = pageNumberParam == null ? 1 : Integer.parseInt(pageNumberParam);
             request.setAttribute("lots", lotService.findLotsByPageAndContext(pageNumber, context));
+            return new SyncCommandResponse(false, PagePath.MAIN.getPath());
         } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
-            request.setAttribute("errorMessage", ex.getMessage());
+            throw ex;
         }
-        return new SyncCommandResponse(false, PagePath.MAIN.getPath());
     }
 
     @Override

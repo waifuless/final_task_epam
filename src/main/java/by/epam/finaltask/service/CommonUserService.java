@@ -65,7 +65,7 @@ public class CommonUserService implements UserService {
             if (!isEMailValid(email)) {
                 errors.add(RegisterError.EMAIL_INVALID);
             }
-            if (userManager.isUserExist(email)) {
+            if (userManager.isUserExists(email)) {
                 errors.add(RegisterError.USER_WITH_EMAIL_ALREADY_EXISTS);
             }
             if (!isPasswordValid(password)) {

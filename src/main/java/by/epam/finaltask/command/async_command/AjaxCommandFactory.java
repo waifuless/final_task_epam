@@ -60,7 +60,9 @@ public class AjaxCommandFactory {
         SHOW_SIGN_IN("upload_image", UploadImageCommand.class),
         FIND_CITIES_OR_DISTRICTS_BY_REGION("find_cities_or_districts_by_region",
                 FindCitiesOrDistrictsByRegionCommand.class),
-        FIND_LOTS_BY_ADMIN("find_lots_by_admin", FindLotsByAdminCommand.class);
+        FIND_LOTS_BY_ADMIN("find_lots_by_admin", FindLotsByAdminCommand.class),
+        ADD_CATEGORY("add_category", AddCategoryCommand.class),
+        DELETE_CATEGORIES("delete_categories", DeleteCategoriesCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;

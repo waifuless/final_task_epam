@@ -71,7 +71,7 @@ public class CommonImagesService implements ImagesService {
             imagesManager.saveImagePath(imageContextPath);
             return imageContextPath;
         } catch (ClientErrorException ex){
-            LOG.warn(ex.getMessage(), ex);
+            LOG.warn(ex.getMessage());
             throw ex;
         }
         catch (Exception ex) {

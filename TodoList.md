@@ -11,3 +11,5 @@ Done
 5.Change 'Personal' to 'Profile' 
 
 6. Check admin role in filter? It can change after user authorization and application will use old role from session
+
+7. Add value to roles (0,1,2);

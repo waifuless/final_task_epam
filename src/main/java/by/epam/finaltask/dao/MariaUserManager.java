@@ -96,7 +96,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     }
 
     @Override
-    public boolean isUserExist(String email) throws SQLException, DataSourceDownException, InterruptedException {
+    public boolean isUserExists(String email) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(IS_EXIST_USER_QUERY);
             statement.setString(1, email);
