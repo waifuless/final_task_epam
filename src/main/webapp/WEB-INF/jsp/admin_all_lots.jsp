@@ -64,6 +64,9 @@
                                 <option value="ENDED">
                                     <fmt:message bundle="${filters}" key="filter.auction_status.ended"/>
                                 </option>
+                                <option value="DENIED">
+                                    <fmt:message bundle="${filters}" key="filter.auction_status.denied"/>
+                                </option>
                             </select>
                         </div>
                         <div class="col-lg-3 col-sm-6 mb-3">
