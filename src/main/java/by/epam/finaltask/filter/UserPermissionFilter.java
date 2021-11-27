@@ -63,13 +63,13 @@ public class UserPermissionFilter implements Filter {
 
     private void sendError(int status, String message, boolean requestIsAjax, HttpServletResponse response)
             throws IOException {
-        if(requestIsAjax){
+        if (requestIsAjax) {
             response.setStatus(status);
             try (PrintWriter writer = response.getWriter()) {
                 writer.print(message);
                 writer.flush();
             }
-        }else{
+        } else {
             response.sendError(status, message);
         }
     }

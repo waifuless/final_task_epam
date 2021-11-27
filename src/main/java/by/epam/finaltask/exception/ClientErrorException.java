@@ -1,9 +1,9 @@
 package by.epam.finaltask.exception;
 
 /**
- *This exception is intended for situations in which the error seems to have been caused by the client.
+ * This exception is intended for situations in which the error seems to have been caused by the client.
  */
-public class ClientErrorException extends Exception{
+public class ClientErrorException extends Exception {
 
     private final int errorStatus;
 
@@ -17,7 +17,7 @@ public class ClientErrorException extends Exception{
         this.errorStatus = errorStatus;
     }
 
-    public ClientErrorException(ClientError clientError){
+    public ClientErrorException(ClientError clientError) {
         super(clientError.getMessage());
         this.errorStatus = clientError.getErrorStatus();
     }
@@ -29,7 +29,7 @@ public class ClientErrorException extends Exception{
     @Override
     public String toString() {
         return "CommandExecutionException{" +
-                super.toString()+
+                super.toString() +
                 "[errorStatus=" + errorStatus +
                 "]}";
     }

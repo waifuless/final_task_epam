@@ -1,7 +1,6 @@
 package by.epam.finaltask.service;
 
 import by.epam.finaltask.dao.CityOrDistrictManager;
-import by.epam.finaltask.dao.UserManager;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.CityOrDistrict;
 import org.apache.logging.log4j.LogManager;
@@ -9,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-public class CommonCityOrDistrictService implements CityOrDistrictService{
+public class CommonCityOrDistrictService implements CityOrDistrictService {
 
     private final static Logger LOG = LogManager.getLogger(CommonCityOrDistrictService.class);
 

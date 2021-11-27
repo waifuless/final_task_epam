@@ -34,8 +34,7 @@ public class SetMainPageLotContextCommand implements SyncCommand {
             LotContext context = findLotContext(request);
             request.getSession().setAttribute(UserSessionAttribute.MAIN_PAGE_LOT_CONTEXT.name(), context);
             return new SyncCommandResponse(true, request.createCommandPath(SyncCommandVariant.SHOW_MAIN));
-        }
-        catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage(), ex);
             throw new ClientErrorException(ClientError.INVALID_NUMBER);
         }
@@ -46,7 +45,7 @@ public class SetMainPageLotContextCommand implements SyncCommand {
         return ALLOWED_ROLES;
     }
 
-    private LotContext findLotContext(CommandRequest request) throws NumberFormatException{
+    private LotContext findLotContext(CommandRequest request) throws NumberFormatException {
         return LotContext.builder()
                 .setCategory(retrieveNullIfEmpty(request.getParameter("category")))
                 .setAuctionType(retrieveNullIfEmpty(request.getParameter("auction-type")))
@@ -63,8 +62,8 @@ public class SetMainPageLotContextCommand implements SyncCommand {
         return param == null || param.trim().isEmpty() ? null : param;
     }
 
-    private BigDecimal parseAndRetrieveNullIfEmpty(String param){
-       return (param == null || param.trim().isEmpty()) ? null : new BigDecimal(param);
+    private BigDecimal parseAndRetrieveNullIfEmpty(String param) {
+        return (param == null || param.trim().isEmpty()) ? null : new BigDecimal(param);
     }
 
 }

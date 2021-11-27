@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class UpdateCategoryCommand implements AjaxCommand{
+public class UpdateCategoryCommand implements AjaxCommand {
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.ADMIN));

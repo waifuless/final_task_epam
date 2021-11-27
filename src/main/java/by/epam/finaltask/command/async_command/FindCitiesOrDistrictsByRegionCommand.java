@@ -37,7 +37,7 @@ public class FindCitiesOrDistrictsByRegionCommand implements AjaxCommand {
     @Override
     public AjaxCommandResponse execute(CommandRequest request) throws Exception {
         String region = request.getParameter("region");
-        if(region==null || region.trim().isEmpty()){
+        if (region == null || region.trim().isEmpty()) {
             throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
         }
         List<CityOrDistrict> citiesOrDistricts = cityOrDistrictService.findCityOrDistrictsByRegion(region);

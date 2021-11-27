@@ -8,7 +8,6 @@ import by.epam.finaltask.model.Category;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class CommonCategoryService implements CategoryService {
@@ -43,16 +42,16 @@ public class CommonCategoryService implements CategoryService {
     @Override
     public void updateCategory(String idParam, String newCategoryName)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
-        try{
+        try {
             long id = Integer.parseInt(idParam);
-            if(newCategoryName==null || newCategoryName.trim().isEmpty()){
+            if (newCategoryName == null || newCategoryName.trim().isEmpty()) {
                 throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
             }
             if (categoryManager.isCategoryExists(newCategoryName)) {
                 throw new ClientErrorException(ClientError.ENTITY_ALREADY_EXISTS);
             }
             categoryManager.update(new Category(id, newCategoryName));
-        }catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage());
             throw new ClientErrorException(ClientError.INVALID_NUMBER);
         } catch (ClientErrorException ex) {

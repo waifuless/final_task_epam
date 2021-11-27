@@ -56,12 +56,12 @@ public class CommonImagesService implements ImagesService {
             BufferedImage preparedImage = prepareImageToSave(image);
 
             String oldImageFileName = image.getSubmittedFileName();
-            String imageFormat = oldImageFileName.substring(oldImageFileName.lastIndexOf('.')+1);
+            String imageFormat = oldImageFileName.substring(oldImageFileName.lastIndexOf('.') + 1);
             String imageFolder = String.format("%s/%s", userId, LocalDate.now());
             String imageFolderRealPath = String.format("%s/%s", AUCTION_IMAGES_FOLDER, imageFolder);
             Files.createDirectories(Paths.get(imageFolderRealPath));
 
-            String imageName = System.currentTimeMillis()+"."+imageFormat;
+            String imageName = System.currentTimeMillis() + "." + imageFormat;
             String imageRealPath = String.format("%s/%s", imageFolderRealPath, imageName);
             LOG.debug("Image real path: {}", imageRealPath);
             ImageIO.write(preparedImage, imageFormat, new File(imageRealPath));
@@ -70,18 +70,17 @@ public class CommonImagesService implements ImagesService {
             LOG.debug("Image context path: {}", imageContextPath);
             imagesManager.saveImagePath(imageContextPath);
             return imageContextPath;
-        } catch (ClientErrorException ex){
+        } catch (ClientErrorException ex) {
             LOG.warn(ex.getMessage());
             throw ex;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
         }
     }
 
-    private void validateImage(Part image) throws ClientErrorException{
-        if(image.getSize()>5242880){
+    private void validateImage(Part image) throws ClientErrorException {
+        if (image.getSize() > 5242880) {
             throw new ClientErrorException(ClientError.INVALID_IMAGE);
         }
         //todo: other validation
@@ -92,7 +91,7 @@ public class CommonImagesService implements ImagesService {
         BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
         BufferedImage resizedBufferedImage = Scalr.resize(bufferedImage, DEFAULT_IMAGE_SIZE);
         Optional<Scalr.Rotation> rotation = findRotation(image);
-        if(rotation.isPresent()){
+        if (rotation.isPresent()) {
             resizedBufferedImage = Scalr.rotate(resizedBufferedImage, rotation.get());
         }
         return resizedBufferedImage;
@@ -103,7 +102,7 @@ public class CommonImagesService implements ImagesService {
             MetadataException {
         Metadata metadata = ImageMetadataReader.readMetadata(image.getInputStream());
         ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-        if(exifIFD0==null){
+        if (exifIFD0 == null) {
             return Optional.empty();
         }
         int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);

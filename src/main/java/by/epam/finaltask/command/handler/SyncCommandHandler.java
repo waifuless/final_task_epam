@@ -25,7 +25,8 @@ public class SyncCommandHandler implements CommandHandler {
 
     private final SyncCommandFactory syncCommandFactory = SyncCommandFactory.getInstance();
 
-    SyncCommandHandler(){}
+    SyncCommandHandler() {
+    }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -46,10 +47,10 @@ public class SyncCommandHandler implements CommandHandler {
         } catch (ClientErrorException ex) {
             LOG.warn(ex.getMessage(), ex);
             response.sendError(ex.getErrorStatus(), ex.getMessage());
-        } catch (ServiceCanNotCompleteCommandRequest ex){
+        } catch (ServiceCanNotCompleteCommandRequest ex) {
             LOG.warn(ex.getMessage(), ex);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, SERVICE_ERROR_MCG);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR_MCG);
         }

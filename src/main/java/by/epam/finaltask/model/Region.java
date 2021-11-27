@@ -1,6 +1,6 @@
 package by.epam.finaltask.model;
 
-public class Region implements DaoEntity<Region>{
+public class Region implements DaoEntity<Region> {
 
     private final long regionId;
     private final String regionName;

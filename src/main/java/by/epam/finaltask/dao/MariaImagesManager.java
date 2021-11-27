@@ -102,7 +102,7 @@ public class MariaImagesManager implements ImagesManager {
                     prepareSaveStatement(insertStatement, lotId, image.getPath(), false);
                     insertStatement.execute();
                     resultSet = findLastInsertIdStatement.executeQuery();
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         otherSavedImages.add(image.createWithId(resultSet.getLong(LAST_INSERT_ID_COLUMN)));
                     }
                 }

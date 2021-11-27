@@ -55,7 +55,7 @@ public class MariaCityOrDistrictManager extends GenericDao<CityOrDistrict> imple
 
     @Override
     public List<CityOrDistrict> findByRegion(String regionName)
-            throws SQLException, DataSourceDownException, InterruptedException{
+            throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(FIND_CITY_OR_DISTRICT_BY_REGION_NAME_QUERY);
             statement.setString(1, regionName);

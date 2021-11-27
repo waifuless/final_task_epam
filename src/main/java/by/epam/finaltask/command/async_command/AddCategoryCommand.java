@@ -2,15 +2,9 @@ package by.epam.finaltask.command.async_command;
 
 import by.epam.finaltask.command.AjaxCommandResponse;
 import by.epam.finaltask.command.CommandRequest;
-import by.epam.finaltask.command.UserSessionAttribute;
-import by.epam.finaltask.exception.ClientError;
-import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.CategoryService;
-import by.epam.finaltask.service.ImagesService;
 import by.epam.finaltask.service.ServiceFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Arrays;

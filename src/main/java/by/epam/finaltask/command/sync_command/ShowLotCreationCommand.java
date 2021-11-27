@@ -4,12 +4,8 @@ import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.controller.PagePath;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
-import by.epam.finaltask.model.Category;
-import by.epam.finaltask.model.LotWithImages;
-import by.epam.finaltask.model.Region;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.CategoryService;
-import by.epam.finaltask.service.CityOrDistrictService;
 import by.epam.finaltask.service.RegionService;
 import by.epam.finaltask.service.ServiceFactory;
 import org.apache.logging.log4j.LogManager;
@@ -18,9 +14,8 @@ import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-public class ShowLotCreationCommand implements SyncCommand{
+public class ShowLotCreationCommand implements SyncCommand {
 
     private final static Logger LOG = LogManager.getLogger(ShowLotCreationCommand.class);
 

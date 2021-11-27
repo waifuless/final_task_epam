@@ -39,7 +39,7 @@ public class SignInCommand implements SyncCommand {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         try {
-            if(isStringEmpty(email) || isStringEmpty(password)){
+            if (isStringEmpty(email) || isStringEmpty(password)) {
                 throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
             }
             Optional<User> optionalUser = userService.authenticate(email, password);

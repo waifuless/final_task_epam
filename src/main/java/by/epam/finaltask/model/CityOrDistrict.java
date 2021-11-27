@@ -1,6 +1,6 @@
 package by.epam.finaltask.model;
 
-public class CityOrDistrict implements DaoEntity<CityOrDistrict>{
+public class CityOrDistrict implements DaoEntity<CityOrDistrict> {
 
     private final long cityOrDistrictId;
     private final String cityOrDistrictName;
@@ -13,7 +13,7 @@ public class CityOrDistrict implements DaoEntity<CityOrDistrict>{
     }
 
     public CityOrDistrict(String cityOrDistrictName, long regionId) {
-        this.cityOrDistrictId=-1;
+        this.cityOrDistrictId = -1;
         this.cityOrDistrictName = cityOrDistrictName;
         this.regionId = regionId;
     }

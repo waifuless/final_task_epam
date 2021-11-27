@@ -1,6 +1,6 @@
 package by.epam.finaltask.model;
 
-public class Category implements DaoEntity<Category>{
+public class Category implements DaoEntity<Category> {
 
     private final long categoryId;
     private final String categoryName;

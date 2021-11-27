@@ -39,7 +39,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
             "SELECT user_id as user_id, email as email," +
                     " role.role_name as role_name FROM app_user" +
                     " LEFT JOIN role ON app_user.role_id = role.role_id";
-    private final static String FIND_USER_BY_ID_QUERY = FIND_ALL_USER_QUERY+ " WHERE user_id=?";
+    private final static String FIND_USER_BY_ID_QUERY = FIND_ALL_USER_QUERY + " WHERE user_id=?";
     private final static String UPDATE_USER_QUERY =
             "UPDATE app_user SET email = ?, password_hash = ?," +
                     " role_id = (SELECT role_id FROM role WHERE role_name = ?)" +

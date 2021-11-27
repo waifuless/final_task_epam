@@ -42,11 +42,10 @@ public class ShowLotPageCommand implements SyncCommand {
                 throw new ClientErrorException(ClientError.NOT_FOUND);
             }
             return new SyncCommandResponse(false, PagePath.LOT.getPath());
-        }catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage(), ex);
             throw new ClientErrorException(ClientError.INVALID_NUMBER);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
             throw ex;
         }

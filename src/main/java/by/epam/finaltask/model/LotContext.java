@@ -1,8 +1,6 @@
 package by.epam.finaltask.model;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.Optional;
 
 /**
  * Fields should be null if you do not mean filter by they
@@ -22,8 +20,8 @@ public class LotContext {
 
     private LotContext(Long ownerId, String category, String auctionType, String title,
                        BigDecimal minInitialPrice, BigDecimal maxInitialPrice, String region,
-                      String cityOrDistrict, String auctionStatus,
-                      String productCondition) {
+                       String cityOrDistrict, String auctionStatus,
+                       String productCondition) {
         this.ownerId = ownerId;
         this.category = category;
         this.auctionType = auctionType;
@@ -34,6 +32,10 @@ public class LotContext {
         this.cityOrDistrict = cityOrDistrict;
         this.auctionStatus = auctionStatus;
         this.productCondition = productCondition;
+    }
+
+    public static LotContextBuilder builder() {
+        return new LotContextBuilder();
     }
 
     public Long getOwnerId() {
@@ -74,12 +76,6 @@ public class LotContext {
 
     public String getProductCondition() {
         return productCondition;
-    }
-
-
-
-    public static LotContextBuilder builder(){
-        return new LotContextBuilder();
     }
 
     public static class LotContextBuilder {

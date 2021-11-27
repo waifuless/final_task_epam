@@ -156,11 +156,11 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     public List<Lot> findByLotContext(LotContext context, long offset, long count)
             throws SQLException, DataSourceDownException, InterruptedException {
         LinkedHashMap<Object, Integer> params = new LinkedHashMap<>();
-        String findByContextQuery = FIND_ALL_LOTS_QUERY + createFilterByContextAndFillParamsMap(context, params)+
+        String findByContextQuery = FIND_ALL_LOTS_QUERY + createFilterByContextAndFillParamsMap(context, params) +
                 " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
         return findListWithPreparator(findByContextQuery, statement ->
         {
-            int i=0;
+            int i = 0;
             for (Map.Entry<Object, Integer> entry : params.entrySet()) {
                 statement.setObject(++i, entry.getKey(), entry.getValue());
             }
@@ -180,7 +180,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
         checkParamAndFillFilterAndParamMap(context.getAuctionType(), Types.VARCHAR, EQUALS_TEMPLATE,
                 "auction_type.type_name", filter, params);
         String title = context.getTitle();
-        title = title!=null? "%"+title+"%" : null;
+        title = title != null ? "%" + title + "%" : null;
         checkParamAndFillFilterAndParamMap(title, Types.VARCHAR, LIKE_STRING_TEMPLATE, "title",
                 filter, params);
         checkParamAndFillFilterAndParamMap(context.getMinInitialPrice(), Types.DECIMAL, GREATER_THAN_OR_EQUALS_TEMPLATE,
@@ -197,7 +197,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                 "pc.product_condition_name", filter, params);
         LOG.debug("Filter query: {}", filter);
         LOG.debug("Params map: {}", params);
-        if(params.isEmpty()){
+        if (params.isEmpty()) {
             return "";
         }
         return new String(filter);

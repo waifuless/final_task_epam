@@ -3,7 +3,6 @@ package by.epam.finaltask.command.sync_command;
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.UserSessionAttribute;
-import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Role;
@@ -29,7 +28,7 @@ public class CreateLotCommand implements SyncCommand {
     public SyncCommandResponse execute(CommandRequest request) throws ServiceCanNotCompleteCommandRequest,
             ClientErrorException {
         try {
-            long userId = (Long)request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
+            long userId = (Long) request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
             String mainImagePath = request.getParameter("mainImage");
             String[] otherImagePaths = request.getParameterValues("otherImage[]");
             String title = request.getParameter("title");
