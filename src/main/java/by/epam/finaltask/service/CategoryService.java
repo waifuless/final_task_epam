@@ -10,6 +10,9 @@ public interface CategoryService {
 
     void saveCategory(String categoryName) throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
 
+    void updateCategory(String idParam, String newCategoryName) throws ServiceCanNotCompleteCommandRequest,
+            ClientErrorException;
+
     void deleteCategories(String [] categoryIds) throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
 
     List<Category> findAllCategories() throws ServiceCanNotCompleteCommandRequest;

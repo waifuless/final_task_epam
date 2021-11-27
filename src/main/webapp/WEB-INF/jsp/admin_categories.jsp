@@ -1,6 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.lots_filters" var="filters"/>
@@ -58,6 +58,7 @@
                                         <input class="form-check-input" type="checkbox" id="main-checkbox">
                                     </th>
                                     <th scope="col">Название</th>
+                                    <th scope="col"></th>
                                 </tr>
                                 </thead>
                                 <tbody id="categories-table-body">
@@ -66,9 +67,11 @@
                                 <c:forEach items="${categories}" var="category">
                                     <tr>
                                         <th scope="row" class="text-center">
-                                            <input class="form-check-input ids" type="checkbox" name="ids[]" value="${category.categoryId}">
+                                            <input class="form-check-input ids" type="checkbox" name="ids[]"
+                                                   value="${category.categoryId}">
                                         </th>
-                                        <td>${category.categoryName}</td>
+                                        <td class="category-name">${category.categoryName}</td>
+                                        <td><a class="link-dark rename-link">переименовать</a></td>
                                     </tr>
                                 </c:forEach>
                                 </tbody>
@@ -103,8 +106,7 @@
                 processData: false,
                 dataType: "text",
                 data: form.serialize(),
-                success: function (response) {
-                    alert(response);
+                success: function () {
                     window.location.replace(window.location.href);
                 },
                 error: function (xhr, textStatus, thrownError) {
@@ -124,7 +126,7 @@
 
         $('#delete-categories').click(function () {
             let checked = $('.ids:checked');
-            if(!confirm("Это действие нельзя будет отменить. Удалить "+checked.length+" категории?")){
+            if (!confirm("Это действие нельзя будет отменить. Удалить " + checked.length + " категории?")) {
                 return;
             }
             $.ajax({
@@ -133,8 +135,35 @@
                 processData: false,
                 dataType: "text",
                 data: checked.serialize(),
-                success: function (response) {
-                    alert(response);
+                success: function () {
+                    window.location.replace(window.location.href);
+                },
+                error: function (xhr, textStatus, thrownError) {
+                    alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+                }
+            });
+        });
+
+        $('.rename-link').click(function () {
+            let parentRow = $(this).parent().parent();
+            let oldCategoryName = parentRow.children('.category-name').text();
+            let categoryId = parentRow.find('th > .ids').val();
+            let newName = prompt("Введите новое название для категории " + oldCategoryName);
+            if(newName==null || newName.length<=0 || oldCategoryName === newName){
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: 'ControllerServlet',
+                dataType: "text",
+                data: {
+                    requestIsAjax: true,
+                    command: "update_category",
+                    id: categoryId,
+                    oldCategoryName: oldCategoryName,
+                    newCategoryName: newName
+                },
+                success: function () {
                     window.location.replace(window.location.href);
                 },
                 error: function (xhr, textStatus, thrownError) {

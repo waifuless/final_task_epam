@@ -62,7 +62,8 @@ public class AjaxCommandFactory {
                 FindCitiesOrDistrictsByRegionCommand.class),
         FIND_LOTS_BY_ADMIN("find_lots_by_admin", FindLotsByAdminCommand.class),
         ADD_CATEGORY("add_category", AddCategoryCommand.class),
-        DELETE_CATEGORIES("delete_categories", DeleteCategoriesCommand.class);
+        DELETE_CATEGORIES("delete_categories", DeleteCategoriesCommand.class),
+        UPDATE_CATEGORY("update_category", UpdateCategoryCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;
