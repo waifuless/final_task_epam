@@ -38,7 +38,9 @@ create table category
 (
     category_id   int auto_increment
         primary key,
-    category_name varchar(64) not null
+    category_name varchar(64) not null,
+    constraint category_category_name_uindex
+        unique (category_name)
 );
 
 create table postal_code
@@ -126,7 +128,8 @@ create table lot
         foreign key (owner_id) references app_user (user_id)
             on delete cascade,
     constraint lot_fk1
-        foreign key (category_id) references category (category_id),
+        foreign key (category_id) references category (category_id)
+            on delete cascade,
     constraint lot_lot_product_condition_product_condition_id_fk
         foreign key (product_condition_id) references product_condition (product_condition_id),
     constraint lot_lot_status_status_id_fk
@@ -272,3 +275,4 @@ BEGIN
     RETURN (SELECT postal_code_id FROM postal_code WHERE postal_code_name = new_postal_code_name);
 
 END;
+
