@@ -21,4 +21,7 @@ public interface LotService {
 
     List<LotWithImages> findLotsByPageAndContext(int pageNumber, LotContext context)
             throws ServiceCanNotCompleteCommandRequest;
+
+    void updateLotsAuctionStatus(String[] lotIds, String newStatus)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
 }

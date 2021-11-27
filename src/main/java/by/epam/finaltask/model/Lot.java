@@ -56,6 +56,10 @@ public class Lot implements DaoEntity<Lot> {
         this.productCondition = productCondition;
     }
 
+    public static LotBuilder builder() {
+        return new LotBuilder();
+    }
+
     public long getLotId() {
         return lotId;
     }
@@ -170,9 +174,116 @@ public class Lot implements DaoEntity<Lot> {
 
     @Override
     public Lot createWithId(long id) {
-        return new Lot(id, ownerId, category, auctionType, title, startDatetime, endDatetime, initialPrice, region,
-                cityOrDistrict, description, auctionStatus, productCondition);
+        return builder().setLotId(id).setOwnerId(ownerId).setCategory(category).setAuctionType(auctionType)
+                .setTitle(title).setStartDatetime(startDatetime).setEndDatetime(endDatetime)
+                .setInitialPrice(initialPrice).setRegion(region).setCityOrDistrict(cityOrDistrict)
+                .setDescription(description).setAuctionStatus(auctionStatus).setProductCondition(productCondition)
+                .build();
     }
 
+    public static class LotBuilder {
+        private long lotId;
+        private long ownerId;
+        private String category;
+        private AuctionType auctionType;
+        private String title;
+        private Timestamp startDatetime;
+        private Timestamp endDatetime;
+        private BigDecimal initialPrice;
+        private String region;
+        private String cityOrDistrict;
+        private String description;
+        private AuctionStatus auctionStatus;
+        private ProductCondition productCondition;
 
+        private LotBuilder() {
+        }
+
+        public LotBuilder setLotId(long lotId) {
+            this.lotId = lotId;
+            return this;
+        }
+
+        public LotBuilder setOwnerId(long ownerId) {
+            this.ownerId = ownerId;
+            return this;
+        }
+
+        public LotBuilder setCategory(String category) {
+            this.category = category;
+            return this;
+        }
+
+        public LotBuilder setAuctionType(AuctionType auctionType) {
+            this.auctionType = auctionType;
+            return this;
+        }
+
+        public LotBuilder setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public LotBuilder setStartDatetime(Timestamp startDatetime) {
+            this.startDatetime = startDatetime;
+            return this;
+        }
+
+        public LotBuilder setEndDatetime(Timestamp endDatetime) {
+            this.endDatetime = endDatetime;
+            return this;
+        }
+
+        public LotBuilder setInitialPrice(BigDecimal initialPrice) {
+            this.initialPrice = initialPrice;
+            return this;
+        }
+
+        public LotBuilder setRegion(String region) {
+            this.region = region;
+            return this;
+        }
+
+        public LotBuilder setCityOrDistrict(String cityOrDistrict) {
+            this.cityOrDistrict = cityOrDistrict;
+            return this;
+        }
+
+        public LotBuilder setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public LotBuilder setAuctionStatus(AuctionStatus auctionStatus) {
+            this.auctionStatus = auctionStatus;
+            return this;
+        }
+
+        public LotBuilder setProductCondition(ProductCondition productCondition) {
+            this.productCondition = productCondition;
+            return this;
+        }
+
+        public LotBuilder setLot(Lot lot) {
+            this.lotId = lot.lotId;
+            this.ownerId = lot.ownerId;
+            this.category = lot.category;
+            this.auctionType = lot.auctionType;
+            this.title = lot.title;
+            this.startDatetime = lot.startDatetime;
+            this.endDatetime = lot.endDatetime;
+            this.initialPrice = lot.initialPrice;
+            this.region = lot.region;
+            this.cityOrDistrict = lot.cityOrDistrict;
+            this.description = lot.description;
+            this.auctionStatus = lot.auctionStatus;
+            this.productCondition = lot.productCondition;
+            return this;
+        }
+
+        public Lot build() {
+            return new Lot(lotId, ownerId, category, auctionType, title, startDatetime, endDatetime, initialPrice,
+                    region, cityOrDistrict, description, auctionStatus, productCondition);
+        }
+    }
 }

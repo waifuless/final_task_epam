@@ -107,37 +107,37 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
 
     @Override
     protected void prepareUpdateStatement(PreparedStatement statement, Lot lot) throws SQLException {
-        statement.setLong(1, lot.getLotId());
-        statement.setLong(2, lot.getOwnerId());
-        statement.setString(3, lot.getCategory());
-        statement.setString(4, lot.getAuctionType().name());
-        statement.setString(5, lot.getTitle());
-        statement.setTimestamp(6, lot.getStartDatetime());
-        statement.setTimestamp(7, lot.getEndDatetime());
-        statement.setBigDecimal(8, lot.getInitialPrice());
-        statement.setString(9, lot.getRegion());
-        statement.setString(10, lot.getCityOrDistrict());
-        statement.setString(11, lot.getDescription());
-        statement.setString(12, lot.getAuctionStatus().name());
-        statement.setString(13, lot.getProductCondition().name());
+        statement.setLong(1, lot.getOwnerId());
+        statement.setString(2, lot.getCategory());
+        statement.setString(3, lot.getAuctionType().name());
+        statement.setString(4, lot.getTitle());
+        statement.setTimestamp(5, lot.getStartDatetime());
+        statement.setTimestamp(6, lot.getEndDatetime());
+        statement.setBigDecimal(7, lot.getInitialPrice());
+        statement.setString(8, lot.getRegion());
+        statement.setString(9, lot.getCityOrDistrict());
+        statement.setString(10, lot.getDescription());
+        statement.setString(11, lot.getAuctionStatus().name());
+        statement.setString(12, lot.getProductCondition().name());
+        statement.setLong(13, lot.getLotId());
     }
 
     @Override
     protected Lot extractEntity(ResultSet resultSet) throws ExtractionException {
         try {
-            return new Lot(resultSet.getLong(ID_COLUMN),
-                    resultSet.getLong(OWNER_ID_COLUMN),
-                    resultSet.getString(CATEGORY_NAME_COLUMN),
-                    AuctionType.valueOf(resultSet.getString(AUCTION_TYPE_NAME_COLUMN)),
-                    resultSet.getString(TITLE_COLUMN),
-                    resultSet.getTimestamp(START_DATETIME_COLUMN),
-                    resultSet.getTimestamp(END_DATETIME_COLUMN),
-                    resultSet.getBigDecimal(INITIAL_PRICE_COLUMN),
-                    resultSet.getString(REGION_NAME_COLUMN),
-                    resultSet.getString(CITY_OR_DISTRICT_NAME_COLUMN),
-                    resultSet.getString(DESCRIPTION_COLUMN),
-                    AuctionStatus.valueOf(resultSet.getString(AUCTION_STATUS_NAME_COLUMN)),
-                    ProductCondition.valueOf(resultSet.getString(PRODUCT_CONDITION_NAME_COLUMN)));
+            return Lot.builder().setLotId(resultSet.getLong(ID_COLUMN)).setOwnerId(resultSet.getLong(OWNER_ID_COLUMN)).
+                    setCategory(resultSet.getString(CATEGORY_NAME_COLUMN))
+                    .setAuctionType(AuctionType.valueOf(resultSet.getString(AUCTION_TYPE_NAME_COLUMN)))
+                    .setTitle(resultSet.getString(TITLE_COLUMN))
+                    .setStartDatetime(resultSet.getTimestamp(START_DATETIME_COLUMN))
+                    .setEndDatetime(resultSet.getTimestamp(END_DATETIME_COLUMN))
+                    .setInitialPrice(resultSet.getBigDecimal(INITIAL_PRICE_COLUMN))
+                    .setRegion(resultSet.getString(REGION_NAME_COLUMN))
+                    .setCityOrDistrict(resultSet.getString(CITY_OR_DISTRICT_NAME_COLUMN))
+                    .setDescription(resultSet.getString(DESCRIPTION_COLUMN))
+                    .setAuctionStatus(AuctionStatus.valueOf(resultSet.getString(AUCTION_STATUS_NAME_COLUMN)))
+                    .setProductCondition(ProductCondition.valueOf(resultSet.getString(PRODUCT_CONDITION_NAME_COLUMN)))
+                    .build();
         } catch (Exception ex) {
             throw new ExtractionException(ex.getMessage(), ex);
         }

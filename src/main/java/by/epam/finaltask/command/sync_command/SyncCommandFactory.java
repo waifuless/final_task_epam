@@ -71,7 +71,8 @@ public class SyncCommandFactory {
         REMOVE_MAIN_PAGE_LOT_CONTEXT("remove_main_page_lot_context",
                 RemoveMainPageLotContextCommand.class),
         SHOW_ADMIN_LOTS("show_admin_tools", ShowAdminLotsCommand.class),
-        SHOW_ADMIN_CATEGORIES("show_admin_categories", ShowAdminCategoriesCommand.class);
+        SHOW_ADMIN_CATEGORIES("show_admin_categories", ShowAdminCategoriesCommand.class),
+        SHOW_ADMIN_NEW_LOTS("show_admin_new_lots", ShowAdminNewLotsCommand.class);
 
         private final String commandName;
         private final Class<? extends SyncCommand> commandClass;

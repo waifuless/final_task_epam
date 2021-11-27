@@ -66,9 +66,12 @@ public class CommonLotService implements LotService {
             Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
             Timestamp endDatetime =
                     new Timestamp(startDatetime.getTime() + (long) Integer.parseInt(duration) * 60 * 60 * 1000);
-            Lot lot = new Lot(userId, category, AuctionType.valueOf(auctionType), title, startDatetime, endDatetime,
-                    new BigDecimal(initPrice), region, cityOrDistrict, description, AuctionStatus.NOT_VERIFIED,
-                    ProductCondition.valueOf(condition));
+            Lot lot = Lot.builder().setOwnerId(userId).setCategory(category).
+                    setAuctionType(AuctionType.valueOf(auctionType)).setTitle(title).setStartDatetime(startDatetime)
+                    .setEndDatetime(endDatetime).setInitialPrice(new BigDecimal(initPrice)).setRegion(region)
+                    .setCityOrDistrict(cityOrDistrict).setDescription(description)
+                    .setAuctionStatus(AuctionStatus.NOT_VERIFIED)
+                    .setProductCondition(ProductCondition.valueOf(condition)).build();
             Optional<Lot> optionalLot = lotManager.save(lot);
             if (optionalLot.isPresent()) {
                 Lot savedLot = optionalLot.get();
@@ -95,6 +98,40 @@ public class CommonLotService implements LotService {
             List<Lot> lots = lotManager.findByLotContext(context,
                     (long) (pageNumber - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
             return findLotsWithImages(lots);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public void updateLotsAuctionStatus(String[] lotIds, String newStatus)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        try {
+            if (lotIds == null || lotIds.length < 1 || newStatus == null || newStatus.trim().isEmpty()) {
+                throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
+            }
+            AuctionStatus auctionStatus = AuctionStatus.valueOf(newStatus);
+            int[] ids = new int[lotIds.length];
+            for (int i = 0; i < lotIds.length; i++) {
+                ids[i] = Integer.parseInt(lotIds[i]);
+            }
+            for (int lotId : ids) {
+                Optional<Lot> optionalLot = lotManager.find(lotId);
+                if (optionalLot.isPresent()) {
+                    lotManager.update(Lot.builder().setLot(optionalLot.get())
+                            .setAuctionStatus(auctionStatus).build());
+                }
+            }
+        } catch (NumberFormatException ex) {
+            LOG.warn(ex.getMessage());
+            throw new ClientErrorException(ClientError.INVALID_NUMBER);
+        } catch (IllegalArgumentException ex) {
+            LOG.warn(ex.getMessage());
+            throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
+        } catch (ClientErrorException ex) {
+            LOG.warn(ex.getMessage());
+            throw ex;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);

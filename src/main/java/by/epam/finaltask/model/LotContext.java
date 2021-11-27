@@ -90,6 +90,9 @@ public class LotContext {
         private String auctionStatus;
         private String productCondition;
 
+        private LotContextBuilder() {
+        }
+
         public LotContextBuilder setOwnerId(Long ownerId) {
             this.ownerId = ownerId;
             return this;

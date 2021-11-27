@@ -82,7 +82,8 @@ public class MariaCityOrDistrictManager extends GenericDao<CityOrDistrict> imple
     protected void prepareUpdateStatement(PreparedStatement statement, CityOrDistrict cityOrDistrict)
             throws SQLException {
         statement.setString(1, cityOrDistrict.getCityOrDistrictName());
-        statement.setLong(2, cityOrDistrict.getCityOrDistrictId());
+        statement.setLong(2, cityOrDistrict.getRegionId());
+        statement.setLong(3, cityOrDistrict.getCityOrDistrictId());
     }
 
     @Override

@@ -134,7 +134,7 @@
         <div class="row mt-4">
             <c:forEach var="lot" items="${lots}">
                 <a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=${lot.lotId}"
-                   class="container__row__a col-12 col-lg-6 mb-3 mb-3">
+                   class="container__row__a col-12 col-lg-6 mb-3 mb-3" target="_blank">
                     <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
                         <div class="row g-0">
                             <div class="col-4 div-image">
