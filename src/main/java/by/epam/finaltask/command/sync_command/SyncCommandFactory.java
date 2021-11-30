@@ -67,9 +67,6 @@ public class SyncCommandFactory {
         SHOW_RESTORE_PASSWORD("show_restore_password", ShowRestorePasswordPageCommand.class),
         SHOW_LOT_CREATION("show_lot_creation", ShowLotCreationCommand.class),
         CREATE_LOT("create_lot", CreateLotCommand.class),
-        SET_MAIN_PAGE_LOT_CONTEXT("set_main_page_lot_context", SetMainPageLotContextCommand.class),
-        REMOVE_MAIN_PAGE_LOT_CONTEXT("remove_main_page_lot_context",
-                RemoveMainPageLotContextCommand.class),
         SHOW_ADMIN_LOTS("show_admin_tools", ShowAdminLotsCommand.class),
         SHOW_ADMIN_CATEGORIES("show_admin_categories", ShowAdminCategoriesCommand.class),
         SHOW_ADMIN_NEW_LOTS("show_admin_new_lots", ShowAdminNewLotsCommand.class);

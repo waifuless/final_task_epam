@@ -1,13 +1,16 @@
-package by.epam.finaltask.command.sync_command;
+package by.epam.finaltask.command.async_command;
 
+import by.epam.finaltask.command.AjaxCommandResponse;
 import by.epam.finaltask.command.CommandRequest;
-import by.epam.finaltask.command.SyncCommandResponse;
-import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.model.AuctionStatus;
 import by.epam.finaltask.model.LotContext;
+import by.epam.finaltask.model.LotWithImages;
 import by.epam.finaltask.model.Role;
+import by.epam.finaltask.service.LotService;
+import by.epam.finaltask.service.ServiceFactory;
+import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,28 +19,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static by.epam.finaltask.command.sync_command.SyncCommandFactory.SyncCommandVariant;
+public class FindLotsByUserCommand implements AjaxCommand{
 
-public class SetMainPageLotContextCommand implements SyncCommand {
-
-    private final static Logger LOG = LogManager.getLogger(SetMainPageLotContextCommand.class);
+    private final static Logger LOG = LogManager.getLogger(FindLotsByUserCommand.class);
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
-            .asList(Role.NOT_AUTHORIZED, Role.ADMIN, Role.USER));
+            .asList(Role.NOT_AUTHORIZED, Role.USER, Role.ADMIN));
 
-    SetMainPageLotContextCommand() {
-    }
+    private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
 
-    @Override
-    public SyncCommandResponse execute(CommandRequest request) throws ClientErrorException {
-        try {
-            LotContext context = findLotContext(request);
-            request.getSession().setAttribute(UserSessionAttribute.MAIN_PAGE_LOT_CONTEXT.name(), context);
-            return new SyncCommandResponse(true, request.createCommandPath(SyncCommandVariant.SHOW_MAIN));
-        } catch (NumberFormatException ex) {
-            LOG.warn(ex.getMessage(), ex);
-            throw new ClientErrorException(ClientError.INVALID_NUMBER);
-        }
+    FindLotsByUserCommand() {
     }
 
     @Override
@@ -45,8 +36,26 @@ public class SetMainPageLotContextCommand implements SyncCommand {
         return ALLOWED_ROLES;
     }
 
+    @Override
+    public AjaxCommandResponse execute(CommandRequest request) throws Exception {
+        try {
+            String pageNumberParam = request.getParameter("pageNum");
+            int pageNumber = pageNumberParam == null ? 1 : Integer.parseInt(pageNumberParam);
+
+            LotContext context = findLotContext(request);
+            LOG.debug("Lot by user context: {}", context);
+            List<LotWithImages> lots = lotService.findLotsByPageAndContext(pageNumber, context);
+            String lotsJson = new Gson().toJson(lots);
+            return new AjaxCommandResponse("application/json", lotsJson);
+        } catch (NumberFormatException ex) {
+            LOG.warn(ex.getMessage(), ex);
+            throw new ClientErrorException(ClientError.INVALID_NUMBER);
+        }
+    }
+
     private LotContext findLotContext(CommandRequest request) throws NumberFormatException {
         return LotContext.builder()
+                .setTitle(retrieveNullIfEmpty(request.getParameter("title")))
                 .setCategory(retrieveNullIfEmpty(request.getParameter("category")))
                 .setAuctionType(retrieveNullIfEmpty(request.getParameter("auction-type")))
                 .setMinInitialPrice(parseAndRetrieveNullIfEmpty(request.getParameter("price-from")))
@@ -65,5 +74,4 @@ public class SetMainPageLotContextCommand implements SyncCommand {
     private BigDecimal parseAndRetrieveNullIfEmpty(String param) {
         return (param == null || param.trim().isEmpty()) ? null : new BigDecimal(param);
     }
-
 }

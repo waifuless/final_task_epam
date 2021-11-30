@@ -25,7 +25,9 @@ function placeCitiesOrDistricts(regionSelectId, cityOrDistrictSelectId, funcAfte
                     + '</option>');
             });
             $(`#${cityOrDistrictSelectId}`).prop('disabled', false);
-            funcAfterSuccess();
+            if(funcAfterSuccess){
+                funcAfterSuccess();
+            }
         }
     });
 }

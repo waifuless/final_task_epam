@@ -73,8 +73,9 @@
                     </ul>
                 </div>
 
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <form class="d-flex" method="get" action="${pageContext.request.contextPath}/ControllerServlet">
+                    <input id="title" name="title" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <input type="hidden" name="command" value="show_main_page">
                     <button class="btn btn-outline-success" type="submit">
                         <fmt:message bundle="${headerLoc}" key="search.button"/>
                     </button>

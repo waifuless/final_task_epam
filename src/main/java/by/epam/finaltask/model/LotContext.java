@@ -143,6 +143,20 @@ public class LotContext {
             return this;
         }
 
+        public LotContextBuilder setLotContext(LotContext context) {
+            this.ownerId = context.ownerId;
+            this.category = context.category;
+            this.auctionType = context.auctionType;
+            this.title = context.title;
+            this.minInitialPrice = context.minInitialPrice;
+            this.maxInitialPrice = context.maxInitialPrice;
+            this.region = context.region;
+            this.cityOrDistrict = context.cityOrDistrict;
+            this.auctionStatus = context.auctionStatus;
+            this.productCondition = context.productCondition;
+            return this;
+        }
+
         public LotContext build() {
             return new LotContext(ownerId, category, auctionType, title, minInitialPrice,
                     maxInitialPrice, region, cityOrDistrict, auctionStatus, productCondition);

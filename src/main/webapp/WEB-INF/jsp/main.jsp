@@ -1,4 +1,3 @@
-<jsp:useBean id="lots" scope="request" type="java.util.List<by.epam.finaltask.model.LotWithImages>"/>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
@@ -32,8 +31,11 @@
         <h2 style="border-bottom: 1px solid green; margin-top: 30px">
             <fmt:message bundle="${filters}" key="filters.header"/>
         </h2>
-        <form method="post"
-              action="${pageContext.request.contextPath}/ControllerServlet?command=set_main_page_lot_context">
+        <form id="filters-form">
+            <input type="hidden" name="command" value="find_lots_by_user">
+            <input type="hidden" name="requestIsAjax" value="true">
+            <input type="hidden" name="title" value="${requestScope.get('title')}">
+
             <div class="row mt-4">
                 <div class="col-lg-3 col-sm-6 mb-3">
                     <label class="mb-2" for="auction-type-filter">
@@ -118,10 +120,9 @@
                     </button>
                 </div>
                 <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
-                    <a class="btn btn-danger w-100"
-                       href="${pageContext.request.contextPath}/ControllerServlet?command=remove_main_page_lot_context">
+                    <button class="btn btn-danger w-100" id="reset-button">
                         <fmt:message bundle="${filters}" key="filters.reset"/>
-                    </a>
+                    </button>
                 </div>
             </div>
         </form>
@@ -131,43 +132,7 @@
             <fmt:message bundle="${loc}" key="container.lots.header"/>
         </h2>
 
-        <div class="row mt-4">
-            <c:forEach var="lot" items="${lots}">
-                <a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=${lot.lotId}"
-                   class="container__row__a col-12 col-lg-6 mb-3 mb-3" target="_blank">
-                    <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
-                        <div class="row g-0">
-                            <div class="col-4 div-image">
-                                <img src="${lot.images.mainImage.path}" class="img-fluid rounded-start"
-                                     alt="...">
-                            </div>
-                            <div class="col-8">
-                                <div class="card-body">
-                                    <h5 class="card-title">${lot.title}</h5>
-                                    <p class="card-text category">${lot.category}</p>
-                                    <p class="card-text auction-type">
-                                        <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_type"/> ${lot.auctionType}
-                                    </p>
-                                    <p class="card-text region">
-                                        <fmt:message bundle="${loc}" key="container.lot.region"/> ${lot.region}
-                                    </p>
-                                    <p class="card-text address">
-                                        <fmt:message bundle="${loc}" key="container.lot.city"/> ${lot.cityOrDistrict}
-                                    </p>
-                                    <p class="card-text initial-price">
-                                        <fmt:message bundle="${loc}" key="container.lot.price"/> ${lot.initialPrice}
-                                    </p>
-                                    <p class="card-text auction-start"><small class="text-muted">
-                                        <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_start_datetime"/>${lot.startDatetime}</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </c:forEach>
+        <div class="row mt-4" id="div-lots">
         </div>
     </div>
 
@@ -190,31 +155,116 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
-        let filtersContext = ${requestScope.get("lotContextJson")};
+        let form = $('#filters-form');
+        form.submit(e => applyFilters(e));
 
-        function setOption(selectId, contextFiledValue) {
-            if (contextFiledValue != null) {
-                $('#' + selectId + ' option[value="' + contextFiledValue + '"]').attr('selected', 'selected');
-            }
-        }
+        let title = '${requestScope.get("title")}';
+        setInput('title', title);
+        // const cookies = document.cookie.split('; ');
+        // let regionCookie;
+        // let region;
+        // if (cookies && (regionCookie = cookies.find(row => row.startsWith('region=')))
+        //     && (region = regionCookie.split('=')[1])) {
+        //
+        //     let cityCookie = cookies.find(row => row.startsWith('cityOrDistrict='));
+        //     let city;
+        //     if (cityCookie) {
+        //         city = cityCookie.split('=')[1];
+        //     }
+        //     setOption('region-filter', region);
+        //     placeCitiesOrDistricts('region-filter', 'city-filter', function () {
+        //         setOption('city-filter', city);
+        //         requestLots(1);
+        //     });
+        // } else {
+        //     requestLots(1);
+        // }
+        requestLots(1);
 
-        function setInput(inputId, contextInputValue) {
-            if (contextInputValue != null) {
-                $('#' + inputId).val(contextInputValue);
-            }
-        }
 
-        setOption('auction-type-filter', filtersContext.auctionType);
-        setOption('category-filter', filtersContext.category);
-        setOption('region-filter', filtersContext.region);
-        placeCitiesOrDistricts('region-filter', 'city-filter', function (){
-            setOption('city-filter', filtersContext.cityOrDistrict);
+
+        $('#reset-button').click(function () {
+            // document.cookie = "region=; expires = "+ new Date(0).toUTCString();
+            // document.cookie = "cityOrDistrict=; expires = "+ new Date(0).toUTCString();
+            window.location.replace("${pageContext.request.contextPath}/ControllerServlet?command=show_main_page");
         });
-        setOption('condition-filter', filtersContext.productCondition);
-        setInput('price-from', filtersContext.minInitialPrice);
-        setInput('price-to', filtersContext.maxInitialPrice);
 
+        function applyFilters(e) {
+            e.preventDefault();
+            // document.cookie = "region=" + $('#region-filter').val();
+            // document.cookie = "cityOrDistrict=" + $('#city-filter').val();
+            requestLots(1);
+        }
+
+        function requestLots(page) {
+            $.ajax({
+                type: 'POST',
+                url: 'ControllerServlet?page=' + page,
+                processData: false,
+                dataType: "json",
+                data: form.serialize(),
+                success: function (lots) {
+                    printLots(lots);
+                },
+                error: function (xhr, textStatus, thrownError) {
+                    alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+                }
+            });
+        }
+
+        function printLots(lots) {
+            let divForLots = $('#div-lots');
+            divForLots.empty();
+            lots.forEach(function (lot) {
+                divForLots.append('<a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=' + lot.lotId + '"' +
+                    `class="container__row__a col-12 col-lg-6 mb-3 mb-3" target="_blank">
+                    <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
+                        <div class="row g-0">
+                            <div class="col-4 div-image">` +
+                    `<img src="` + lot.images.mainImage.path + `" class="img-fluid rounded-start"
+                                     alt="...">
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">` + lot.title + `</h5>
+                                    <p class="card-text category">` + lot.category + `</p>
+                                    <p class="card-text auction-type">
+                                        <fmt:message bundle="${loc}"
+                                                     key="container.lot.auction_type"/>` + lot.auctionType +
+                    `</p>
+                                    <p class="card-text region">
+                                        <fmt:message bundle="${loc}" key="container.lot.region"/>` + lot.region +
+                    `</p>
+                                    <p class="card-text address">
+                                        <fmt:message bundle="${loc}" key="container.lot.city"/>` + lot.cityOrDistrict +
+                    `</p>
+                                    <p class="card-text initial-price">
+                                        <fmt:message bundle="${loc}" key="container.lot.price"/>` + lot.initialPrice +
+                    `</p>
+                                    <p class="card-text auction-start"><small class="text-muted">
+                                        <fmt:message bundle="${loc}"
+                                                     key="container.lot.auction_start_datetime"/>` + lot.startDatetime + `</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>`);
+            });
+        }
     });
+
+    // function setOption(selectId, value) {
+    //     if (value != null) {
+    //         $('#' + selectId + ' option[value="' + value + '"]').attr('selected', 'selected');
+    //     }
+    // }
+
+    function setInput(inputId, value) {
+        if (value != null) {
+            $('#' + inputId).val(value);
+        }
+    }
 </script>
 </body>
 </html>

@@ -27,29 +27,18 @@ public class ShowMainPageCommand implements SyncCommand {
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.NOT_AUTHORIZED, Role.ADMIN, Role.USER));
 
-    private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
     private final RegionService regionService = ServiceFactory.getFactoryInstance().regionService();
     private final CategoryService categoryService = ServiceFactory.getFactoryInstance().categoryService();
-
-    private final LotContext defaultLotContext = LotContext.builder()
-            .setAuctionStatus(AuctionStatus.APPROVED_BY_ADMIN.name()).build();
 
     ShowMainPageCommand() {
     }
 
     @Override
     public SyncCommandResponse execute(CommandRequest request) throws ServiceCanNotCompleteCommandRequest {
-        String pageNumberParam = request.getParameter("pageNum");
         try {
             request.setAttribute("regions", regionService.findAllRegions());
             request.setAttribute("categories", categoryService.findAllCategories());
-            //todo:validation
-            LotContext sessionContext = (LotContext) request.getSession()
-                    .getAttribute(UserSessionAttribute.MAIN_PAGE_LOT_CONTEXT.name());
-            LotContext context = sessionContext != null ? sessionContext : defaultLotContext;
-            request.setAttribute("lotContextJson", new Gson().toJson(context));
-            int pageNumber = pageNumberParam == null ? 1 : Integer.parseInt(pageNumberParam);
-            request.setAttribute("lots", lotService.findLotsByPageAndContext(pageNumber, context));
+            request.setAttribute("title", request.getParameter("title"));
             return new SyncCommandResponse(false, PagePath.MAIN.getPath());
         } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
