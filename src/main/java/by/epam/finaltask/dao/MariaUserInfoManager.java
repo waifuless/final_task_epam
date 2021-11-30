@@ -27,12 +27,13 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
     private final static String POSTAL_CODE_NAME_COLUMN = "postal_code_name";
     private final static String TABLE_NAME = "user_info";
     private final static String SAVE_USER_INFO_QUERY =
-            "INSERT INTO user_info(user_id, phone_number, first_name, last_name," +
+            "SET @regionId = findRegionId(?);" +
+                    "INSERT INTO user_info(user_id, phone_number, first_name, last_name," +
                     " address_id, city_or_district_id, region_id, postal_code_id)" +
                     "VALUES(?,?,?,?," +
                     "insertAddressIfNotExistAndSelectId(?)," +
-                    "findCityOrDistrictId(?)," +
-                    "findRegionId(?)," +
+                    "findCityOrDistrictId(?, @regionId)," +
+                    "@regionId," +
                     "insertPostalCodeIfNotExistAndSelectId(?));";
     private final static String IS_USER_INFO_EXIST_QUERY =
             "SELECT EXISTS(SELECT 1 FROM user_info WHERE user_id=?) AS user_info_existence";
@@ -47,10 +48,11 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
                     " LEFT JOIN postal_code pc on user_info.postal_code_id = pc.postal_code_id";
     private final static String FIND_USER_INFO_BY_ID_QUERY = FIND_ALL_USER_INFO_QUERY + " WHERE user_id=?";
     private final static String UPDATE_USER_INFO_QUERY =
-            "UPDATE user_info SET phone_number = ?, first_name = ?, last_name = ?," +
+            "SET @regionId = findRegionId(?);" +
+                    "UPDATE user_info SET phone_number = ?, first_name = ?, last_name = ?," +
                     " address_id = insertAddressIfNotExistAndSelectId(?)," +
-                    " city_or_district_id = findCityOrDistrictId(?)," +
-                    " region_id = findRegionId(?)," +
+                    " city_or_district_id = findCityOrDistrictId(?, @regionId)," +
+                    " region_id = @regionId," +
                     " postal_code_id = insertPostalCodeIfNotExistAndSelectId(?)" +
                     " WHERE user_id = ?";
     private final static String DELETE_USER_INFO_QUERY =
@@ -76,24 +78,24 @@ public class MariaUserInfoManager extends GenericDao<UserInfo> implements UserIn
 
     @Override
     protected void prepareSaveStatement(PreparedStatement statement, UserInfo userInfo) throws SQLException {
-        statement.setLong(1, userInfo.getUserId());
-        statement.setString(2, userInfo.getPhoneNumber());
-        statement.setString(3, userInfo.getFirstName());
-        statement.setString(4, userInfo.getLastName());
-        statement.setString(5, userInfo.getAddress());
-        statement.setString(6, userInfo.getCity());
-        statement.setString(7, userInfo.getRegion());
+        statement.setString(1, userInfo.getRegion());
+        statement.setLong(2, userInfo.getUserId());
+        statement.setString(3, userInfo.getPhoneNumber());
+        statement.setString(4, userInfo.getFirstName());
+        statement.setString(5, userInfo.getLastName());
+        statement.setString(6, userInfo.getAddress());
+        statement.setString(7, userInfo.getCity());
         statement.setString(8, userInfo.getPostalCode());
     }
 
     @Override
     protected void prepareUpdateStatement(PreparedStatement statement, UserInfo userInfo) throws SQLException {
-        statement.setString(1, userInfo.getPhoneNumber());
-        statement.setString(2, userInfo.getFirstName());
-        statement.setString(3, userInfo.getLastName());
-        statement.setString(4, userInfo.getAddress());
-        statement.setString(5, userInfo.getCity());
-        statement.setString(6, userInfo.getRegion());
+        statement.setString(1, userInfo.getRegion());
+        statement.setString(2, userInfo.getPhoneNumber());
+        statement.setString(3, userInfo.getFirstName());
+        statement.setString(4, userInfo.getLastName());
+        statement.setString(5, userInfo.getAddress());
+        statement.setString(6, userInfo.getCity());
         statement.setString(7, userInfo.getPostalCode());
         statement.setLong(8, userInfo.getUserId());
     }

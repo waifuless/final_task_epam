@@ -31,11 +31,12 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     private final static String PRODUCT_CONDITION_NAME_COLUMN = "product_condition_name";
     private final static String TABLE_NAME = "lot";
     private final static String SAVE_LOT_QUERY =
-            "INSERT INTO lot(owner_id, category_id, auction_type_id, title, start_datetime, end_datetime," +
+            "SET @regionId = findRegionId(?);" +
+                    " INSERT INTO lot(owner_id, category_id, auction_type_id, title, start_datetime, end_datetime," +
                     " initial_price, region_id, city_or_district_id, description, auction_status_id," +
                     " product_condition_id)" +
-                    " VALUES(?, findCategoryId(?), findAuctionTypeId(?), ?, ?, ?, ?, findRegionId(?)," +
-                    " findCityOrDistrictId(?), ?, findAuctionStatusId(?)," +
+                    " VALUES(?, findCategoryId(?), findAuctionTypeId(?), ?, ?, ?, ?, @regionId," +
+                    " findCityOrDistrictId(?, @regionId), ?, findAuctionStatusId(?)," +
                     " findProductConditionId(?));";
     private final static String FIND_ALL_LOTS_QUERY =
             "SELECT lot.lot_id AS lot_id, owner_id AS owner_id, category.category_name AS category_name," +
@@ -58,9 +59,11 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             FIND_ALL_LOTS_QUERY + " WHERE owner_id = ?" +
                     " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
     private final static String UPDATE_LOT_QUERY =
-            "UPDATE lot SET owner_id = ?, category_id = findCategoryId(?), auction_type_id = findAuctionTypeId(?)," +
-                    " title = ?, start_datetime = ?, end_datetime = ?, initial_price = ?, region_id = findRegionId(?)," +
-                    " city_or_district_id = findCityOrDistrictId(?)," +
+            "SET @regionId = findRegionId(?);" +
+                    " UPDATE lot SET owner_id = ?, category_id = findCategoryId(?)," +
+                    " auction_type_id = findAuctionTypeId(?), title = ?, start_datetime = ?, end_datetime = ?," +
+                    " initial_price = ?, region_id = @regionId," +
+                    " city_or_district_id = findCityOrDistrictId(?, @regionId)," +
                     " description = ?, auction_status_id = findAuctionStatusId(?)," +
                     " product_condition_id = findProductConditionId(?)" +
                     " WHERE lot_id = ?";
@@ -91,14 +94,14 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
 
     @Override
     protected void prepareSaveStatement(PreparedStatement statement, Lot lot) throws SQLException {
-        statement.setLong(1, lot.getOwnerId());
-        statement.setString(2, lot.getCategory());
-        statement.setString(3, lot.getAuctionType().name());
-        statement.setString(4, lot.getTitle());
-        statement.setTimestamp(5, lot.getStartDatetime());
-        statement.setTimestamp(6, lot.getEndDatetime());
-        statement.setBigDecimal(7, lot.getInitialPrice());
-        statement.setString(8, lot.getRegion());
+        statement.setString(1, lot.getRegion());
+        statement.setLong(2, lot.getOwnerId());
+        statement.setString(3, lot.getCategory());
+        statement.setString(4, lot.getAuctionType().name());
+        statement.setString(5, lot.getTitle());
+        statement.setTimestamp(6, lot.getStartDatetime());
+        statement.setTimestamp(7, lot.getEndDatetime());
+        statement.setBigDecimal(8, lot.getInitialPrice());
         statement.setString(9, lot.getCityOrDistrict());
         statement.setString(10, lot.getDescription());
         statement.setString(11, lot.getAuctionStatus().name());
@@ -107,14 +110,14 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
 
     @Override
     protected void prepareUpdateStatement(PreparedStatement statement, Lot lot) throws SQLException {
-        statement.setLong(1, lot.getOwnerId());
-        statement.setString(2, lot.getCategory());
-        statement.setString(3, lot.getAuctionType().name());
-        statement.setString(4, lot.getTitle());
-        statement.setTimestamp(5, lot.getStartDatetime());
-        statement.setTimestamp(6, lot.getEndDatetime());
-        statement.setBigDecimal(7, lot.getInitialPrice());
-        statement.setString(8, lot.getRegion());
+        statement.setString(1, lot.getRegion());
+        statement.setLong(2, lot.getOwnerId());
+        statement.setString(3, lot.getCategory());
+        statement.setString(4, lot.getAuctionType().name());
+        statement.setString(5, lot.getTitle());
+        statement.setTimestamp(6, lot.getStartDatetime());
+        statement.setTimestamp(7, lot.getEndDatetime());
+        statement.setBigDecimal(8, lot.getInitialPrice());
         statement.setString(9, lot.getCityOrDistrict());
         statement.setString(10, lot.getDescription());
         statement.setString(11, lot.getAuctionStatus().name());

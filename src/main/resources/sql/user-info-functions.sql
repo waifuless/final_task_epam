@@ -9,15 +9,11 @@ BEGIN
     IF NOT EXISTS(SELECT 1 FROM address WHERE address_name = new_address_name) THEN
         INSERT INTO address(address_name) VALUE (new_address_name);
     END IF;
-    RETURN (SELECT address_id FROM address WHERE address_name = new_address_name);
+    RETURN (SELECT address_id FROM address WHERE address_name = new_address_name LIMIT 1);
 
 END //
 
 DELIMITER ;
-
-
-
-
 
 
 DELIMITER //
@@ -26,37 +22,29 @@ CREATE FUNCTION findRegionId(searching_region_name VARCHAR(60)) RETURNS INT
 
 BEGIN
 
-    RETURN (SELECT region_id FROM region WHERE region_name = searching_region_name);
+    RETURN (SELECT region_id FROM region WHERE region_name = searching_region_name LIMIT 1);
 
 END //
 
 DELIMITER ;
-
-
-
-
-
 
 
 DELIMITER //
 
-CREATE FUNCTION findCityOrDistrictId(searching_city_or_district_name VARCHAR(60)) RETURNS INT
+CREATE FUNCTION findCityOrDistrictId(searching_city_or_district_name VARCHAR(60),
+                                     searching_region_id INT(11)) RETURNS INT
 
 BEGIN
 
-    RETURN (SELECT city_or_district_id FROM city_or_district WHERE city_or_district_name =
-                                                                   searching_city_or_district_name);
+    RETURN (SELECT city_or_district_id
+            FROM city_or_district
+            WHERE city_or_district_name =
+                  searching_city_or_district_name
+              AND region_id = searching_region_id LIMIT 1);
 
 END //
 
 DELIMITER ;
-
-
-
-
-
-
-
 
 
 DELIMITER //
@@ -68,7 +56,7 @@ BEGIN
     IF NOT EXISTS(SELECT 1 FROM postal_code WHERE postal_code_name = new_postal_code_name) THEN
         INSERT INTO postal_code(postal_code_name) VALUE (new_postal_code_name);
     END IF;
-    RETURN (SELECT postal_code_id FROM postal_code WHERE postal_code_name = new_postal_code_name);
+    RETURN (SELECT postal_code_id FROM postal_code WHERE postal_code_name = new_postal_code_name LIMIT 1);
 
 END //
 

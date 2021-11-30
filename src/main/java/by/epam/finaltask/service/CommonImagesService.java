@@ -102,7 +102,7 @@ public class CommonImagesService implements ImagesService {
             MetadataException {
         Metadata metadata = ImageMetadataReader.readMetadata(image.getInputStream());
         ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-        if (exifIFD0 == null) {
+        if (exifIFD0 == null || !exifIFD0.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
             return Optional.empty();
         }
         int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);

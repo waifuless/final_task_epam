@@ -11,6 +11,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalField;
 import java.util.*;
 
 public class CommonLotService implements LotService {
@@ -18,6 +21,10 @@ public class CommonLotService implements LotService {
     private final static Logger LOG = LogManager.getLogger(CommonLotService.class);
 
     private final static int LOTS_PER_PAGE = 8;
+    private final static int MIN_DAYS_BEFORE_START_AUCTION = 4;
+    private final static int MIN_DURATION_HOURS = 2;
+    private final static int MAX_DURATION_HOURS = 24;
+    private final static int ONE_HOUR_IN_MILLIS = 60 * 60 * 1000;
 
     private final LotManager lotManager;
     private final ImagesManager imagesManager;
@@ -64,8 +71,10 @@ public class CommonLotService implements LotService {
             validateCreationParams(mainImagePath, otherImagePaths, title, category, auctionType, condition,
                     description, initPrice, auctionStart, duration, region, cityOrDistrict);
             Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
+            int intDuration = Integer.parseInt(duration);
+            validateStartTimeAndDuration(startDatetime.toLocalDateTime().toLocalDate(), intDuration);
             Timestamp endDatetime =
-                    new Timestamp(startDatetime.getTime() + (long) Integer.parseInt(duration) * 60 * 60 * 1000);
+                    new Timestamp(startDatetime.getTime() + (long) Integer.parseInt(duration) * ONE_HOUR_IN_MILLIS);
             Lot lot = Lot.builder().setOwnerId(userId).setCategory(category).
                     setAuctionType(AuctionType.valueOf(auctionType)).setTitle(title).setStartDatetime(startDatetime)
                     .setEndDatetime(endDatetime).setInitialPrice(new BigDecimal(initPrice)).setRegion(region)
@@ -169,5 +178,12 @@ public class CommonLotService implements LotService {
     private String reformatForTimestamp(String time) {
         time = time.replace("T", " ");
         return time.indexOf(':') == time.lastIndexOf(':') ? time.concat(":00") : time;
+    }
+
+    private void validateStartTimeAndDuration(LocalDate startDate, int duration) throws ClientErrorException {
+        if(startDate.minusDays(MIN_DAYS_BEFORE_START_AUCTION).compareTo(LocalDate.now()) < 0
+                || duration<MIN_DURATION_HOURS || duration>MAX_DURATION_HOURS){
+            throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
+        }
     }
 }

@@ -207,7 +207,7 @@ create
     definer = epamTaskUser@localhost function findAuctionStatusId(searching_status_name varchar(60)) returns int
 BEGIN
 
-    RETURN (SELECT status_id FROM auction_status WHERE status_name = searching_status_name);
+    RETURN (SELECT status_id FROM auction_status WHERE status_name = searching_status_name LIMIT 1);
 
 END;
 
@@ -215,7 +215,7 @@ create
     definer = epamTaskUser@localhost function findAuctionTypeId(searching_type_name varchar(60)) returns int
 BEGIN
 
-    RETURN (SELECT type_id FROM auction_type WHERE type_name = searching_type_name);
+    RETURN (SELECT type_id FROM auction_type WHERE type_name = searching_type_name LIMIT 1);
 
 END;
 
@@ -223,18 +223,21 @@ create
     definer = epamTaskUser@localhost function findCategoryId(searching_category_name varchar(60)) returns int
 BEGIN
 
-    RETURN (SELECT category_id FROM category WHERE category_name = searching_category_name);
+    RETURN (SELECT category_id FROM category WHERE category_name = searching_category_name LIMIT 1);
 
 END;
 
 create
-    definer = epamTaskUser@localhost function findCityOrDistrictId(searching_city_or_district_name varchar(60)) returns int
+    definer = epamTaskUser@localhost function findCityOrDistrictId(searching_city_or_district_name varchar(60),
+                                                                   searching_region_id int) returns int
 BEGIN
 
     RETURN (SELECT city_or_district_id
             FROM city_or_district
             WHERE city_or_district_name =
-                  searching_city_or_district_name);
+                  searching_city_or_district_name
+              AND region_id = searching_region_id
+            LIMIT 1);
 
 END;
 
@@ -242,7 +245,10 @@ create
     definer = epamTaskUser@localhost function findProductConditionId(searching_condition_name varchar(60)) returns int
 BEGIN
 
-    RETURN (SELECT product_condition_id FROM product_condition WHERE product_condition_name = searching_condition_name);
+    RETURN (SELECT product_condition_id
+            FROM product_condition
+            WHERE product_condition_name = searching_condition_name
+            LIMIT 1);
 
 END;
 
@@ -250,7 +256,7 @@ create
     definer = epamTaskUser@localhost function findRegionId(searching_region_name varchar(60)) returns int
 BEGIN
 
-    RETURN (SELECT region_id FROM region WHERE region_name = searching_region_name);
+    RETURN (SELECT region_id FROM region WHERE region_name = searching_region_name LIMIT 1);
 
 END;
 
@@ -261,7 +267,7 @@ BEGIN
     IF NOT EXISTS(SELECT 1 FROM address WHERE address_name = new_address_name) THEN
         INSERT INTO address(address_name) VALUE (new_address_name);
     END IF;
-    RETURN (SELECT address_id FROM address WHERE address_name = new_address_name);
+    RETURN (SELECT address_id FROM address WHERE address_name = new_address_name LIMIT 1);
 
 END;
 
@@ -272,7 +278,7 @@ BEGIN
     IF NOT EXISTS(SELECT 1 FROM postal_code WHERE postal_code_name = new_postal_code_name) THEN
         INSERT INTO postal_code(postal_code_name) VALUE (new_postal_code_name);
     END IF;
-    RETURN (SELECT postal_code_id FROM postal_code WHERE postal_code_name = new_postal_code_name);
+    RETURN (SELECT postal_code_id FROM postal_code WHERE postal_code_name = new_postal_code_name LIMIT 1);
 
 END;
 
