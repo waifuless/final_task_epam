@@ -160,39 +160,16 @@
 
         let title = '${requestScope.get("title")}';
         setInput('title', title);
-        // const cookies = document.cookie.split('; ');
-        // let regionCookie;
-        // let region;
-        // if (cookies && (regionCookie = cookies.find(row => row.startsWith('region=')))
-        //     && (region = regionCookie.split('=')[1])) {
-        //
-        //     let cityCookie = cookies.find(row => row.startsWith('cityOrDistrict='));
-        //     let city;
-        //     if (cityCookie) {
-        //         city = cityCookie.split('=')[1];
-        //     }
-        //     setOption('region-filter', region);
-        //     placeCitiesOrDistricts('region-filter', 'city-filter', function () {
-        //         setOption('city-filter', city);
-        //         requestLots(1);
-        //     });
-        // } else {
-        //     requestLots(1);
-        // }
         requestLots(1);
 
 
 
         $('#reset-button').click(function () {
-            // document.cookie = "region=; expires = "+ new Date(0).toUTCString();
-            // document.cookie = "cityOrDistrict=; expires = "+ new Date(0).toUTCString();
             window.location.replace("${pageContext.request.contextPath}/ControllerServlet?command=show_main_page");
         });
 
         function applyFilters(e) {
             e.preventDefault();
-            // document.cookie = "region=" + $('#region-filter').val();
-            // document.cookie = "cityOrDistrict=" + $('#city-filter').val();
             requestLots(1);
         }
 
@@ -253,12 +230,6 @@
             });
         }
     });
-
-    // function setOption(selectId, value) {
-    //     if (value != null) {
-    //         $('#' + selectId + ' option[value="' + value + '"]').attr('selected', 'selected');
-    //     }
-    // }
 
     function setInput(inputId, value) {
         if (value != null) {
