@@ -12,6 +12,7 @@
     <link rel="shortcut icon" href="images/dollar-symbol.png" type="image/x-icon">
     <title><fmt:message bundle="${loc}" key="head.title"/></title>
     <script src="js/jquery-3.6.0.js"></script>
+    <script src="js/jquery.validate.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
@@ -57,22 +58,29 @@
             </div>
         </div>
 
-        <form action="${pageContext.request.contextPath}/ControllerServlet?command=create_lot" method="post">
+        <form action="${pageContext.request.contextPath}/ControllerServlet?command=create_lot" method="post"
+              id="form-new-lot">
 
             <div class="row col-lg-8 col-sm-9 col-11 mb-3 mx-auto mx-lg-0">
+                <input type="text" style="display: none" class="imageAlert">
                 <div class="gallery" id="gallery"></div>
+            </div>
+
+            <div class="row col-lg-8 col-sm-9 col-11 mb-3 mx-auto mx-lg-0">
+                <p class="big-text"><fmt:message bundle="${loc}" key="necessary.alert"/></p>
             </div>
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <label for="title"><fmt:message bundle="${loc}" key="lot.label.title"/></label><br>
-                <input type="text" required name="title" id="title" class="form-control">
+                <input type="text" name="title" id="title" class="form-control">
             </div>
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <label class="mb-2" for="category-input"><fmt:message bundle="${loc}"
-                                                                       key="lot.label.category"/></label>
+                                                                      key="lot.label.category"/></label>
                 <select id="category-input" name="category" class="form-select" aria-label="Default select example">
-                    <option value="" disabled selected><fmt:message bundle="${loc}" key="lot.category.not_chosen"/></option>
+                    <option value="" disabled selected><fmt:message bundle="${loc}"
+                                                                    key="lot.category.not_chosen"/></option>
                     <jsp:useBean id="categories" scope="request"
                                  type="java.util.List<by.epam.finaltask.model.Category>"/>
                     <c:forEach items="${categories}" var="category">
@@ -83,10 +91,11 @@
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <label class="mb-2" for="auction-type-input"><fmt:message bundle="${loc}"
-                                                                           key="lot.label.auction_type"/></label>
+                                                                          key="lot.label.auction_type"/></label>
                 <select id="auction-type-input" name="auction-type" class="form-select"
                         aria-label="Default select example">
-                    <option value="" disabled selected><fmt:message bundle="${loc}" key="lot.auction_type.not_chosen"/></option>
+                    <option value="" disabled selected><fmt:message bundle="${loc}"
+                                                                    key="lot.auction_type.not_chosen"/></option>
                     <option value="FORWARD"><fmt:message bundle="${loc}" key="lot.auction_type.forward"/></option>
                     <option value="REVERSE"><fmt:message bundle="${loc}" key="lot.auction_type.reverse"/></option>
                 </select>
@@ -107,7 +116,7 @@
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <label for="description"><fmt:message bundle="${loc}" key="lot.label.description"/></label><br>
-                <textarea style="resize: none" required name="description" id="description"
+                <textarea style="resize: none" name="description" id="description"
                           class="form-control"></textarea>
             </div>
 
@@ -115,17 +124,18 @@
                 <label class="big-text" for="init-price">
                     <fmt:message bundle="${loc}" key="lot.label.initial_price"/>
                 </label><br>
-                <input type="text" required name="init-price" id="init-price" class="form-control">
+                <input type="text" pattern="\d+" name="init-price" id="init-price" class="form-control">
             </div>
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <label for="auction-start"><fmt:message bundle="${loc}" key="lot.label.auction_start"/></label><br>
-                <input type="datetime-local" required name="auction-start" id="auction-start" class="form-control"/>
+                <input type="datetime-local" name="auction-start" id="auction-start" class="form-control"/>
             </div>
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <label for="duration"><fmt:message bundle="${loc}" key="lot.label.auction_duration"/></label><br>
-                <input type="number" required name="duration" id="duration" class="form-control"/>
+                <input type="number" step="1" name="duration" id="duration"
+                       class="form-control" pattern="\d+" value="2"/>
             </div>
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
@@ -145,7 +155,7 @@
 
             <div class="row col-lg-5 col-sm-8 col-10 mb-3 mx-auto mx-lg-0">
                 <label class="mb-2" for="city-input"><fmt:message bundle="${loc}"
-                                                                   key="lot.label.city_or_district"/></label>
+                                                                  key="lot.label.city_or_district"/></label>
                 <select disabled id="city-input" name="city-or-district" class="form-select"
                         aria-label="Default select example">
                     <option value="" disabled selected>
@@ -168,5 +178,96 @@
 
 <%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        // $('#form-new-lot').validate({
+        //     rules: {
+        //         email: {
+        //             required: true,
+        //             email: true
+        //         }
+        //     },
+        //     messages: {
+        //         email: {
+        //             required: "We need your email address to contact you",
+        //             email: "Your email address must be in the format of name@domain.com"
+        //         }
+        //     }
+        // });
+
+        $('#form-new-lot').validate({
+            ignore: "",
+            rules:{
+                'init-price': {
+                    required: true,
+                    digits: true,
+                    maxlength: 20
+                },
+                duration: {
+                    digits: true,
+                    range: [2, 24]
+                },
+                'auction-start':{
+                    // afterFourDays: true,
+                    min: findDatePlusFour().toUTCString()
+                }
+            }
+            //todo: messages
+        });
+
+        //todo: make date validation
+        function findDatePlusFour(){
+            let date = new Date();
+            console.log("Created");
+            console.log(date);
+            console.log(date.toUTCString());
+            date.setHours(date.getHours()+ 3);
+            date.setDate(date.getDate() + 4);
+            console.log("Plus four days");
+            console.log(date);
+            console.log(date.toUTCString());
+            date.setHours(0);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            date.setMilliseconds(0);
+            console.log("zeroded");
+            console.log(date);
+            console.log(date.toUTCString());
+            return date;
+        }
+
+        $.validator.addMethod("afterFourDays", function (value, element) {
+            return $('.div__added-image').length > 0;
+        }, "Start date should be at least after 4 days");
+
+        $.validator.addMethod("cRequired", $.validator.methods.required, "Fields should not be empty");
+
+        $.validator.addMethod("imageRequired", function (value, element) {
+            const test = $('.div__added-image').length > 0;
+            if(!test){
+                alert("Please, add an image.");
+            }
+            return test;
+        }, "There should be at least one image");
+
+        $.validator.addMethod("cSelectedNotNull", function (value, element) {
+            return value !== null;
+        }, "Please select some value");
+
+        $.validator.addClassRules({
+            "form-control": {
+                cRequired: true
+            },
+            "form-select": {
+                cSelectedNotNull: true
+            },
+            "imageAlert": {
+                imageRequired: true
+            }
+        });
+
+    });
+</script>
 </body>
 </html>

@@ -20,6 +20,8 @@ $(document).ready(function () {
             .attr('name', imageName)
             .attr('value', path)
             .appendTo(divToFill);
+
+        $('.imageAlert').valid();
     };
 
     let saveImageAndPlace = function(file){
