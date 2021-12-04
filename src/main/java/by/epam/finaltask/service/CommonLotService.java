@@ -20,6 +20,7 @@ public class CommonLotService implements LotService {
 
     private final static Logger LOG = LogManager.getLogger(CommonLotService.class);
 
+    private final static int MAX_BIAS_IN_MINUTES = 5;
     private final static int LOTS_PER_PAGE = 8;
     private final static int MIN_DAYS_BEFORE_START_AUCTION = 4;
     private final static int MIN_DURATION_HOURS = 2;
@@ -72,7 +73,8 @@ public class CommonLotService implements LotService {
                     description, initPrice, auctionStart, duration, region, cityOrDistrict);
             Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
             int intDuration = Integer.parseInt(duration);
-            validateStartTimeAndDuration(startDatetime.toLocalDateTime().toLocalDate(), intDuration);
+            validateAuctionStartDate(startDatetime.toLocalDateTime().toLocalDate());
+            validateDuration(intDuration);
             Timestamp endDatetime =
                     new Timestamp(startDatetime.getTime() + (long) Integer.parseInt(duration) * ONE_HOUR_IN_MILLIS);
             Lot lot = Lot.builder().setOwnerId(userId).setCategory(category).
@@ -98,6 +100,12 @@ public class CommonLotService implements LotService {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
         }
+    }
+
+    @Override
+    public void validateAuctionStartDate(String auctionStart) throws ClientErrorException{
+        Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
+        validateAuctionStartDate(startDatetime.toLocalDateTime().toLocalDate());
     }
 
     @Override
@@ -180,9 +188,15 @@ public class CommonLotService implements LotService {
         return time.indexOf(':') == time.lastIndexOf(':') ? time.concat(":00") : time;
     }
 
-    private void validateStartTimeAndDuration(LocalDate startDate, int duration) throws ClientErrorException {
-        if(startDate.minusDays(MIN_DAYS_BEFORE_START_AUCTION).compareTo(LocalDate.now()) < 0
-                || duration<MIN_DURATION_HOURS || duration>MAX_DURATION_HOURS){
+    private void validateAuctionStartDate(LocalDate startDate) throws ClientErrorException {
+        if(startDate.minusDays(MIN_DAYS_BEFORE_START_AUCTION).compareTo(LocalDateTime.now()
+                .minusMinutes(MAX_BIAS_IN_MINUTES).toLocalDate()) < 0){
+            throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
+        }
+    }
+
+    private void validateDuration(int duration) throws ClientErrorException{
+        if(duration<MIN_DURATION_HOURS || duration>MAX_DURATION_HOURS){
             throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
         }
     }

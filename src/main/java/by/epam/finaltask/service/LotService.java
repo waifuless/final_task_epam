@@ -19,6 +19,8 @@ public interface LotService {
                           String auctionStart, String duration, String region, String cityOrDistrict)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
 
+    void validateAuctionStartDate(String auctionStart) throws ClientErrorException;
+
     List<LotWithImages> findLotsByPageAndContext(int pageNumber, LotContext context)
             throws ServiceCanNotCompleteCommandRequest;
 

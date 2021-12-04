@@ -65,7 +65,8 @@ public class AjaxCommandFactory {
         DELETE_CATEGORIES("delete_categories", DeleteCategoriesCommand.class),
         UPDATE_CATEGORY("update_category", UpdateCategoryCommand.class),
         UPDATE_AUCTION_STATUS("update_auction_status", UpdateAuctionStatusCommand.class),
-        FIND_LOTS_BY_USER("find_lots_by_user", FindLotsByUserCommand.class);
+        FIND_LOTS_BY_USER("find_lots_by_user", FindLotsByUserCommand.class),
+        VALIDATE_AUCTION_START_DATE("validateAuctionStartDate", ValidateDateInLotCreationCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;

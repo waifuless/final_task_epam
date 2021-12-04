@@ -209,36 +209,34 @@
                     range: [2, 24]
                 },
                 'auction-start':{
-                    // afterFourDays: true,
-                    min: findDatePlusFour().toUTCString()
+                    startDateValidation: true
                 }
             }
             //todo: messages
         });
 
-        //todo: make date validation
-        function findDatePlusFour(){
-            let date = new Date();
-            console.log("Created");
-            console.log(date);
-            console.log(date.toUTCString());
-            date.setHours(date.getHours()+ 3);
-            date.setDate(date.getDate() + 4);
-            console.log("Plus four days");
-            console.log(date);
-            console.log(date.toUTCString());
-            date.setHours(0);
-            date.setMinutes(0);
-            date.setSeconds(0);
-            date.setMilliseconds(0);
-            console.log("zeroded");
-            console.log(date);
-            console.log(date.toUTCString());
-            return date;
-        }
-
-        $.validator.addMethod("afterFourDays", function (value, element) {
-            return $('.div__added-image').length > 0;
+        $.validator.addMethod("startDateValidation", function (value, element) {
+            let test = true;
+            $.ajax({
+                type: 'POST',
+                url: 'ControllerServlet',
+                async: false,
+                dataType: "text",
+                data: {
+                    command: "validateAuctionStartDate",
+                    requestIsAjax: true,
+                    'auction-start': value
+                },
+                success: function (resp) {
+                    test = true;
+                },
+                error: function (xhr, textStatus, thrownError) {
+                    if(xhr.status>=400 && xhr.status<500){
+                        test = false;
+                    }
+                }
+            });
+            return test;
         }, "Start date should be at least after 4 days");
 
         $.validator.addMethod("cRequired", $.validator.methods.required, "Fields should not be empty");
