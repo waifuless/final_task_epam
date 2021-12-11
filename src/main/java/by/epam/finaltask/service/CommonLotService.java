@@ -21,6 +21,7 @@ public class CommonLotService implements LotService {
     private final static Logger LOG = LogManager.getLogger(CommonLotService.class);
 
     private final static int MAX_BIAS_IN_MINUTES = 5;
+    private final static int ZERO_BIAS = 0;
     private final static int LOTS_PER_PAGE = 8;
     private final static int MIN_DAYS_BEFORE_START_AUCTION = 4;
     private final static int MIN_DURATION_HOURS = 2;
@@ -73,7 +74,7 @@ public class CommonLotService implements LotService {
                     description, initPrice, auctionStart, duration, region, cityOrDistrict);
             Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
             int intDuration = Integer.parseInt(duration);
-            validateAuctionStartDate(startDatetime.toLocalDateTime().toLocalDate());
+            validateAuctionStartDate(startDatetime.toLocalDateTime().toLocalDate(), MAX_BIAS_IN_MINUTES);
             validateDuration(intDuration);
             Timestamp endDatetime =
                     new Timestamp(startDatetime.getTime() + (long) Integer.parseInt(duration) * ONE_HOUR_IN_MILLIS);
@@ -105,7 +106,7 @@ public class CommonLotService implements LotService {
     @Override
     public void validateAuctionStartDate(String auctionStart) throws ClientErrorException{
         Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
-        validateAuctionStartDate(startDatetime.toLocalDateTime().toLocalDate());
+        validateAuctionStartDate(startDatetime.toLocalDateTime().toLocalDate(), ZERO_BIAS);
     }
 
     @Override
@@ -188,9 +189,9 @@ public class CommonLotService implements LotService {
         return time.indexOf(':') == time.lastIndexOf(':') ? time.concat(":00") : time;
     }
 
-    private void validateAuctionStartDate(LocalDate startDate) throws ClientErrorException {
+    private void validateAuctionStartDate(LocalDate startDate, int biasMinutes) throws ClientErrorException {
         if(startDate.minusDays(MIN_DAYS_BEFORE_START_AUCTION).compareTo(LocalDateTime.now()
-                .minusMinutes(MAX_BIAS_IN_MINUTES).toLocalDate()) < 0){
+                .minusMinutes(biasMinutes).toLocalDate()) < 0){
             throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
         }
     }
