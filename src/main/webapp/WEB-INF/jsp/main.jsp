@@ -134,8 +134,18 @@
 
         <div class="row mt-4" id="div-lots">
         </div>
-    </div>
 
+        <div class="row">
+            <ul class="pagination mx-auto" style="justify-content: center" id="pagination">
+                <li class="page-item" id="leftArrow">
+                    <button class="page-link">&laquo;</button>
+                </li>
+                <li class="page-item" id="rightArrow">
+                    <button class="page-link">&raquo;</button>
+                </li>
+            </ul>
+        </div>
+    </div>
 
     <div class="page-buffer"></div>
 </div>
@@ -146,6 +156,7 @@
 <script src="js/region-cities-select.js" type="text/javascript"></script>
 
 <script src="js/nav-link.js" type="text/javascript"></script>
+<script src="js/pagination-range.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         selectActiveNavPage('main-link');
@@ -162,43 +173,63 @@
         setInput('title', title);
         requestLots(1);
 
-
-
         $('#reset-button').click(function () {
             window.location.replace("${pageContext.request.contextPath}/ControllerServlet?command=show_main_page");
         });
+    });
 
-        function applyFilters(e) {
-            e.preventDefault();
-            requestLots(1);
-        }
+    function applyFilters(e) {
+        e.preventDefault();
+        requestLots(1);
+    }
 
-        function requestLots(page) {
-            $.ajax({
-                type: 'POST',
-                url: 'ControllerServlet?page=' + page,
-                processData: false,
-                dataType: "json",
-                data: form.serialize(),
-                success: function (lots) {
-                    printLots(lots);
-                },
-                error: function (xhr, textStatus, thrownError) {
-                    alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
-                }
-            });
-        }
+    function requestLots(page) {
+        $.ajax({
+            type: 'GET',
+            url: 'ControllerServlet?page=' + page,
+            processData: false,
+            dataType: "json",
+            cache: false,
+            data: $('#filters-form').serialize(),
+            success: function (lots) {
+                printLots(lots);
+                updateLotsPaginationOnPage(page);
+            },
+            error: function (xhr, textStatus, thrownError) {
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+            }
+        });
+    }
 
-        function printLots(lots) {
-            let divForLots = $('#div-lots');
-            divForLots.empty();
-            lots.forEach(function (lot) {
-                divForLots.append('<a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=' + lot.lotId + '"' +
-                    `class="container__row__a col-12 col-lg-6 mb-3 mb-3" target="_blank">
+    function updateLotsPaginationOnPage(page) {
+        $.ajax({
+            type: 'GET',
+            url: 'ControllerServlet',
+            cache: false,
+            dataType: "json",
+            data: {
+                requestIsAjax: true,
+                command: "find_lot_pages_count",
+            },
+            success: function (pagesCount) {
+                printPagination(page, pagesCount);
+            },
+            error: function (xhr, textStatus, thrownError) {
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+            }
+        });
+    }
+
+    function printLots(lots) {
+        let divForLots = $('#div-lots');
+        divForLots.empty();
+        lots.forEach(function (lot) {
+            divForLots.append('<a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=' + lot.lotId + '"' +
+                `class="container__row__a col-12 col-lg-6 mb-3 mb-3" target="_blank">
                     <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
                         <div class="row g-0">
                             <div class="col-4 div-image">` +
-                    `<img src="` + lot.images.mainImage.path + `" class="img-fluid rounded-start"
+                `<img src="` + lot.images.mainImage.path + `" class="img-fluid rounded-start"
                                      alt="...">
                             </div>
                             <div class="col-8">
@@ -208,16 +239,16 @@
                                     <p class="card-text auction-type">
                                         <fmt:message bundle="${loc}"
                                                      key="container.lot.auction_type"/>` + lot.auctionType +
-                    `</p>
+                `</p>
                                     <p class="card-text region">
                                         <fmt:message bundle="${loc}" key="container.lot.region"/>` + lot.region +
-                    `</p>
+                `</p>
                                     <p class="card-text address">
                                         <fmt:message bundle="${loc}" key="container.lot.city"/>` + lot.cityOrDistrict +
-                    `</p>
+                `</p>
                                     <p class="card-text initial-price">
                                         <fmt:message bundle="${loc}" key="container.lot.price"/>` + lot.initialPrice +
-                    `</p>
+                `</p>
                                     <p class="card-text auction-start"><small class="text-muted">
                                         <fmt:message bundle="${loc}"
                                                      key="container.lot.auction_start_datetime"/>` + lot.startDatetime + `</small>
@@ -227,13 +258,52 @@
                         </div>
                     </div>
                 </a>`);
-            });
-        }
-    });
+        });
+    }
 
     function setInput(inputId, value) {
         if (value != null) {
             $('#' + inputId).val(value);
+        }
+    }
+
+    function printPagination(page, pagesCount) {
+        const leftArrow = $('#leftArrow');
+        const rightArrow = $('#rightArrow');
+        if (page == 1) {
+            leftArrow.addClass('disabled');
+        } else {
+            leftArrow.removeClass('disabled');
+            leftArrow.click(function () {
+                requestLots(page - 1);
+            });
+        }
+        if (page == pagesCount) {
+            rightArrow.addClass('disabled');
+        } else {
+            rightArrow.removeClass('disabled');
+            rightArrow.click(function () {
+                requestLots(page + 1);
+            });
+        }
+        $('#pagination li:not(:first):not(:last)').remove();
+        let range = findPaginationRange(page, pagesCount);
+        for (let elem of range) {
+            let classToAdd = '';
+            let attrToAdd = '';
+            if (Number.isInteger(elem)) {
+                if (elem == page) {
+                    classToAdd = ' active ';
+                } else {
+                    attrToAdd = 'onclick="requestLots(' + elem + ')"';
+                }
+            } else {
+                classToAdd = ' disabled '
+            }
+            rightArrow.before(`<li class="page-item `
+                + classToAdd + `">
+                <button class="page-link" ` + attrToAdd + `>` + elem + `</button>
+            </li>`);
         }
     }
 </script>

@@ -29,6 +29,7 @@ public class ShowMainPageCommand implements SyncCommand {
 
     private final RegionService regionService = ServiceFactory.getFactoryInstance().regionService();
     private final CategoryService categoryService = ServiceFactory.getFactoryInstance().categoryService();
+    private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
 
     ShowMainPageCommand() {
     }

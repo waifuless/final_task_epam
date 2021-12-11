@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalField;
 import java.util.*;
 
 public class CommonLotService implements LotService {
@@ -37,7 +36,7 @@ public class CommonLotService implements LotService {
     }
 
     @Override
-    public Optional<LotWithImages> findLot(int id) throws ServiceCanNotCompleteCommandRequest {
+    public Optional<LotWithImages> findLot(long id) throws ServiceCanNotCompleteCommandRequest {
         try {
             Optional<Lot> optionalLot = lotManager.find(id);
             if (optionalLot.isPresent()) {
@@ -53,9 +52,9 @@ public class CommonLotService implements LotService {
     }
 
     @Override
-    public List<LotWithImages> findLotsByPage(int pageNumber) throws ServiceCanNotCompleteCommandRequest {
+    public List<LotWithImages> findLotsByPage(long pageNumber) throws ServiceCanNotCompleteCommandRequest {
         try {
-            List<Lot> lots = lotManager.find((long) (pageNumber - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
+            List<Lot> lots = lotManager.find((pageNumber - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
             return findLotsWithImages(lots);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -104,17 +103,17 @@ public class CommonLotService implements LotService {
     }
 
     @Override
-    public void validateAuctionStartDate(String auctionStart) throws ClientErrorException{
+    public void validateAuctionStartDate(String auctionStart) throws ClientErrorException {
         Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
         validateAuctionStartDate(startDatetime.toLocalDateTime().toLocalDate(), ZERO_BIAS);
     }
 
     @Override
-    public List<LotWithImages> findLotsByPageAndContext(int pageNumber, LotContext context)
+    public List<LotWithImages> findLotsByPageAndContext(long pageNumber, LotContext context)
             throws ServiceCanNotCompleteCommandRequest {
         try {
             List<Lot> lots = lotManager.findByLotContext(context,
-                    (long) (pageNumber - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
+                    (pageNumber - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
             return findLotsWithImages(lots);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -156,6 +155,17 @@ public class CommonLotService implements LotService {
         }
     }
 
+    @Override
+    public long findLotPagesCount() throws ServiceCanNotCompleteCommandRequest {
+        try {
+            long lotsCount = lotManager.count();
+            return lotsCount / LOTS_PER_PAGE + (lotsCount % LOTS_PER_PAGE == 0 ? 0 : 1);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
     private List<LotWithImages> findLotsWithImages(List<Lot> lots)
             throws java.sql.SQLException, InterruptedException {
         List<LotWithImages> lotsWithImages = new LinkedList<>();
@@ -190,14 +200,14 @@ public class CommonLotService implements LotService {
     }
 
     private void validateAuctionStartDate(LocalDate startDate, int biasMinutes) throws ClientErrorException {
-        if(startDate.minusDays(MIN_DAYS_BEFORE_START_AUCTION).compareTo(LocalDateTime.now()
-                .minusMinutes(biasMinutes).toLocalDate()) < 0){
+        if (startDate.minusDays(MIN_DAYS_BEFORE_START_AUCTION).compareTo(LocalDateTime.now()
+                .minusMinutes(biasMinutes).toLocalDate()) < 0) {
             throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
         }
     }
 
-    private void validateDuration(int duration) throws ClientErrorException{
-        if(duration<MIN_DURATION_HOURS || duration>MAX_DURATION_HOURS){
+    private void validateDuration(int duration) throws ClientErrorException {
+        if (duration < MIN_DURATION_HOURS || duration > MAX_DURATION_HOURS) {
             throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
         }
     }

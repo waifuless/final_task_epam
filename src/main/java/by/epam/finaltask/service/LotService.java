@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface LotService {
 
-    Optional<LotWithImages> findLot(int id) throws ServiceCanNotCompleteCommandRequest;
+    Optional<LotWithImages> findLot(long id) throws ServiceCanNotCompleteCommandRequest;
 
-    List<LotWithImages> findLotsByPage(int pageNumber) throws ServiceCanNotCompleteCommandRequest;
+    List<LotWithImages> findLotsByPage(long pageNumber) throws ServiceCanNotCompleteCommandRequest;
 
     void createAndSaveLot(long userId, String mainImagePath, String[] otherImagePaths, String title, String category,
                           String auctionType, String condition, String description, String initPrice,
@@ -21,9 +21,11 @@ public interface LotService {
 
     void validateAuctionStartDate(String auctionStart) throws ClientErrorException;
 
-    List<LotWithImages> findLotsByPageAndContext(int pageNumber, LotContext context)
+    List<LotWithImages> findLotsByPageAndContext(long pageNumber, LotContext context)
             throws ServiceCanNotCompleteCommandRequest;
 
     void updateLotsAuctionStatus(String[] lotIds, String newStatus)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
+
+    long findLotPagesCount() throws ServiceCanNotCompleteCommandRequest;
 }

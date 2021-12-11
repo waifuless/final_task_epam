@@ -38,8 +38,8 @@ public class FindLotsByAdminCommand implements AjaxCommand {
     @Override
     public AjaxCommandResponse execute(CommandRequest request) throws Exception {
         try {
-            String pageNumberParam = request.getParameter("pageNum");
-            int pageNumber = pageNumberParam == null ? 1 : Integer.parseInt(pageNumberParam);
+            String pageNumberParam = request.getParameter("page");
+            long pageNumber = pageNumberParam == null ? 1 : Integer.parseInt(pageNumberParam);
 
             LotContext context = findLotContext(request);
             LOG.debug("Lot by admin context: {}", context);

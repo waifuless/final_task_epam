@@ -39,9 +39,9 @@ public class FindLotsByUserCommand implements AjaxCommand{
     @Override
     public AjaxCommandResponse execute(CommandRequest request) throws Exception {
         try {
-            String pageNumberParam = request.getParameter("pageNum");
-            int pageNumber = pageNumberParam == null ? 1 : Integer.parseInt(pageNumberParam);
-
+            String pageNumberParam = request.getParameter("page");
+            long pageNumber = pageNumberParam == null ? 1 : Integer.parseInt(pageNumberParam);
+            LOG.debug("PageParam:{}, PageToFind: {}", pageNumberParam, pageNumber);
             LotContext context = findLotContext(request);
             LOG.debug("Lot by user context: {}", context);
             List<LotWithImages> lots = lotService.findLotsByPageAndContext(pageNumber, context);
