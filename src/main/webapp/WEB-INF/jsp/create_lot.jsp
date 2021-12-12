@@ -224,7 +224,7 @@
                 cache: false,
                 dataType: "text",
                 data: {
-                    command: "validateAuctionStartDate",
+                    command: "validate_auction_start_date",
                     requestIsAjax: true,
                     'auction-start': value
                 },
