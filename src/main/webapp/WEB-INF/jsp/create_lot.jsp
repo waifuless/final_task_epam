@@ -218,9 +218,10 @@
         $.validator.addMethod("startDateValidation", function (value, element) {
             let test = true;
             $.ajax({
-                type: 'POST',
+                type: 'GET',
                 url: 'ControllerServlet',
                 async: false,
+                cache: false,
                 dataType: "text",
                 data: {
                     command: "validateAuctionStartDate",
