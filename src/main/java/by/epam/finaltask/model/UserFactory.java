@@ -25,23 +25,23 @@ public class UserFactory {
         return instance;
     }
 
-    public User createUserWithoutPassword(int user_id, String email, Role role) {
-        return new User(user_id, email, EMPTY_STRING, role);
+    public User createUserWithoutPassword(int user_id, String email, Role role, boolean banned) {
+        return new User(user_id, email, EMPTY_STRING, role, banned);
     }
 
     public User createUser(int user_id, String email, String password) {
-        return new User(user_id, email, encoder.encode(password));
+        return new User(user_id, email, password);
     }
 
-    public User createUser(int user_id, String email, String password, Role role) {
-        return new User(user_id, email, encoder.encode(password), role);
+    public User createUser(int user_id, String email, String password, Role role, boolean banned) {
+        return new User(user_id, email, password, role, banned);
     }
 
-    public User createUser(String email, String password) {
-        return createUser(DEFAULT_ID, email, password);
+    public User createUserAndHashPassword(String email, String password) {
+        return new User(DEFAULT_ID, email, encoder.encode(password));
     }
 
-    public User createUser(String email, String password, Role role) {
-        return createUser(DEFAULT_ID, email, password, role);
+    public User createUserAndHashPassword(String email, String password, Role role, boolean banned) {
+        return new User(DEFAULT_ID, email, encoder.encode(password), role, banned);
     }
 }

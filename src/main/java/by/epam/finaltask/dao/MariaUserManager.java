@@ -25,24 +25,22 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     private final static String EMAIL_COLUMN = "email";
     private final static String PASSWORD_HASH_COLUMN = "password_hash";
     private final static String ROLE_COLUMN = "role_name";
+    private final static String BANNED_COLUMN = "banned";
     private final static String TABLE_NAME = "app_user";
     private final static String SAVE_USER_QUERY =
-            "INSERT INTO app_user(email, password_hash, role_id)" +
-                    " VALUES(?,?,(SELECT role_id FROM role WHERE role_name = ?));";
+            "INSERT INTO app_user(email, password_hash, role_id, banned)" +
+                    " VALUES(?,?,(SELECT role_id FROM role WHERE role_name = ?), ?);";
     private final static String IS_EXIST_USER_QUERY =
             "SELECT EXISTS(SELECT 1 FROM app_user WHERE email=?) AS user_existence";
-    private final static String FIND_USER_BY_EMAIL_QUERY =
-            "SELECT user_id as user_id, password_hash as password_hash, role.role_name as role_name FROM app_user" +
-                    " LEFT JOIN role ON app_user.role_id = role.role_id" +
-                    " WHERE email=?";
     private final static String FIND_ALL_USER_QUERY =
-            "SELECT user_id as user_id, email as email," +
-                    " role.role_name as role_name FROM app_user" +
+            "SELECT user_id as user_id, email as email, password_hash as password_hash," +
+                    " role.role_name as role_name, banned as banned FROM app_user" +
                     " LEFT JOIN role ON app_user.role_id = role.role_id";
+    private final static String FIND_USER_BY_EMAIL_QUERY = FIND_ALL_USER_QUERY + " WHERE email=?";
     private final static String FIND_USER_BY_ID_QUERY = FIND_ALL_USER_QUERY + " WHERE user_id=?";
     private final static String UPDATE_USER_QUERY =
             "UPDATE app_user SET email = ?, password_hash = ?," +
-                    " role_id = (SELECT role_id FROM role WHERE role_name = ?)" +
+                    " role_id = (SELECT role_id FROM role WHERE role_name = ?), banned = ? " +
                     " WHERE user_id = ?";
     private final static String DELETE_USER_QUERY =
             "DELETE FROM app_user WHERE user_id = ?";
@@ -75,6 +73,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
         statement.setString(1, user.getEmail());
         statement.setString(2, user.getPasswordHash());
         statement.setString(3, user.getRole().name());
+        statement.setBoolean(4, user.isBanned());
     }
 
     @Override
@@ -82,14 +81,16 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
         statement.setString(1, user.getEmail());
         statement.setString(2, user.getPasswordHash());
         statement.setString(3, user.getRole().name());
-        statement.setLong(4, user.getUserId());
+        statement.setBoolean(4, user.isBanned());
+        statement.setLong(5, user.getUserId());
     }
 
     @Override
     protected User extractEntity(ResultSet resultSet) throws ExtractionException {
         try {
-            return userFactory.createUserWithoutPassword(resultSet.getInt(USER_ID_COLUMN),
-                    resultSet.getString(EMAIL_COLUMN), Role.valueOf(resultSet.getString(ROLE_COLUMN)));
+            return userFactory.createUser(resultSet.getInt(USER_ID_COLUMN), resultSet.getString(EMAIL_COLUMN),
+                    resultSet.getString(PASSWORD_HASH_COLUMN), Role.valueOf(resultSet.getString(ROLE_COLUMN)),
+                    resultSet.getBoolean(BANNED_COLUMN));
         } catch (Exception ex) {
             throw new ExtractionException(ex.getMessage(), ex);
         }
@@ -123,8 +124,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
             if (resultSet.next()) {
                 String passwordHash = resultSet.getString(PASSWORD_HASH_COLUMN);
                 if (encoder.matches(password, passwordHash)) {
-                    return Optional.of(userFactory.createUserWithoutPassword(resultSet.getInt(USER_ID_COLUMN),
-                            email, Role.valueOf(resultSet.getString(ROLE_COLUMN))));
+                    return Optional.of(extractEntity(resultSet));
                 }
             }
         } catch (SQLException | DataSourceDownException e) {

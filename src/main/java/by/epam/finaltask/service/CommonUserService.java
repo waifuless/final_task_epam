@@ -30,7 +30,7 @@ public class CommonUserService implements UserService {
         try {
             List<RegisterError> errors = validateParameters(email, password, passwordRepeat);
             if (errors.isEmpty()) {
-                userManager.save(UserFactory.getInstance().createUser(email, password));
+                userManager.save(UserFactory.getInstance().createUserAndHashPassword(email, password));
             }
             return errors;
         } catch (Exception ex) {
