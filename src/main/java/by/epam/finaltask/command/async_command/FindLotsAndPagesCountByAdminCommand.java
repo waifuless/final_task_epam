@@ -18,16 +18,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class FindLotsByAdminCommand implements AjaxCommand {
+public class FindLotsAndPagesCountByAdminCommand implements AjaxCommand {
 
-    private final static Logger LOG = LogManager.getLogger(FindLotsByAdminCommand.class);
+    private final static Logger LOG = LogManager.getLogger(FindLotsAndPagesCountByAdminCommand.class);
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.ADMIN));
 
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
 
-    FindLotsByAdminCommand() {
+    FindLotsAndPagesCountByAdminCommand() {
     }
 
     @Override
@@ -44,7 +44,11 @@ public class FindLotsByAdminCommand implements AjaxCommand {
             LotContext context = findLotContext(request);
             LOG.debug("Lot by admin context: {}", context);
             List<LotWithImages> lots = lotService.findLotsByPageAndContext(pageNumber, context);
-            String lotsJson = new Gson().toJson(lots);
+            long pagesCount = lotService.findLotPagesCount(context);
+            Object[] answer = new Object[2];
+            answer[0] = lots;
+            answer[1] = pagesCount;
+            String lotsJson = new Gson().toJson(answer);
             return new AjaxCommandResponse("application/json", lotsJson);
         } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage(), ex);

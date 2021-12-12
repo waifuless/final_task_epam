@@ -16,6 +16,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
 
     private final static Logger LOG = LoggerFactory.getLogger(MariaLotManager.class);
 
+    private final static String ROWS_COUNT_COLUMN = "rows_count";
     private final static String ID_COLUMN = "lot_id";
     private final static String OWNER_ID_COLUMN = "owner_id";
     private final static String CATEGORY_NAME_COLUMN = "category_name";
@@ -69,6 +70,13 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     " WHERE lot_id = ?";
     private final static String DELETE_LOT_QUERY =
             "DELETE FROM lot WHERE lot_id = ?;";
+    private final static String COUNT_QUERY_WITH_JOINS = "SELECT COUNT(1) AS rows_count FROM lot"+
+            " LEFT JOIN category ON lot.category_id = category.category_id" +
+            " LEFT JOIN auction_type ON lot.auction_type_id = auction_type.type_id" +
+            " LEFT JOIN region r on lot.region_id = r.region_id" +
+            " LEFT JOIN city_or_district c on lot.city_or_district_id = c.city_or_district_id" +
+            " LEFT JOIN auction_status ON lot.auction_status_id = auction_status.status_id" +
+            " LEFT JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id";
     private final static String EQUALS_TEMPLATE = " %s = ? ";
     private final static String GREATER_THAN_OR_EQUALS_TEMPLATE = " %s>=? ";
     private final static String LESS_THAN_OR_EQUALS_TEMPLATE = " %s<=? ";
@@ -170,6 +178,30 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             statement.setLong(++i, count);
             statement.setLong(++i, offset);
         });
+    }
+
+    @Override
+    public long findLotsCount(LotContext context)
+            throws SQLException, DataSourceDownException, InterruptedException {
+        try (Connection connection = connectionPool.getConnection()) {
+            LinkedHashMap<Object, Integer> params = new LinkedHashMap<>();
+            PreparedStatement statement = connection.prepareStatement(COUNT_QUERY_WITH_JOINS+
+                    createFilterByContextAndFillParamsMap(context, params));
+            int i = 0;
+            for (Map.Entry<Object, Integer> entry : params.entrySet()) {
+                statement.setObject(++i, entry.getKey(), entry.getValue());
+            }
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getLong(ROWS_COUNT_COLUMN);
+        } catch (SQLException | DataSourceDownException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw e;
+        }
     }
 
     private String createFilterByContextAndFillParamsMap(LotContext context, LinkedHashMap<Object, Integer> params) {

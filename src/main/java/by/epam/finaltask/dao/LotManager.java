@@ -17,4 +17,6 @@ public interface LotManager extends Dao<Lot> {
 
     List<Lot> findByLotContext(LotContext context, long offset, long count)
             throws SQLException, DataSourceDownException, InterruptedException;
+
+    long findLotsCount(LotContext context)throws SQLException, DataSourceDownException, InterruptedException;
 }

@@ -60,14 +60,15 @@ public class AjaxCommandFactory {
         SHOW_SIGN_IN("upload_image", UploadImageCommand.class),
         FIND_CITIES_OR_DISTRICTS_BY_REGION("find_cities_or_districts_by_region",
                 FindCitiesOrDistrictsByRegionCommand.class),
-        FIND_LOTS_BY_ADMIN("find_lots_by_admin", FindLotsByAdminCommand.class),
+        FIND_LOTS_AND_PAGES_COUNT_BY_ADMIN("find_lots_and_pages_count_by_admin",
+                FindLotsAndPagesCountByAdminCommand.class),
         ADD_CATEGORY("add_category", AddCategoryCommand.class),
         DELETE_CATEGORIES("delete_categories", DeleteCategoriesCommand.class),
         UPDATE_CATEGORY("update_category", UpdateCategoryCommand.class),
         UPDATE_AUCTION_STATUS("update_auction_status", UpdateAuctionStatusCommand.class),
-        FIND_LOTS_BY_USER("find_lots_by_user", FindLotsByUserCommand.class),
-        VALIDATE_AUCTION_START_DATE("validateAuctionStartDate", ValidateDateInLotCreationCommand.class),
-        FIND_LOT_PAGES_COUNT("find_lot_pages_count", FindPagesCountCommand.class);
+        FIND_LOTS_AND_PAGES_COUNT_BY_USER("find_lots_and_pages_count_by_user",
+                FindLotsAndPagesCountByUserCommand.class),
+        VALIDATE_AUCTION_START_DATE("validateAuctionStartDate", ValidateDateInLotCreationCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;

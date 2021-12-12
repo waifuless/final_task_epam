@@ -122,6 +122,17 @@ public class CommonLotService implements LotService {
     }
 
     @Override
+    public long findLotPagesCount(LotContext context) throws ServiceCanNotCompleteCommandRequest {
+        try {
+            long lotsCount = lotManager.findLotsCount(context);
+            return lotsCount / LOTS_PER_PAGE + (lotsCount % LOTS_PER_PAGE == 0 ? 0 : 1);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
     public void updateLotsAuctionStatus(String[] lotIds, String newStatus)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
@@ -170,7 +181,8 @@ public class CommonLotService implements LotService {
             throws java.sql.SQLException, InterruptedException {
         List<LotWithImages> lotsWithImages = new LinkedList<>();
         for (Lot lot : lots) {
-            lotsWithImages.add(new LotWithImages(lot, imagesManager.find(lot.getLotId()).orElse(null)));
+            lotsWithImages.add(new LotWithImages(lot, imagesManager.find(lot.getLotId())
+                    .orElse(new Images(lot.getLotId(), new Images.Image("")))));
         }
         LOG.debug("LotsWithImages: {}", lotsWithImages);
         return lotsWithImages;

@@ -36,7 +36,7 @@
                     <fmt:message bundle="${filters}" key="filters.header"/>
                 </h2>
                 <form id="filters-form">
-                    <input type="hidden" name="command" value="find_lots_by_admin">
+                    <input type="hidden" name="command" value="find_lots_and_pages_count_by_admin">
                     <input type="hidden" name="requestIsAjax" value="true">
 
                     <div class="row mt-4">
@@ -196,6 +196,17 @@
                 <div class="row mt-4" id="div-lots">
 
                 </div>
+
+                <div class="row">
+                    <ul class="pagination mx-auto" style="justify-content: center" id="pagination">
+                        <li class="page-item" id="leftArrow">
+                            <button class="page-link">&laquo;</button>
+                        </li>
+                        <li class="page-item" id="rightArrow">
+                            <button class="page-link">&raquo;</button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </main>
     </div>
@@ -208,6 +219,8 @@
     });
 </script>
 
+<script src="js/pagination-range.js" type="text/javascript"></script>
+
 <script type="text/javascript">
     $(document).ready(function () {
 
@@ -216,35 +229,42 @@
         });
 
         let form = $('#filters-form');
-        form.submit(e=>requestLots(e));
+        form.submit(e=>applyFilters(e));
+    });
 
-        function requestLots(e) {
-            e.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: 'ControllerServlet',
-                processData: false,
-                dataType: "json",
-                data: form.serialize(),
-                success: function (lots) {
-                    printLots(lots);
-                },
-                error: function (xhr, textStatus, thrownError) {
-                    alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
-                }
-            });
-        }
+    function applyFilters(e) {
+        e.preventDefault();
+        requestLots(1);
+    }
 
-        function printLots(lots){
-            let divForLots = $('#div-lots');
-            divForLots.empty();
-            lots.forEach(function (lot){
-                divForLots.append('<a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id='+lot.lotId+'"'+
-                   `class="container__row__a col-12 col-lg-6 mb-3 mb-3" target="_blank">
+    function requestLots(page) {
+        $.ajax({
+            type: 'GET',
+            url: 'ControllerServlet?page=' + page,
+            processData: false,
+            cache: false,
+            dataType: "json",
+            data: $('#filters-form').serialize(),
+            success: function (answer) {
+                printLots(answer[0]);
+                printPagination(page, answer[1], 'requestLots', 'pagination');
+            },
+            error: function (xhr, textStatus, thrownError) {
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+            }
+        });
+    }
+
+    function printLots(lots){
+        let divForLots = $('#div-lots');
+        divForLots.empty();
+        lots.forEach(function (lot){
+            divForLots.append('<a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id='+lot.lotId+'"'+
+                `class="container__row__a col-12 col-lg-6 mb-3 mb-3" target="_blank">
                     <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
                         <div class="row g-0">
                             <div class="col-4 div-image">`+
-                                `<img src="`+lot.images.mainImage.path+`" class="img-fluid rounded-start"
+                `<img src="`+lot.images.mainImage.path+`" class="img-fluid rounded-start"
                                      alt="...">
                             </div>
                             <div class="col-8">
@@ -254,16 +274,16 @@
                                     <p class="card-text auction-type">
                                         <fmt:message bundle="${loc}"
                                                      key="container.lot.auction_type"/>` +lot.auctionType+
-                                    `</p>
+                `</p>
                                     <p class="card-text region">
                                         <fmt:message bundle="${loc}" key="container.lot.region"/>` +lot.region+
-                                    `</p>
+                `</p>
                                     <p class="card-text address">
                                         <fmt:message bundle="${loc}" key="container.lot.city"/>` +lot.cityOrDistrict+
-                                    `</p>
+                `</p>
                                     <p class="card-text initial-price">
                                         <fmt:message bundle="${loc}" key="container.lot.price"/>` +lot.initialPrice+
-                                    `</p>
+                `</p>
                                     <p class="card-text auction-start"><small class="text-muted">
                                         <fmt:message bundle="${loc}"
                                                      key="container.lot.auction_start_datetime"/>`+lot.startDatetime+`</small>
@@ -273,9 +293,8 @@
                         </div>
                     </div>
                 </a>`);
-            });
-        }
-    });
+        });
+    }
 </script>
 </body>
 </html>

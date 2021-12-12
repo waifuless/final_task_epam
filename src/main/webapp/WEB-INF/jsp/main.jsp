@@ -32,7 +32,7 @@
             <fmt:message bundle="${filters}" key="filters.header"/>
         </h2>
         <form id="filters-form">
-            <input type="hidden" name="command" value="find_lots_by_user">
+            <input type="hidden" name="command" value="find_lots_and_pages_count_by_user">
             <input type="hidden" name="requestIsAjax" value="true">
             <input type="hidden" name="title" value="${requestScope.get('title')}">
 
@@ -191,28 +191,9 @@
             dataType: "json",
             cache: false,
             data: $('#filters-form').serialize(),
-            success: function (lots) {
-                printLots(lots);
-                updateLotsPaginationOnPage(page);
-            },
-            error: function (xhr, textStatus, thrownError) {
-                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
-            }
-        });
-    }
-
-    function updateLotsPaginationOnPage(page) {
-        $.ajax({
-            type: 'GET',
-            url: 'ControllerServlet',
-            cache: false,
-            dataType: "json",
-            data: {
-                requestIsAjax: true,
-                command: "find_lot_pages_count",
-            },
-            success: function (pagesCount) {
-                printPagination(page, pagesCount);
+            success: function (answer) {
+                printLots(answer[0]);
+                printPagination(page, answer[1], 'requestLots', 'pagination');
             },
             error: function (xhr, textStatus, thrownError) {
                 alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
@@ -264,46 +245,6 @@
     function setInput(inputId, value) {
         if (value != null) {
             $('#' + inputId).val(value);
-        }
-    }
-
-    function printPagination(page, pagesCount) {
-        const leftArrow = $('#leftArrow');
-        const rightArrow = $('#rightArrow');
-        if (page == 1) {
-            leftArrow.addClass('disabled');
-        } else {
-            leftArrow.removeClass('disabled');
-            leftArrow.click(function () {
-                requestLots(page - 1);
-            });
-        }
-        if (page == pagesCount) {
-            rightArrow.addClass('disabled');
-        } else {
-            rightArrow.removeClass('disabled');
-            rightArrow.click(function () {
-                requestLots(page + 1);
-            });
-        }
-        $('#pagination li:not(:first):not(:last)').remove();
-        let range = findPaginationRange(page, pagesCount);
-        for (let elem of range) {
-            let classToAdd = '';
-            let attrToAdd = '';
-            if (Number.isInteger(elem)) {
-                if (elem == page) {
-                    classToAdd = ' active ';
-                } else {
-                    attrToAdd = 'onclick="requestLots(' + elem + ')"';
-                }
-            } else {
-                classToAdd = ' disabled '
-            }
-            rightArrow.before(`<li class="page-item `
-                + classToAdd + `">
-                <button class="page-link" ` + attrToAdd + `>` + elem + `</button>
-            </li>`);
         }
     }
 </script>
