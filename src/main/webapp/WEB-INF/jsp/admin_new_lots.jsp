@@ -51,6 +51,17 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="row">
+                    <ul class="pagination mx-auto" style="justify-content: center" id="pagination">
+                        <li class="page-item" id="leftArrow">
+                            <button class="page-link">&laquo;</button>
+                        </li>
+                        <li class="page-item" id="rightArrow">
+                            <button class="page-link">&raquo;</button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </main>
     </div>
@@ -63,6 +74,7 @@
     });
 </script>
 
+<script src="js/pagination-range.js" type="text/javascript"></script>
 
 <script type="text/javascript">
     $(document).ready(function () {
@@ -77,33 +89,51 @@
             }
         });
 
+        $('#deny-lots').click(function () {
+            let checked = $('.ids:checked');
+            if (!confirm("Отклонить " + checked.length + " лотов?")) {
+                return;
+            }
+            updateStatus('DENIED', checked);
+        });
 
-        function requestLots(page) {
-            $.ajax({
-                type: 'POST',
-                url: 'ControllerServlet',
-                dataType: "json",
-                data: {
-                    requestIsAjax: true,
-                    command: "find_lots_by_admin",
-                    page: page,
-                    'auction-status': 'NOT_VERIFIED'
-                },
-                success: function (lots) {
-                    printLots(lots);
-                },
-                error: function (xhr, textStatus, thrownError) {
-                    alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
-                }
-            });
-        }
+        $('#approve-lots').click(function () {
+            let checked = $('.ids:checked');
+            if (!confirm("Одобрить " + checked.length + " лотов?")) {
+                return;
+            }
+            updateStatus('APPROVED_BY_ADMIN', checked);
+        });
+    });
 
-        function printLots(lots){
-            let divForLots = $('#lots-table-body');
-            divForLots.empty();
-            lots.forEach(function (lot){
-                divForLots.append(
-                    `<tr>
+    function requestLots(page) {
+        $.ajax({
+            type: 'GET',
+            url: 'ControllerServlet',
+            dataType: "json",
+            cache: false,
+            data: {
+                requestIsAjax: true,
+                command: "find_lots_and_pages_count_by_admin",
+                page: page,
+                'auction-status': 'NOT_VERIFIED'
+            },
+            success: function (answer) {
+                printLots(answer[0]);
+                printPagination(page, answer[1], 'requestLots', 'pagination');
+            },
+            error: function (xhr, textStatus, thrownError) {
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+            }
+        });
+    }
+
+    function printLots(lots){
+        let divForLots = $('#lots-table-body');
+        divForLots.empty();
+        lots.forEach(function (lot){
+            divForLots.append(
+                `<tr>
                         <th scope="row" class="text-center">
                             <input class="form-check-input ids" type="checkbox" name="ids[]" value="`+lot.lotId+`">
                         </th>
@@ -116,25 +146,8 @@
                             </a>
                         </td>
                     </tr>`);
-            });
-        }
-    });
-
-    $('#deny-lots').click(function () {
-        let checked = $('.ids:checked');
-        if (!confirm("Отклонить " + checked.length + " лотов?")) {
-            return;
-        }
-        updateStatus('DENIED', checked);
-    });
-
-    $('#approve-lots').click(function () {
-        let checked = $('.ids:checked');
-        if (!confirm("Одобрить " + checked.length + " лотов?")) {
-            return;
-        }
-        updateStatus('APPROVED_BY_ADMIN', checked);
-    });
+        });
+    }
 
     function updateStatus(newStatus, checked){
         $.ajax({
