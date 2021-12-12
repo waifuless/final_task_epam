@@ -34,11 +34,11 @@
                   action="${pageContext.request.contextPath}/ControllerServlet?command=register"
                   method="post">
                 <div class="form-floating my-2">
-                    <input type="email" required class="form-control <c:if test="${requestScope.containsKey('EMAIL_INVALID')
+                    <input type="email" id="email" required class="form-control <c:if test="${requestScope.containsKey('EMAIL_INVALID')
                 || requestScope.containsKey('USER_WITH_EMAIL_ALREADY_EXISTS')}">is-invalid</c:if>"
-                           id="emailInput" name="email" placeholder="name@example.com"
+                           name="email" placeholder="name@example.com"
                            <c:if test="${not empty requestScope.get('email')}">value="${requestScope.get('email')}"</c:if>>
-                    <label for="emailInput"><fmt:message bundle="${loc}" key="email.label"/></label>
+                    <label for="email"><fmt:message bundle="${loc}" key="email.label"/></label>
                     <div class="invalid-feedback">
                         <c:if test="${requestScope.containsKey('EMAIL_INVALID')}">
                             <fmt:message bundle="${loc}" key="email.invalid"/>
@@ -87,5 +87,48 @@
 
 <%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
+<script src="js/jquery-3.6.0.js"></script>
+<script src="js/jquery.validate.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        let emailInvalidMessage = '<fmt:message bundle="${loc}" key="email.invalid"/>';
+
+        $('.needs-validation').validate({
+            errorPlacement : function( error, element ) {
+                element.addClass('is-invalid');
+                if(element.attr('id')==='email'){
+                    let feedback = element.siblings('.invalid-feedback')[0];
+                    feedback.innerHTML = emailInvalidMessage;
+                }
+            },
+            success: function (label, element) {
+                $(element).removeClass('is-invalid');
+            },
+            rules: {
+                email: {
+                    email: true
+                },
+                password:{
+                    minlength: 4,
+                    maxlength: 256
+                },
+                passwordRepeat:{
+                    equalTo: "#PasswordInput"
+                }
+            }
+        });
+
+        $.validator.addMethod("cRequired", $.validator.methods.required, "Fields should not be empty");
+
+        $.validator.addClassRules({
+            "form-control": {
+                cRequired: true
+            }
+        });
+
+    });
+</script>
 </body>
 </html>
