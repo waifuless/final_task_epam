@@ -111,7 +111,7 @@
                     email: true
                 },
                 password:{
-                    minlength: 4,
+                    minlength: 8,
                     maxlength: 256
                 },
                 passwordRepeat:{
