@@ -16,7 +16,6 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
 
     private final static Logger LOG = LoggerFactory.getLogger(MariaLotManager.class);
 
-    private final static String ROWS_COUNT_COLUMN = "rows_count";
     private final static String ID_COLUMN = "lot_id";
     private final static String OWNER_ID_COLUMN = "owner_id";
     private final static String CATEGORY_NAME_COLUMN = "category_name";
@@ -30,6 +29,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     private final static String DESCRIPTION_COLUMN = "description";
     private final static String AUCTION_STATUS_NAME_COLUMN = "auction_status_name";
     private final static String PRODUCT_CONDITION_NAME_COLUMN = "product_condition_name";
+    private final static String ROWS_COUNT_COLUMN = "rows_count";
     private final static String TABLE_NAME = "lot";
     private final static String SAVE_LOT_QUERY =
             "SET @regionId = findRegionId(?);" +

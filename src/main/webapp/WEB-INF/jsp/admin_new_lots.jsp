@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/main-page.css">
     <script src="js/jquery-3.6.0.js" type="text/javascript"></script>
-    <script src="js/region-cities-select.js" type="text/javascript"></script>
 </head>
 <body>
 

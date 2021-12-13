@@ -1,8 +1,11 @@
 package by.epam.finaltask.service;
 
 import by.epam.finaltask.dao.UserManager;
+import by.epam.finaltask.exception.ClientError;
+import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.User;
+import by.epam.finaltask.model.UserContext;
 import by.epam.finaltask.model.UserFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +17,7 @@ import java.util.regex.Pattern;
 
 public class CommonUserService implements UserService {
 
+    private final static int USERS_PER_PAGE = 8;
     public final static Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
     public final static int MAX_EMAIL_LENGTH = 254;
@@ -44,6 +48,62 @@ public class CommonUserService implements UserService {
         try {
             return userManager.findUserByEmailAndPassword(email, password);
         } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public Optional<User> findUserById(long id) throws ServiceCanNotCompleteCommandRequest {
+        try {
+            return userManager.find(id);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public List<User> findUsersByPageAndContext(long pageNumber, UserContext context)
+            throws ServiceCanNotCompleteCommandRequest {
+        try {
+            return userManager.findByUserContext(context, (pageNumber - 1) * USERS_PER_PAGE, USERS_PER_PAGE);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public long findUsersPagesCount(UserContext context) throws ServiceCanNotCompleteCommandRequest {
+        try {
+            long lotsCount = userManager.findUsersCount(context);
+            return lotsCount / USERS_PER_PAGE + (lotsCount % USERS_PER_PAGE == 0 ? 0 : 1);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public void changeUserBannedStatus(long id, String action) throws ServiceCanNotCompleteCommandRequest,
+            ClientErrorException {
+        try {
+            if(action==null || action.trim().isEmpty()){
+                throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
+            }
+            boolean bannedAction = action.equals("ban");
+            Optional<User> optionalOldUserState = userManager.find(id);
+            if(optionalOldUserState.isPresent() && optionalOldUserState.get().isBanned() != bannedAction){
+                User oldUserState = optionalOldUserState.get();
+                userManager.update(new User(oldUserState.getUserId(), oldUserState.getEmail(),
+                        oldUserState.getPasswordHash(), oldUserState.getRole(), bannedAction));
+            }
+        } catch (ClientErrorException ex){
+            LOG.warn(ex.getMessage());
+            throw ex;
+        }
+        catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
         }

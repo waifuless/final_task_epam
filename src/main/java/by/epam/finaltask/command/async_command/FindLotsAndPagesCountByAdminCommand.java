@@ -58,7 +58,7 @@ public class FindLotsAndPagesCountByAdminCommand implements AjaxCommand {
 
     private LotContext findLotContext(CommandRequest request) throws NumberFormatException {
         String ownerIdParam = request.getParameter("owner-id");
-        Long ownerId = ownerIdParam == null || ownerIdParam.trim().isEmpty() ? null : Long.parseLong(ownerIdParam);
+        Long ownerId = ownerIdParam == null || ownerIdParam.trim().isEmpty() ? null : Long.valueOf(ownerIdParam);
         return LotContext.builder()
                 .setOwnerId(ownerId)
                 .setTitle(retrieveNullIfEmpty(request.getParameter("title")))

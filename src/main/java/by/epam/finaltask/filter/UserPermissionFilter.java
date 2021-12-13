@@ -6,6 +6,8 @@ import by.epam.finaltask.command.async_command.AjaxCommandFactory;
 import by.epam.finaltask.command.handler.HandlerFactory;
 import by.epam.finaltask.command.sync_command.SyncCommandFactory;
 import by.epam.finaltask.model.Role;
+import by.epam.finaltask.service.LotService;
+import by.epam.finaltask.service.ServiceFactory;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +29,7 @@ public class UserPermissionFilter implements Filter {
     private final static Logger LOG = LoggerFactory.getLogger(UserPermissionFilter.class);
     private final static String BAD_REQUEST_ERROR_MESSAGE = "Unknown command received %s";
     private final static String FORBIDDEN_ERROR_MESSAGE = "Forbidden to access %s";
+    private final static String BAN_ERROR_MESSAGE = "Forbidden to access anything. You got permanently banned.";
     private final static String FORBIDDEN_LOG_MCG = "forbidden {} to access {} command";
     private final static String BAD_REQUEST_LOG_MCG = "Command {} does not exist";
     private final SyncCommandFactory syncCommandFactory = SyncCommandFactory.getInstance();
@@ -41,11 +44,18 @@ public class UserPermissionFilter implements Filter {
         final HttpServletRequest request = (HttpServletRequest) req;
         final HttpServletResponse response = (HttpServletResponse) res;
 
-        final Role userRole = getCurrentRole(request);
+        boolean requestIsAjax = handlerFactory.isRequestAjax(request);
+
+        final boolean bannedStatus = retrieveUserBannedStatus(request);
+        if(bannedStatus){
+            LOG.debug(BAN_ERROR_MESSAGE);
+            sendError(SC_FORBIDDEN, BAN_ERROR_MESSAGE, requestIsAjax, response);
+            return;
+        }
+        final Role userRole = retrieveUserRole(request);
 
         String commandName = request.getParameter("command");
         LOG.debug("Command: {}", commandName);
-        boolean requestIsAjax = handlerFactory.isRequestAjax(request);
         Optional<RoledCommand> roledCommand = findCommand(commandName, requestIsAjax);
 
         if (!roledCommand.isPresent()) {
@@ -74,7 +84,7 @@ public class UserPermissionFilter implements Filter {
         }
     }
 
-    private Role getCurrentRole(HttpServletRequest request) {
+    private Role retrieveUserRole(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session == null) {
             request.getSession(true).setAttribute(UserSessionAttribute.USER_ROLE.name(), Role.NOT_AUTHORIZED);
@@ -82,6 +92,16 @@ public class UserPermissionFilter implements Filter {
         }
         Role role = (Role) session.getAttribute(UserSessionAttribute.USER_ROLE.name());
         return role != null ? role : Role.NOT_AUTHORIZED;
+    }
+
+    private boolean retrieveUserBannedStatus(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            request.getSession(true).setAttribute(UserSessionAttribute.USER_BANNED_STATUS.name(), false);
+            return false;
+        }
+        Boolean bannedStatus = (Boolean) session.getAttribute(UserSessionAttribute.USER_BANNED_STATUS.name());
+        return bannedStatus != null ? bannedStatus : false;
     }
 
     private Optional<RoledCommand> findCommand(String commandName, boolean requestIsAjax) {
