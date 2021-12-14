@@ -10,14 +10,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class CommonLotService implements LotService {
 
     private final static Logger LOG = LogManager.getLogger(CommonLotService.class);
+
+    private final static String LOT_DID_NOT_SAVED_ERROR_MESSAGE =
+            "Error occurred while saving lot to database. Lot: {}";
 
     private final static int MAX_BIAS_IN_MINUTES = 5;
     private final static int ZERO_BIAS = 0;
@@ -73,7 +78,8 @@ public class CommonLotService implements LotService {
                     description, initPrice, auctionStart, duration, region, cityOrDistrict);
             Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
             int intDuration = Integer.parseInt(duration);
-            validateAuctionStartDate(startDatetime.toLocalDateTime().toLocalDate(), MAX_BIAS_IN_MINUTES);
+            validateAuctionStartDate(startDatetime, MAX_BIAS_IN_MINUTES);
+            startDatetime = roundTimeToHours(startDatetime);
             validateDuration(intDuration);
             Timestamp endDatetime =
                     new Timestamp(startDatetime.getTime() + (long) Integer.parseInt(duration) * ONE_HOUR_IN_MILLIS);
@@ -91,7 +97,8 @@ public class CommonLotService implements LotService {
                 Images images = new Images(savedLot.getLotId(), mainImagePath, imagePaths);
                 imagesManager.save(images);
             } else {
-                //throw exception
+                LOG.error(LOT_DID_NOT_SAVED_ERROR_MESSAGE, lot);
+                throw new ServiceCanNotCompleteCommandRequest(LOT_DID_NOT_SAVED_ERROR_MESSAGE);
             }
         } catch (ClientErrorException ex) {
             LOG.warn(ex.getMessage());
@@ -105,7 +112,7 @@ public class CommonLotService implements LotService {
     @Override
     public void validateAuctionStartDate(String auctionStart) throws ClientErrorException {
         Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
-        validateAuctionStartDate(startDatetime.toLocalDateTime().toLocalDate(), ZERO_BIAS);
+        validateAuctionStartDate(startDatetime, ZERO_BIAS);
     }
 
     @Override
@@ -188,6 +195,10 @@ public class CommonLotService implements LotService {
         return lotsWithImages;
     }
 
+    private Timestamp roundTimeToHours(Timestamp timestamp){
+        return Timestamp.valueOf(timestamp.toLocalDateTime().truncatedTo(ChronoUnit.HOURS));
+    }
+
     private void validateCreationParams(String mainImagePath, String[] otherImagePaths, String title,
                                         String category, String auctionType, String condition, String description,
                                         String initPrice, String auctionStart, String duration, String region,
@@ -211,7 +222,8 @@ public class CommonLotService implements LotService {
         return time.indexOf(':') == time.lastIndexOf(':') ? time.concat(":00") : time;
     }
 
-    private void validateAuctionStartDate(LocalDate startDate, int biasMinutes) throws ClientErrorException {
+    private void validateAuctionStartDate(Timestamp startTimeStamp, int biasMinutes) throws ClientErrorException {
+        LocalDate startDate = startTimeStamp.toLocalDateTime().toLocalDate();
         if (startDate.minusDays(MIN_DAYS_BEFORE_START_AUCTION).compareTo(LocalDateTime.now()
                 .minusMinutes(biasMinutes).toLocalDate()) < 0) {
             throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
