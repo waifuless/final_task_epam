@@ -184,6 +184,28 @@ public class CommonLotService implements LotService {
         }
     }
 
+    @Override
+    public void startLotsAuctionStatusAutoUpdate() throws ServiceCanNotCompleteCommandRequest {
+        try {
+            LocalDateTime scheduleStart = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS).plusHours(1);
+            LOG.debug("Start of schedule to renew lots: {}", scheduleStart);
+            lotManager.executeLotsRenewAndCreateEventSchedule(Timestamp.valueOf(scheduleStart));
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public void stopLotsAuctionStatusAutoUpdate() throws ServiceCanNotCompleteCommandRequest {
+        try {
+            lotManager.dropLotsRenewEventSchedule();
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
     private List<LotWithImages> findLotsWithImages(List<Lot> lots)
             throws java.sql.SQLException, InterruptedException {
         List<LotWithImages> lotsWithImages = new LinkedList<>();

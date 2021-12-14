@@ -1,10 +1,13 @@
 package by.epam.finaltask.service;
 
 import by.epam.finaltask.exception.ClientErrorException;
+import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.LotContext;
 import by.epam.finaltask.model.LotWithImages;
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,4 +33,8 @@ public interface LotService {
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
 
     long findLotPagesCount() throws ServiceCanNotCompleteCommandRequest;
+
+    void startLotsAuctionStatusAutoUpdate() throws ServiceCanNotCompleteCommandRequest;
+
+    void stopLotsAuctionStatusAutoUpdate() throws ServiceCanNotCompleteCommandRequest;
 }
