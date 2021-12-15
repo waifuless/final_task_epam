@@ -77,6 +77,7 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             " LEFT JOIN city_or_district c on lot.city_or_district_id = c.city_or_district_id" +
             " LEFT JOIN auction_status ON lot.auction_status_id = auction_status.status_id" +
             " LEFT JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id";
+    private final static String DROP_RENEW_SCHEDULE = "DROP EVENT IF EXISTS every_hour_auction_status_renew;";
     private final static String RENEW_LOTS_QUERY = "UPDATE lot SET " +
             " auction_status_id = findAuctionStatusId('RUNNING')" +
             " WHERE auction_status_id = findAuctionStatusId('APPROVED_BY_ADMIN') AND NOW() >= start_datetime;" +
@@ -86,9 +87,9 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             " UPDATE lot SET " +
             " auction_status_id = findAuctionStatusId('DENIED')" +
             " WHERE auction_status_id = findAuctionStatusId('NOT_VERIFIED') AND NOW() >= start_datetime;";
-    private final static String CREATE_RENEW_SCHEDULE = "CREATE EVENT IF NOT EXISTS every_hour_auction_status_renew" +
+    private final static String CREATE_RENEW_SCHEDULE = DROP_RENEW_SCHEDULE +
+            " CREATE EVENT every_hour_auction_status_renew" +
             " ON SCHEDULE EVERY 1 HOUR STARTS ? DO BEGIN " + RENEW_LOTS_QUERY + " END;";
-    private final static String DROP_RENEW_SCHEDULE = "DROP EVENT IF EXISTS every_hour_auction_status_renew";
     private final static String EQUALS_TEMPLATE = " %s = ? ";
     private final static String GREATER_THAN_OR_EQUALS_TEMPLATE = " %s>=? ";
     private final static String LESS_THAN_OR_EQUALS_TEMPLATE = " %s<=? ";
