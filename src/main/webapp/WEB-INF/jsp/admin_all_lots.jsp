@@ -230,6 +230,7 @@
 
         let form = $('#filters-form');
         form.submit(e=>applyFilters(e));
+        requestLots(1);
     });
 
     function applyFilters(e) {
