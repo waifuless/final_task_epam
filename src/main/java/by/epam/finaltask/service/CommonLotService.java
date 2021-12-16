@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +33,7 @@ public class CommonLotService implements LotService {
 
     private final LotManager lotManager;
     private final ImagesManager imagesManager;
+    private final UserService userService = ServiceFactory.getFactoryInstance().userService();
 
     CommonLotService(LotManager lotManager, ImagesManager imagesManager) {
         this.lotManager = lotManager;
@@ -41,15 +41,26 @@ public class CommonLotService implements LotService {
     }
 
     @Override
-    public Optional<LotWithImages> findLot(long id) throws ServiceCanNotCompleteCommandRequest {
+    public Optional<LotWithImages> findLotWithImages(long id) throws ServiceCanNotCompleteCommandRequest {
         try {
             Optional<Lot> optionalLot = lotManager.find(id);
             if (optionalLot.isPresent()) {
                 LotWithImages lotWithImages = new LotWithImages(optionalLot.get(),
-                        imagesManager.find(id).orElse(null));
+                        imagesManager.find(id).orElse(new Images(optionalLot.get().getLotId(),
+                                new Images.Image(""))));
                 return Optional.of(lotWithImages);
             }
             return Optional.empty();
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public Optional<Lot> findLot(long id) throws ServiceCanNotCompleteCommandRequest {
+        try {
+            return lotManager.find(id);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
@@ -217,7 +228,7 @@ public class CommonLotService implements LotService {
         return lotsWithImages;
     }
 
-    private Timestamp roundTimeToHours(Timestamp timestamp){
+    private Timestamp roundTimeToHours(Timestamp timestamp) {
         return Timestamp.valueOf(timestamp.toLocalDateTime().truncatedTo(ChronoUnit.HOURS));
     }
 

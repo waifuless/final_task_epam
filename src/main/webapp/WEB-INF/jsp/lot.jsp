@@ -1,7 +1,8 @@
 <jsp:useBean id="lot" scope="request" type="by.epam.finaltask.model.LotWithImages"/>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="by.epam.finaltask.model.AuctionStatus" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+         import="by.epam.finaltask.model.AuctionStatus, by.epam.finaltask.command.UserSessionAttribute" %>
 
 <fmt:setBundle basename="path-to-images-folder" var="imgFolderPath"/>
 
@@ -115,7 +116,8 @@
             <h2>Начальная цена: ${lot.initialPrice}р</h2>
         </div>
 
-        <c:if test="${lot.auctionStatus eq AuctionStatus.APPROVED_BY_ADMIN}">
+        <c:if test="${lot.auctionStatus eq AuctionStatus.APPROVED_BY_ADMIN
+        && sessionScope.get(UserSessionAttribute.USER_ID.name()) ne lot.ownerId}">
             <div class="row col-9 my-5">
                 <button type="button" class="btn btn-success w-100">Записаться на участие</button>
             </div>

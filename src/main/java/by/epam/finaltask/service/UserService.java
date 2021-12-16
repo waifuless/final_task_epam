@@ -5,6 +5,7 @@ import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.User;
 import by.epam.finaltask.model.UserContext;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,5 +23,12 @@ public interface UserService {
 
     long findUsersPagesCount(UserContext context) throws ServiceCanNotCompleteCommandRequest;
 
-    void changeUserBannedStatus(long id, String action) throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
+    void changeUserBannedStatus(long id, String action)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
+
+    void plusToCashAccount(long userId, BigDecimal cash)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
+
+    void minusFromCashAccount(long userId, BigDecimal cash)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
 }

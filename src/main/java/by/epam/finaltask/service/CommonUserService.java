@@ -10,6 +10,7 @@ import by.epam.finaltask.model.UserFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -99,6 +100,52 @@ public class CommonUserService implements UserService {
                 userManager.update(new User(oldUserState.getUserId(), oldUserState.getEmail(),
                         oldUserState.getPasswordHash(), oldUserState.getRole(), bannedAction,
                         oldUserState.getCashAccount()));
+            }
+        } catch (ClientErrorException ex){
+            LOG.warn(ex.getMessage());
+            throw ex;
+        }
+        catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public void plusToCashAccount(long userId, BigDecimal cash)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        validateCash(cash);
+        addToCashAccount(userId, cash);
+    }
+
+    @Override
+    public void minusFromCashAccount(long userId, BigDecimal cash)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        validateCash(cash);
+        addToCashAccount(userId, cash.negate());
+    }
+
+    private void validateCash(BigDecimal cash) throws ClientErrorException, ServiceCanNotCompleteCommandRequest {
+        if(cash==null){
+            throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
+        }
+        if(cash.compareTo(BigDecimal.ZERO) <= 0){
+            throw new ServiceCanNotCompleteCommandRequest("Cash amount should be >= 0");
+        }
+    }
+
+    private void addToCashAccount(long userId, BigDecimal cash)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        try {
+            Optional<User> optionalOldUserState = userManager.find(userId);
+            if(optionalOldUserState.isPresent()){
+                User oldUserState = optionalOldUserState.get();
+                if(oldUserState.isBanned()){
+                    throw new ClientErrorException(ClientError.FORBIDDEN);
+                }
+                userManager.update(new User(oldUserState.getUserId(), oldUserState.getEmail(),
+                        oldUserState.getPasswordHash(), oldUserState.getRole(), oldUserState.isBanned(),
+                        oldUserState.getCashAccount().add(cash)));
             }
         } catch (ClientErrorException ex){
             LOG.warn(ex.getMessage());

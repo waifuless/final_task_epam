@@ -35,7 +35,7 @@ public class ShowLotPageCommand implements SyncCommand {
             ServiceCanNotCompleteCommandRequest {
         try {
             int lot_id = Integer.parseInt(request.getParameter("lot_id"));
-            Optional<LotWithImages> optionalLotWithImages = lotService.findLot(lot_id);
+            Optional<LotWithImages> optionalLotWithImages = lotService.findLotWithImages(lot_id);
             if (optionalLotWithImages.isPresent()) {
                 request.setAttribute("lot", optionalLotWithImages.get());
             } else {

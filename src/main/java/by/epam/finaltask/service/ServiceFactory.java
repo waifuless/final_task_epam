@@ -13,6 +13,7 @@ public class ServiceFactory {
     private static volatile CategoryService categoryServiceInstance;
     private static volatile CityOrDistrictService cityOrDistrictServiceInstance;
     private static volatile RegionService regionServiceInstance;
+    private static volatile AuctionParticipationService auctionParticipationServiceInstance;
 
     private ServiceFactory() {
     }
@@ -93,5 +94,17 @@ public class ServiceFactory {
             }
         }
         return regionServiceInstance;
+    }
+
+    public AuctionParticipationService auctionParticipationService() {
+        if (auctionParticipationServiceInstance == null) {
+            synchronized (CommonAuctionParticipationService.class) {
+                if (auctionParticipationServiceInstance == null) {
+                    auctionParticipationServiceInstance =
+                            new CommonAuctionParticipationService(AuctionParticipationManager.getInstance());
+                }
+            }
+        }
+        return auctionParticipationServiceInstance;
     }
 }

@@ -9,7 +9,8 @@ public enum ClientError {
     INVALID_IMAGE(400, "Image is invalid"),
     INVALID_ARGUMENTS(400, "One or more arguments are invalid"),
     NOT_FOUND(404, "Resource not found"),
-    ENTITY_ALREADY_EXISTS(409, "Entity already exists");
+    ENTITY_ALREADY_EXISTS(409, "Entity already exists"),
+    FORBIDDEN(403, "Forbidden to execute command");
 
     private final int errorStatus;
     private final String message;
