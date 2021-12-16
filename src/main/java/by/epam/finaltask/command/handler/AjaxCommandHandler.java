@@ -40,7 +40,7 @@ public class AjaxCommandHandler implements CommandHandler {
                 writer.write(ajaxCommandResponse.getResponse());
             }
         } catch (ClientErrorException ex) {
-            LOG.warn(ex.getMessage(), ex);
+            LOG.warn(ex.getMessage());
             response.setStatus(ex.getErrorStatus());
             try (PrintWriter writer = response.getWriter()) {
                 writer.print(ex.getMessage());
