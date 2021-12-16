@@ -2,7 +2,7 @@ package by.epam.finaltask.model;
 
 import java.math.BigDecimal;
 
-public class Bid {
+public class Bid implements DaoEntity<Bid>{
 
     private final long bidId;
     private final long userId;
@@ -62,6 +62,11 @@ public class Bid {
                 ", amount=" + amount +
                 ", lotId=" + lotId +
                 '}';
+    }
+
+    @Override
+    public Bid createWithId(long id) {
+        return new Bid(id, userId, amount, lotId);
     }
 
     public static BidBuilder builder(){
