@@ -84,6 +84,7 @@
                             <th scope="col">User id</th>
                             <th scope="col">Email</th>
                             <th scope="col">Ban status</th>
+                            <th scope="col">Cash account</th>
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
@@ -174,6 +175,7 @@
                             <td>`+user.userId+`</td>
                             <td>`+user.email+`</td>
                             <td>`+bannedStatus+`</td>
+                            <td>`+user.cashAccount+`</td>
                             <td>
                                 `+button+`
                             </td>

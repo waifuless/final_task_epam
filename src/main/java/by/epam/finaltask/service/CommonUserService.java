@@ -97,7 +97,8 @@ public class CommonUserService implements UserService {
             if(optionalOldUserState.isPresent() && optionalOldUserState.get().isBanned() != bannedAction){
                 User oldUserState = optionalOldUserState.get();
                 userManager.update(new User(oldUserState.getUserId(), oldUserState.getEmail(),
-                        oldUserState.getPasswordHash(), oldUserState.getRole(), bannedAction));
+                        oldUserState.getPasswordHash(), oldUserState.getRole(), bannedAction,
+                        oldUserState.getCashAccount()));
             }
         } catch (ClientErrorException ex){
             LOG.warn(ex.getMessage());
