@@ -39,21 +39,23 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     " VALUES(?, findCategoryId(?), findAuctionTypeId(?), ?, ?, ?, ?, @regionId," +
                     " findCityOrDistrictId(?, @regionId), ?, findAuctionStatusId(?)," +
                     " findProductConditionId(?));";
-    private final static String FIND_ALL_LOTS_QUERY =
+    private final static String SELECT_LOTS_WITH_ALL_JOINS =
             "SELECT lot.lot_id AS lot_id, owner_id AS owner_id, category.category_name AS category_name," +
-                    " auction_type.type_name" +
-                    " AS auction_type_name, title AS title, start_datetime AS start_datetime," +
-                    " end_datetime AS end_datetime, initial_price AS initial_price, region_name AS region_name," +
-                    " city_or_district_name AS city_or_district_name," +
-                    " description AS description, auction_status.status_name AS auction_status_name," +
-                    " pc.product_condition_name AS product_condition_name FROM lot" +
-                    " LEFT JOIN category ON lot.category_id = category.category_id" +
-                    " LEFT JOIN auction_type ON lot.auction_type_id = auction_type.type_id" +
-                    " LEFT JOIN region r on lot.region_id = r.region_id" +
-                    " LEFT JOIN city_or_district c on lot.city_or_district_id = c.city_or_district_id" +
-                    " LEFT JOIN auction_status ON lot.auction_status_id = auction_status.status_id" +
-                    " LEFT JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id";
-    private final static String FIND_LOT_BY_ID_QUERY = FIND_ALL_LOTS_QUERY + " WHERE lot.lot_id=?;";
+            " auction_type.type_name" +
+            " AS auction_type_name, title AS title, start_datetime AS start_datetime," +
+            " end_datetime AS end_datetime, initial_price AS initial_price, region_name AS region_name," +
+            " city_or_district_name AS city_or_district_name," +
+            " description AS description, auction_status.status_name AS auction_status_name," +
+            " pc.product_condition_name AS product_condition_name FROM lot" +
+            " LEFT JOIN category ON lot.category_id = category.category_id" +
+            " LEFT JOIN auction_type ON lot.auction_type_id = auction_type.type_id" +
+            " LEFT JOIN region r on lot.region_id = r.region_id" +
+            " LEFT JOIN city_or_district c on lot.city_or_district_id = c.city_or_district_id" +
+            " LEFT JOIN auction_status ON lot.auction_status_id = auction_status.status_id" +
+            " LEFT JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id";
+    private final static String FIND_ALL_LOTS_QUERY =
+            "SELECT * FROM ( " + SELECT_LOTS_WITH_ALL_JOINS + " ) as inner_lot";
+    private final static String FIND_LOT_BY_ID_QUERY = FIND_ALL_LOTS_QUERY + " WHERE inner_lot.lot_id=?;";
     private final static String FIND_LOT_OFFSET_QUERY =
             FIND_ALL_LOTS_QUERY + " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
     private final static String FIND_LOT_OFFSET_BY_USER_ID_QUERY =
@@ -70,13 +72,8 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
                     " WHERE lot_id = ?";
     private final static String DELETE_LOT_QUERY =
             "DELETE FROM lot WHERE lot_id = ?;";
-    private final static String COUNT_QUERY_WITH_JOINS = "SELECT COUNT(1) AS rows_count FROM lot"+
-            " LEFT JOIN category ON lot.category_id = category.category_id" +
-            " LEFT JOIN auction_type ON lot.auction_type_id = auction_type.type_id" +
-            " LEFT JOIN region r on lot.region_id = r.region_id" +
-            " LEFT JOIN city_or_district c on lot.city_or_district_id = c.city_or_district_id" +
-            " LEFT JOIN auction_status ON lot.auction_status_id = auction_status.status_id" +
-            " LEFT JOIN product_condition pc ON lot.product_condition_id = pc.product_condition_id";
+    private final static String COUNT_QUERY_WITH_JOINS = "SELECT COUNT(1) AS rows_count FROM ( "+
+            SELECT_LOTS_WITH_ALL_JOINS + " ) as inner_lot";
     private final static String DROP_RENEW_SCHEDULE = "DROP EVENT IF EXISTS every_hour_auction_status_renew;";
     private final static String RENEW_LOTS_QUERY = "UPDATE lot SET " +
             " auction_status_id = findAuctionStatusId('RUNNING')" +
@@ -259,25 +256,25 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
             params.put(context.getOwnerId(), Types.INTEGER);
         }
         checkParamAndFillFilterAndParamMap(context.getCategory(), Types.VARCHAR, EQUALS_TEMPLATE,
-                "category.category_name", filter, params);
+                CATEGORY_NAME_COLUMN, filter, params);
         checkParamAndFillFilterAndParamMap(context.getAuctionType(), Types.VARCHAR, EQUALS_TEMPLATE,
-                "auction_type.type_name", filter, params);
+                AUCTION_TYPE_NAME_COLUMN, filter, params);
         String title = context.getTitle();
         title = title != null ? "%" + title + "%" : null;
-        checkParamAndFillFilterAndParamMap(title, Types.VARCHAR, LIKE_STRING_TEMPLATE, "title",
+        checkParamAndFillFilterAndParamMap(title, Types.VARCHAR, LIKE_STRING_TEMPLATE, TITLE_COLUMN,
                 filter, params);
         checkParamAndFillFilterAndParamMap(context.getMinInitialPrice(), Types.DECIMAL, GREATER_THAN_OR_EQUALS_TEMPLATE,
-                "initial_price", filter, params);
+                INITIAL_PRICE_COLUMN, filter, params);
         checkParamAndFillFilterAndParamMap(context.getMaxInitialPrice(), Types.DECIMAL, LESS_THAN_OR_EQUALS_TEMPLATE,
-                "initial_price", filter, params);
+                INITIAL_PRICE_COLUMN, filter, params);
         checkParamAndFillFilterAndParamMap(context.getRegion(), Types.VARCHAR, EQUALS_TEMPLATE,
-                "region_name", filter, params);
+                REGION_NAME_COLUMN, filter, params);
         checkParamAndFillFilterAndParamMap(context.getCityOrDistrict(), Types.VARCHAR, EQUALS_TEMPLATE,
-                "city_or_district_name", filter, params);
+                CITY_OR_DISTRICT_NAME_COLUMN, filter, params);
         checkParamAndFillFilterAndParamMap(context.getAuctionStatus(), Types.VARCHAR, EQUALS_TEMPLATE,
-                "auction_status.status_name", filter, params);
+                AUCTION_STATUS_NAME_COLUMN, filter, params);
         checkParamAndFillFilterAndParamMap(context.getProductCondition(), Types.VARCHAR, EQUALS_TEMPLATE,
-                "pc.product_condition_name", filter, params);
+                PRODUCT_CONDITION_NAME_COLUMN, filter, params);
         LOG.debug("Filter query: {}", filter);
         LOG.debug("Params map: {}", params);
         if (params.isEmpty()) {
