@@ -2,12 +2,14 @@ package by.epam.finaltask.command.sync_command;
 
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
+import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.controller.PagePath;
 import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.LotWithImages;
 import by.epam.finaltask.model.Role;
+import by.epam.finaltask.service.AuctionParticipationService;
 import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +29,9 @@ public class ShowLotPageCommand implements SyncCommand {
 
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
 
+    private final AuctionParticipationService auctionParticipationService
+            = ServiceFactory.getFactoryInstance().auctionParticipationService();
+
     ShowLotPageCommand() {
     }
 
@@ -38,6 +43,12 @@ public class ShowLotPageCommand implements SyncCommand {
             Optional<LotWithImages> optionalLotWithImages = lotService.findLotWithImages(lot_id);
             if (optionalLotWithImages.isPresent()) {
                 request.setAttribute("lot", optionalLotWithImages.get());
+                Role userRole = (Role) request.getSession().getAttribute(UserSessionAttribute.USER_ROLE.name());
+                if(!userRole.equals(Role.NOT_AUTHORIZED)) {
+                    long userId = (Long)request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
+                    request.setAttribute("user_is_participate",
+                            auctionParticipationService.isUserParticipateInLotAuction(userId, lot_id));
+                }
             } else {
                 throw new ClientErrorException(ClientError.NOT_FOUND);
             }

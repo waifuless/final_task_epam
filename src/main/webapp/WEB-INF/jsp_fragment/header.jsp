@@ -99,6 +99,9 @@
                                         ${sessionScope.get('USER_EMAIL')}
                                 </a></li>
                                 <li><a class="dropdown-item" href="#">
+                                        Мой счет
+                                </a></li>
+                                <li><a class="dropdown-item" href="#">
                                     <fmt:message bundle="${headerLoc}" key="account.personal_link"/>
                                 </a></li>
                                 <c:if test="${sessionScope.get('USER_ROLE') eq Role.ADMIN}">

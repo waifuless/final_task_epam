@@ -91,7 +91,11 @@ public class UserPermissionFilter implements Filter {
             return Role.NOT_AUTHORIZED;
         }
         Role role = (Role) session.getAttribute(UserSessionAttribute.USER_ROLE.name());
-        return role != null ? role : Role.NOT_AUTHORIZED;
+        if(role==null){
+            session.setAttribute(UserSessionAttribute.USER_ROLE.name(), Role.NOT_AUTHORIZED);
+            role = Role.NOT_AUTHORIZED;
+        }
+        return role;
     }
 
     private boolean retrieveUserBannedStatus(HttpServletRequest request) {

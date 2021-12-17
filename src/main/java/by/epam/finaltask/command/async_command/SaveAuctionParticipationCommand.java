@@ -44,7 +44,7 @@ public class SaveAuctionParticipationCommand implements AjaxCommand{
     public AjaxCommandResponse execute(CommandRequest request) throws Exception {
         try {
             long userId = (Long) request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
-            auctionParticipationService.saveParticipant(userId, request.getParameter("lot_id"));
+            auctionParticipationService.saveParticipant(userId, request.getParameter("lotId"));
             String lotsJson = new Gson().toJson("success!");
             return new AjaxCommandResponse("application/json", lotsJson);
         } catch (NumberFormatException ex) {

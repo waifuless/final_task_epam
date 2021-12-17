@@ -19,7 +19,7 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
     private final static String SAVE_PARTICIPATION_QUERY = "INSERT INTO auction_participation(participant_id, lot_id," +
             " deposit, deposit_is_returned)" +
             " VALUES (?,?,?,?)";
-    private final static String IS_USER_PARTICIPATE_QUERY = "SELECT EXISTS(SELECT COUNT(1) FROM auction_participation" +
+    private final static String IS_USER_PARTICIPATE_QUERY = "SELECT EXISTS(SELECT 1 FROM auction_participation" +
             " WHERE participant_id=? AND lot_id=?) as participation_existence";
 
     private static volatile MariaAuctionParticipationManager instance;

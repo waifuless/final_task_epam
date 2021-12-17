@@ -116,10 +116,34 @@
             <h2>Начальная цена: ${lot.initialPrice}р</h2>
         </div>
 
-        <c:if test="${lot.auctionStatus eq AuctionStatus.APPROVED_BY_ADMIN
-        && sessionScope.get(UserSessionAttribute.USER_ID.name()) ne lot.ownerId}">
+        <c:if test="${lot.auctionStatus eq AuctionStatus.APPROVED_BY_ADMIN}">
+            <div class="row col-9 my-5 mx-1">
+                Размер задатка составляет 10% от начальной стоимости лота.
+            </div>
             <div class="row col-9 my-5">
-                <button type="button" class="btn btn-success w-100">Записаться на участие</button>
+                <c:choose>
+                    <c:when test="${sessionScope.get(UserSessionAttribute.USER_ROLE.name()) eq Role.NOT_AUTHORIZED}">
+                        <button type="button" class="btn btn-success w-100 disabled">
+                            Для записи на участие вы должны авторизоваться
+                        </button>
+                    </c:when>
+                    <c:when test="${requestScope.get('user_is_participate')}">
+                        <button type="button" class="btn btn-success w-100 disabled">
+                            Вы уже числитесь в участниках
+                        </button>
+                    </c:when>
+                    <c:when test="${sessionScope.get(UserSessionAttribute.USER_ID.name()) eq lot.ownerId}">
+                        <button type="button" class="btn btn-success w-100 disabled">
+                            Участие недоступно для владельца лота
+                        </button>
+                    </c:when>
+                    <c:otherwise>
+                        <button type="button" class="btn btn-success w-100"
+                                onclick="saveAuctionParticipation(${lot.lotId})">
+                            Записаться на участие
+                        </button>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </c:if>
 
@@ -129,5 +153,25 @@
 
 <%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
+<script type="text/javascript">
+    function saveAuctionParticipation(lotId){
+        $.ajax({
+            type: 'POST',
+            url: 'ControllerServlet',
+            dataType: "text",
+            data: {
+                requestIsAjax: true,
+                command: "save_auction_participation",
+                lotId: lotId
+            },
+            success: function (answer) {
+                window.location.replace(window.location.href);
+            },
+            error: function (xhr, textStatus, thrownError) {
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+            }
+        });
+    }
+</script>
 </body>
 </html>

@@ -73,7 +73,8 @@ public class AjaxCommandFactory {
         FIND_USERS_AND_PAGES_COUNT_BY_ADMIN("find_users_and_pages_count_by_admin",
                 FindUsersAndPagesCountByAdminCommand.class),
         CHANGE_USER_BANNED_STATUS_BY_ADMIN("change_user_banned_status_by_admin",
-                ChangeUserBannedStatusByAdminCommand.class);
+                ChangeUserBannedStatusByAdminCommand.class),
+        SAVE_AUCTION_PARTICIPATION("save_auction_participation", SaveAuctionParticipationCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;
