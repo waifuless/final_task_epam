@@ -138,8 +138,8 @@
                         </button>
                     </c:when>
                     <c:otherwise>
-                        <button type="button" class="btn btn-success w-100"
-                                onclick="saveAuctionParticipation(${lot.lotId})">
+                        <button type="button" class="btn btn-success w-100" data-bs-toggle="modal"
+                                data-bs-target="#auctionParticipationModal">
                             Записаться на участие
                         </button>
                     </c:otherwise>
@@ -147,6 +147,29 @@
             </div>
         </c:if>
 
+        <div class="modal fade" id="auctionParticipationModal" tabindex="-1"
+             aria-labelledby="auctionParticipationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="auctionParticipationModalLabel">Сумма залога для участия составляет, р.</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="auctionParticipationModalBody">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                onclick="saveAuctionParticipation(${lot.lotId})">
+                            Заплатить
+                        </button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                            Отказаться
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="page-buffer"></div>
     </div>
 </div>
@@ -154,6 +177,13 @@
 <%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
 <script type="text/javascript">
+
+    $(document).ready(function () {
+        let modalBody = $('#auctionParticipationModalBody');
+        modalBody.empty();
+        modalBody.append(0.1 * ${lot.initialPrice});
+    });
+
     function saveAuctionParticipation(lotId){
         $.ajax({
             type: 'POST',
