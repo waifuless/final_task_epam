@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="by.epam.finaltask.model.Role"%>
 
 <script src="js/language-switch.js" type="text/javascript"></script>
+<script src="js/print-cash-account-in-header.js" type="text/javascript"></script>
 <link rel="stylesheet" href="css/account-drop-down-menu.css">
 
 <fmt:setBundle basename="l10n.page.header" var="headerLoc"/>
@@ -98,9 +99,10 @@
                                 <li><a style="font-size: 0.75em" class="dropdown-item disabled" href="#">
                                         ${sessionScope.get('USER_EMAIL')}
                                 </a></li>
-                                <li><a class="dropdown-item" href="#">
+                                <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#cashAccountModal"
+                                            onclick="printCashAccountInHeader()">
                                         Мой счет
-                                </a></li>
+                                </button></li>
                                 <li><a class="dropdown-item" href="#">
                                     <fmt:message bundle="${headerLoc}" key="account.personal_link"/>
                                 </a></li>
@@ -128,6 +130,23 @@
                         </div>
                     </c:otherwise>
                 </c:choose>
+            </div>
+
+
+            <div class="modal fade" id="cashAccountModal" tabindex="-1" aria-labelledby="cashAccountModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cashAccountModalLabel">Сейчас на счету, р.</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="cashAccountModalBody">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Ok</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
