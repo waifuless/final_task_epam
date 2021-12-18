@@ -75,7 +75,9 @@ public class AjaxCommandFactory {
         CHANGE_USER_BANNED_STATUS_BY_ADMIN("change_user_banned_status_by_admin",
                 ChangeUserBannedStatusByAdminCommand.class),
         SAVE_AUCTION_PARTICIPATION("save_auction_participation", SaveAuctionParticipationCommand.class),
-        FIND_USER_CASH_ACCOUNT("find_user_cash_account", FindUserCashAccountCommand.class);
+        FIND_USER_CASH_ACCOUNT("find_user_cash_account", FindUserCashAccountCommand.class),
+        ADD_BID("add_bid", AddBidCommand.class),
+        FIND_BEST_BID_AMOUNT("find_best_bid_amount", FindBestBidAmountCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;

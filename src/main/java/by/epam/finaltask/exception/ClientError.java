@@ -10,7 +10,9 @@ public enum ClientError {
     INVALID_ARGUMENTS(400, "One or more arguments are invalid"),
     NOT_FOUND(404, "Resource not found"),
     ENTITY_ALREADY_EXISTS(409, "Entity already exists"),
-    FORBIDDEN(403, "Forbidden to execute command");
+    LOT_NOT_RUNNING(409, "Lot is not running"),
+    FORBIDDEN(403, "Forbidden to execute command"),
+    BID_SHOULD_BE_BIGGER_THAN_INIT_PRICE(409, "Bid amount should be bigger than init price");
 
     private final int errorStatus;
     private final String message;

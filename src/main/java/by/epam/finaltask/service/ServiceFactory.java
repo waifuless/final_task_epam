@@ -14,6 +14,7 @@ public class ServiceFactory {
     private static volatile CityOrDistrictService cityOrDistrictServiceInstance;
     private static volatile RegionService regionServiceInstance;
     private static volatile AuctionParticipationService auctionParticipationServiceInstance;
+    private static volatile BidService bidServiceInstance;
 
     private ServiceFactory() {
     }
@@ -106,5 +107,17 @@ public class ServiceFactory {
             }
         }
         return auctionParticipationServiceInstance;
+    }
+
+    public BidService bidService() {
+        if (bidServiceInstance == null) {
+            synchronized (CommonBidService.class) {
+                if (bidServiceInstance == null) {
+                    bidServiceInstance =
+                            new CommonBidService(BidManager.getInstance());
+                }
+            }
+        }
+        return bidServiceInstance;
     }
 }

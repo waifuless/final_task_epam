@@ -7,9 +7,11 @@ import by.epam.finaltask.model.Bid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class MariaBidManager extends GenericDao<Bid> implements BidManager {
 
@@ -31,6 +33,10 @@ public class MariaBidManager extends GenericDao<Bid> implements BidManager {
                     " WHERE bid_id = ?";
     private final static String DELETE_BID_QUERY =
             "DELETE FROM bid WHERE bid_id = ?";
+    private final static String FIND_MAX_BID_QUERY = FIND_ALL_BIDS_QUERY + " WHERE amount = " +
+            " (SELECT MAX(amount) FROM bid WHERE lot_id = ?) ORDER BY bid_id LIMIT 1";
+    private final static String FIND_MIN_BID_QUERY = FIND_ALL_BIDS_QUERY + " WHERE amount = " +
+            " (SELECT MIN(amount) FROM bid WHERE lot_id = ?) ORDER BY bid_id LIMIT 1";
 
     private static volatile MariaBidManager instance;
 
@@ -48,6 +54,16 @@ public class MariaBidManager extends GenericDao<Bid> implements BidManager {
             }
         }
         return instance;
+    }
+
+    @Override
+    public Optional<Bid> findMaxBid(long lotId) throws SQLException, DataSourceDownException, InterruptedException {
+        return findBestBid(lotId, FIND_MAX_BID_QUERY);
+    }
+
+    @Override
+    public Optional<Bid> findMinBid(long lotId) throws SQLException, DataSourceDownException, InterruptedException {
+        return findBestBid(lotId, FIND_MIN_BID_QUERY);
     }
 
     @Override
@@ -73,6 +89,28 @@ public class MariaBidManager extends GenericDao<Bid> implements BidManager {
                     .build();
         } catch (Exception ex) {
             throw new ExtractionException(ex.getMessage(), ex);
+        }
+    }
+
+
+    private Optional<Bid> findBestBid(long lotId, String query)
+            throws SQLException, DataSourceDownException, InterruptedException {
+        try (Connection connection = connectionPool.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setLong(1, lotId);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                return Optional.of(extractEntity(resultSet));
+            }else{
+                return Optional.empty();
+            }
+        } catch (SQLException | DataSourceDownException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw e;
         }
     }
 }
