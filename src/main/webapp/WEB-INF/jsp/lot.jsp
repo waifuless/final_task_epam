@@ -128,8 +128,10 @@
                         </button>
                     </c:when>
                     <c:when test="${requestScope.get('user_is_participate')}">
-                        <button type="button" class="btn btn-success w-100 disabled">
-                            Вы уже числитесь в участниках
+                        <button type="button" class="btn btn-danger w-100"
+                                onclick="deleteAuctionParticipation(${lot.lotId})">
+                            Отменить участие (вам вернется <fmt:formatNumber type="number" maxFractionDigits="2"
+                                                                             value="${lot.initialPrice*0.1}"/> рублей)
                         </button>
                     </c:when>
                     <c:when test="${sessionScope.get(UserSessionAttribute.USER_ID.name()) eq lot.ownerId}">
@@ -192,6 +194,25 @@
             data: {
                 requestIsAjax: true,
                 command: "save_auction_participation",
+                lotId: lotId
+            },
+            success: function (answer) {
+                window.location.replace(window.location.href);
+            },
+            error: function (xhr, textStatus, thrownError) {
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+            }
+        });
+    }
+
+    function deleteAuctionParticipation(lotId){
+        $.ajax({
+            type: 'POST',
+            url: 'ControllerServlet',
+            dataType: "text",
+            data: {
+                requestIsAjax: true,
+                command: "delete_auction_participation",
                 lotId: lotId
             },
             success: function (answer) {
