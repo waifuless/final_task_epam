@@ -34,7 +34,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="cart" href="#">
+                        <a class="nav-link" id="users-lots-link"
+                           href="${pageContext.request.contextPath}/ControllerServlet?command=show_user_lots">
                             <fmt:message bundle="${headerLoc}" key="link.cart"/>
                         </a>
                     </li>

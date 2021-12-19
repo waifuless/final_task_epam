@@ -2,22 +2,6 @@ USE racingSite;
 
 DELIMITER //
 
-CREATE FUNCTION insertAddressIfNotExistAndSelectId(new_address_name VARCHAR(128)) RETURNS INT
-
-BEGIN
-
-    IF NOT EXISTS(SELECT 1 FROM address WHERE address_name = new_address_name) THEN
-        INSERT INTO address(address_name) VALUE (new_address_name);
-    END IF;
-    RETURN (SELECT address_id FROM address WHERE address_name = new_address_name LIMIT 1);
-
-END //
-
-DELIMITER ;
-
-
-DELIMITER //
-
 CREATE FUNCTION findRegionId(searching_region_name VARCHAR(60)) RETURNS INT
 
 BEGIN
@@ -47,17 +31,3 @@ END //
 DELIMITER ;
 
 
-DELIMITER //
-
-CREATE FUNCTION insertPostalCodeIfNotExistAndSelectId(new_postal_code_name VARCHAR(16)) RETURNS INT
-
-BEGIN
-
-    IF NOT EXISTS(SELECT 1 FROM postal_code WHERE postal_code_name = new_postal_code_name) THEN
-        INSERT INTO postal_code(postal_code_name) VALUE (new_postal_code_name);
-    END IF;
-    RETURN (SELECT postal_code_id FROM postal_code WHERE postal_code_name = new_postal_code_name LIMIT 1);
-
-END //
-
-DELIMITER ;

@@ -7,18 +7,21 @@ import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.AuctionParticipation;
 import by.epam.finaltask.model.AuctionStatus;
 import by.epam.finaltask.model.Lot;
+import by.epam.finaltask.model.LotWithImages;
 import by.epam.finaltask.validation.StringClientParameterValidator;
 import by.epam.finaltask.validation.ValidatorFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
+import java.util.*;
 
 public class CommonAuctionParticipationService implements AuctionParticipationService {
 
     private final static Logger LOG = LogManager.getLogger(CommonAuctionParticipationService.class);
 
     private final static BigDecimal DEFAULT_DEPOSIT_COEFFICIENT = BigDecimal.valueOf(0.1);
+    private final static int LOTS_PER_PAGE = 8;
 
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
     private final UserService userService = ServiceFactory.getFactoryInstance().userService();
@@ -95,9 +98,7 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     public boolean isUserParticipateInLotAuction(long userId, String lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            if (isStringEmpty(lotId)) {
-                throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
-            }
+            validator.validateNotEmpty(lotId);
             long longLotId = Long.parseLong(lotId);
             return isUserParticipateInLotAuction(userId, longLotId);
         } catch (NumberFormatException ex) {
@@ -117,7 +118,76 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
         }
     }
 
-    private boolean isStringEmpty(String str) {
-        return str == null || str.trim().isEmpty();
+    @Override
+    public Map<LotWithImages, AuctionParticipation> findLotsParticipatedByUser(long page, long userId)
+            throws ServiceCanNotCompleteCommandRequest {
+        try {
+            List<AuctionParticipation> auctionParticipations = auctionParticipationManager
+                    .findUsersParticipations(userId, (page - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
+            return findResultsByLotsWithImages(auctionParticipations);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public long findPageCountParticipatedByUser(long userId) throws ServiceCanNotCompleteCommandRequest {
+        try {
+            long participationsCount = auctionParticipationManager.findUsersParticipationsCount(userId);
+            return participationsCount / LOTS_PER_PAGE + (participationsCount % LOTS_PER_PAGE == 0 ? 0 : 1);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public Map<LotWithImages, AuctionParticipation> findLotsParticipatedByUser(long page, long userId,
+                                                                               AuctionStatus status)
+            throws ServiceCanNotCompleteCommandRequest {
+        try {
+            List<AuctionParticipation> auctionParticipations = auctionParticipationManager
+                    .findUsersParticipations(userId,
+                            (page - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE, status);
+            return findResultsByLotsWithImages(auctionParticipations);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public long findPageCountParticipatedByUser(long userId, AuctionStatus status)
+            throws ServiceCanNotCompleteCommandRequest {
+        try {
+            long participationsCount = auctionParticipationManager.findUsersParticipationsCount(userId, status);
+            return participationsCount / LOTS_PER_PAGE + (participationsCount % LOTS_PER_PAGE == 0 ? 0 : 1);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public Optional<AuctionParticipation> findParticipation(long userId, long lotId)
+            throws ServiceCanNotCompleteCommandRequest {
+        try {
+            return auctionParticipationManager.findParticipation(userId, lotId);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    private Map<LotWithImages, AuctionParticipation> findResultsByLotsWithImages
+            (List<AuctionParticipation> auctionParticipations)
+            throws ServiceCanNotCompleteCommandRequest {
+        Map<LotWithImages, AuctionParticipation> lotsWithParticipations = new LinkedHashMap<>();
+        for (AuctionParticipation auctionParticipation : auctionParticipations) {
+            Optional<LotWithImages> optionalLot = lotService.findLotWithImages(auctionParticipation.getLotId());
+            optionalLot.ifPresent(lot -> lotsWithParticipations.put(lot, auctionParticipation));
+        }
+        return lotsWithParticipations;
     }
 }

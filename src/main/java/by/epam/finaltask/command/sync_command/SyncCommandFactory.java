@@ -70,7 +70,8 @@ public class SyncCommandFactory {
         SHOW_ADMIN_LOTS("show_admin_tools", ShowAdminLotsCommand.class),
         SHOW_ADMIN_CATEGORIES("show_admin_categories", ShowAdminCategoriesCommand.class),
         SHOW_ADMIN_NEW_LOTS("show_admin_new_lots", ShowAdminNewLotsCommand.class),
-        SHOW_ADMIN_USERS("show_admin_users", ShowAdminUsersPageCommand.class);
+        SHOW_ADMIN_USERS("show_admin_users", ShowAdminUsersPageCommand.class),
+        SHOW_USER_LOTS("show_user_lots", ShowUserLotsCommand.class);
 
         private final String commandName;
         private final Class<? extends SyncCommand> commandClass;

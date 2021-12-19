@@ -10,12 +10,6 @@ insert into racingSite.auction_type (type_id, type_name)
 values  (1, 'FORWARD'),
         (2, 'REVERSE');
 
-insert into racingSite.cart_item_status (status_id, status_name)
-values  (4, 'DELIVERED'),
-        (1, 'NEW'),
-        (2, 'PAID'),
-        (3, 'SENT');
-
 insert into racingSite.region (region_id, region_name)
 values  (2, 'Brest Oblast'),
         (1, 'City of Minsk'),

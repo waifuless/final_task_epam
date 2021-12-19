@@ -12,7 +12,8 @@ public enum PagePath {
     LOT_CREATION("WEB-INF/jsp/create_lot.jsp"),
     ADMIN_CATEGORIES("WEB-INF/jsp/admin_categories.jsp"),
     ADMIN_NEW_LOTS("WEB-INF/jsp/admin_new_lots.jsp"),
-    ADMIN_USERS("WEB-INF/jsp/admin_users.jsp");
+    ADMIN_USERS("WEB-INF/jsp/admin_users.jsp"),
+    USER_LOTS("WEB-INF/jsp/users_lots.jsp");
 
     private final String path;
 

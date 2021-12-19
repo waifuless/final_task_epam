@@ -2,8 +2,10 @@ package by.epam.finaltask.dao;
 
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.model.AuctionParticipation;
+import by.epam.finaltask.model.AuctionStatus;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 public interface AuctionParticipationManager {
@@ -11,6 +13,7 @@ public interface AuctionParticipationManager {
     static AuctionParticipationManager getInstance() throws DataSourceDownException {
         return MariaAuctionParticipationManager.getInstance();
     }
+
     void saveParticipation(AuctionParticipation participation)
             throws SQLException, DataSourceDownException, InterruptedException;
 
@@ -21,5 +24,18 @@ public interface AuctionParticipationManager {
             throws SQLException, DataSourceDownException, InterruptedException;
 
     void deleteParticipation(long userId, long lotId)
+            throws SQLException, DataSourceDownException, InterruptedException;
+
+    List<AuctionParticipation> findUsersParticipations(long userId, long offset, long count)
+            throws SQLException, DataSourceDownException, InterruptedException;
+
+    List<AuctionParticipation> findUsersParticipations(long userId, long offset, long count,
+                                                       AuctionStatus auctionStatus)
+            throws SQLException, DataSourceDownException, InterruptedException;
+
+    long findUsersParticipationsCount(long userId)
+            throws SQLException, DataSourceDownException, InterruptedException;
+
+    long findUsersParticipationsCount(long userId, AuctionStatus auctionStatus)
             throws SQLException, DataSourceDownException, InterruptedException;
 }

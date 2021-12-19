@@ -1,12 +1,3 @@
-create table address
-(
-    address_id   int auto_increment
-        primary key,
-    address_name varchar(128) not null,
-    constraint address_address_value_uindex
-        unique (address_name)
-);
-
 create table auction_status
 (
     status_id   int auto_increment
@@ -25,15 +16,6 @@ create table auction_type
         unique (type_name)
 );
 
-create table cart_item_status
-(
-    status_id   int auto_increment
-        primary key,
-    status_name varchar(20) not null,
-    constraint cart_item_status_status_value_uindex
-        unique (status_name)
-);
-
 create table category
 (
     category_id   int auto_increment
@@ -41,15 +23,6 @@ create table category
     category_name varchar(64) not null,
     constraint category_category_name_uindex
         unique (category_name)
-);
-
-create table postal_code
-(
-    postal_code_id   int auto_increment
-        primary key,
-    postal_code_name varchar(16) not null,
-    constraint postal_code_postal_code_name_uindex
-        unique (postal_code_name)
 );
 
 create table product_condition
@@ -93,9 +66,11 @@ create table app_user
 (
     user_id       int auto_increment
         primary key,
-    email         varchar(254) not null,
-    password_hash char(60)     not null,
-    role_id       int          not null,
+    email         varchar(254)                not null,
+    password_hash char(60)                    not null,
+    role_id       int                         not null,
+    banned        tinyint(1)     default 0    not null,
+    cash_account  decimal(20, 2) default 0.00 not null,
     constraint email
         unique (email),
     constraint password_hash
@@ -138,30 +113,30 @@ create table lot
         foreign key (region_id) references region (region_id)
 );
 
+create table auction_participation
+(
+    participant_id      int            not null,
+    lot_id              int            not null,
+    deposit             decimal(20, 2) not null,
+    deposit_is_returned tinyint(1)     not null,
+    primary key (participant_id, lot_id),
+    constraint ` auction_participant_app_user_user_id_fk`
+        foreign key (participant_id) references app_user (user_id),
+    constraint ` auction_participant_lot_lot_id_fk`
+        foreign key (lot_id) references lot (lot_id)
+);
+
 create table bid
 (
-    bid_id   int auto_increment
+    bid_id  int auto_increment
         primary key,
-    user_id  int            not null,
-    amount   decimal(20, 2) not null,
-    lot_id   int            not null,
-    datetime datetime       not null,
+    user_id int            not null,
+    amount  decimal(20, 2) not null,
+    lot_id  int            not null,
     constraint bid_fk0
         foreign key (user_id) references app_user (user_id),
     constraint bid_fk1
         foreign key (lot_id) references lot (lot_id)
-);
-
-create table cart_item
-(
-    bid_id           int          not null
-        primary key,
-    origin_lot_title varchar(256) not null,
-    status_id        int          not null,
-    constraint cart_item_cart_item_status_status_id_fk
-        foreign key (status_id) references cart_item_status (status_id),
-    constraint cart_item_fk0
-        foreign key (bid_id) references bid (bid_id)
 );
 
 create table lot_image
@@ -177,30 +152,6 @@ create table lot_image
     constraint lot_image_lot_lot_id_fk
         foreign key (lot_id) references lot (lot_id)
             on delete set null
-);
-
-create table user_info
-(
-    user_id             int auto_increment
-        primary key,
-    phone_number        varchar(15) not null,
-    first_name          varchar(64) not null,
-    last_name           varchar(64) not null,
-    address_id          int         not null,
-    city_or_district_id int         not null,
-    region_id           int         not null,
-    postal_code_id      int         not null,
-    constraint city_fk
-        foreign key (city_or_district_id) references city_or_district (city_or_district_id),
-    constraint user_info_address_address_id_fk
-        foreign key (address_id) references address (address_id),
-    constraint user_info_fk0
-        foreign key (user_id) references app_user (user_id)
-            on delete cascade,
-    constraint user_info_postal_code_postal_code_id_fk
-        foreign key (postal_code_id) references postal_code (postal_code_id),
-    constraint user_info_region_region_id_fk
-        foreign key (region_id) references region (region_id)
 );
 
 create
@@ -236,8 +187,7 @@ BEGIN
             FROM city_or_district
             WHERE city_or_district_name =
                   searching_city_or_district_name
-              AND region_id = searching_region_id
-            LIMIT 1);
+              AND region_id = searching_region_id LIMIT 1);
 
 END;
 
@@ -257,28 +207,6 @@ create
 BEGIN
 
     RETURN (SELECT region_id FROM region WHERE region_name = searching_region_name LIMIT 1);
-
-END;
-
-create
-    definer = epamTaskUser@localhost function insertAddressIfNotExistAndSelectId(new_address_name varchar(128)) returns int
-BEGIN
-
-    IF NOT EXISTS(SELECT 1 FROM address WHERE address_name = new_address_name) THEN
-        INSERT INTO address(address_name) VALUE (new_address_name);
-    END IF;
-    RETURN (SELECT address_id FROM address WHERE address_name = new_address_name LIMIT 1);
-
-END;
-
-create
-    definer = epamTaskUser@localhost function insertPostalCodeIfNotExistAndSelectId(new_postal_code_name varchar(16)) returns int
-BEGIN
-
-    IF NOT EXISTS(SELECT 1 FROM postal_code WHERE postal_code_name = new_postal_code_name) THEN
-        INSERT INTO postal_code(postal_code_name) VALUE (new_postal_code_name);
-    END IF;
-    RETURN (SELECT postal_code_id FROM postal_code WHERE postal_code_name = new_postal_code_name LIMIT 1);
 
 END;
 

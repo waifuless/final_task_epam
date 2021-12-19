@@ -140,7 +140,7 @@
                     </button>
                 </div>
             </div>
-            <div class="row col-9">
+            <div class="row col-9 mb-3">
                 <button type="button" class="btn btn-primary w-100" onclick="renewBestBid(${lot.lotId})">
                     Обновить
                 </button>

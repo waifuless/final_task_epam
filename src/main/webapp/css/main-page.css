@@ -28,6 +28,10 @@
     font-size: 12px;
 }
 
+.auction-status{
+    font-size: 12px;
+}
+
 .card-text{
     margin: 4px;
 }
@@ -40,9 +44,15 @@
     background-color: #e3f2fd;
 }
 
+/*.card-body * {*/
+/*    text-overflow: ellipsis;*/
+/*    overflow: hidden;*/
+/*    white-space: nowrap;*/
+/*}*/
+
 .card-body * {
-    text-overflow: ellipsis;
-    overflow: hidden;
+    overflow-y: hidden;
+    overflow-x: auto;
     white-space: nowrap;
 }
 

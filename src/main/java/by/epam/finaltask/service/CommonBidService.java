@@ -4,10 +4,7 @@ import by.epam.finaltask.dao.BidManager;
 import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
-import by.epam.finaltask.model.AuctionStatus;
-import by.epam.finaltask.model.AuctionType;
-import by.epam.finaltask.model.Bid;
-import by.epam.finaltask.model.Lot;
+import by.epam.finaltask.model.*;
 import by.epam.finaltask.validation.StringClientParameterValidator;
 import by.epam.finaltask.validation.ValidatorFactory;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +12,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class CommonBidService implements BidService {
@@ -28,6 +28,7 @@ public class CommonBidService implements BidService {
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
     private final AuctionParticipationService auctionParticipationService =
             ServiceFactory.getFactoryInstance().auctionParticipationService();
+    private final UserService userService = ServiceFactory.getFactoryInstance().userService();
 
     private final BidManager bidManager;
 
@@ -83,6 +84,84 @@ public class CommonBidService implements BidService {
         }
     }
 
+    @Override
+    public Map<LotWithImages, AuctionResult> findUserWonLotsWithAuctionResult(long page, long userId)
+            throws ServiceCanNotCompleteCommandRequest {
+        try {
+            Map<LotWithImages, AuctionParticipation> lotsWithAuctionParticipations = auctionParticipationService
+                    .findLotsParticipatedByUser(page, userId, AuctionStatus.ENDED);
+            Optional<Bid> optionalBid;
+            Map<LotWithImages, AuctionResult> participationByWonLots = new LinkedHashMap<>();
+            for (Map.Entry<LotWithImages, AuctionParticipation> entry : lotsWithAuctionParticipations.entrySet()) {
+                if (entry.getKey().getAuctionType().equals(AuctionType.FORWARD)) {
+                    optionalBid = bidManager.findMaxBid(entry.getKey().getLotId());
+                } else {
+                    optionalBid = bidManager.findMinBid(entry.getKey().getLotId());
+                }
+                if (optionalBid.isPresent()) {
+                    Bid bid = optionalBid.get();
+                    if (bid.getUserId() == userId) {
+                        Optional<User> optionalUser = userService.findUserById(entry.getKey().getOwnerId());
+                        if (optionalUser.isPresent()) {
+                            participationByWonLots.put(entry.getKey(), new AuctionResult(bid.getAmount(),
+                                    optionalUser.get().getEmail(), entry.getValue().getDeposit()));
+                        } else {
+                            participationByWonLots.put(entry.getKey(), null);
+                        }
+                    } else {
+                        participationByWonLots.put(entry.getKey(), null);
+                    }
+                } else {
+                    participationByWonLots.put(entry.getKey(), null);
+                }
+            }
+            return participationByWonLots;
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public Map<LotWithImages, AuctionResult> findUsersEndedLotsWithAuctionResult(long page, long userId)
+            throws ServiceCanNotCompleteCommandRequest {
+        try {
+            List<LotWithImages> lots = lotService.findLotsByPageAndContext(page, LotContext.builder().setOwnerId(userId)
+                    .setAuctionStatus(AuctionStatus.ENDED.name()).build());
+            Optional<Bid> optionalBid;
+            Map<LotWithImages, AuctionResult> wonEmailByUserLots = new LinkedHashMap<>();
+            for (LotWithImages lot : lots) {
+                if (lot.getAuctionType().equals(AuctionType.FORWARD)) {
+                    optionalBid = bidManager.findMaxBid(lot.getLotId());
+                } else {
+                    optionalBid = bidManager.findMinBid(lot.getLotId());
+                }
+                if (optionalBid.isPresent()) {
+                    Bid bid = optionalBid.get();
+                    Optional<User> optionalUser = userService.findUserById(bid.getUserId());
+                    if (optionalUser.isPresent()) {
+                        Optional<AuctionParticipation> optionalParticipation = auctionParticipationService
+                                .findParticipation(bid.getUserId(), bid.getLotId());
+                        if (optionalParticipation.isPresent()) {
+                            wonEmailByUserLots.put(lot, new AuctionResult(bid.getAmount(),
+                                    optionalUser.get().getEmail(), optionalParticipation.get().getDeposit()));
+                        } else {
+                            wonEmailByUserLots.put(lot, null);
+                        }
+                    } else {
+                        wonEmailByUserLots.put(lot, null);
+                    }
+                } else {
+                    wonEmailByUserLots.put(lot, null);
+                }
+            }
+            return wonEmailByUserLots;
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
     private void validateBid(long userId, long lotId, BigDecimal amount)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException, SQLException, InterruptedException {
         Lot lot = lotService.findLot(lotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
@@ -108,9 +187,9 @@ public class CommonBidService implements BidService {
                 throw new ClientErrorException(ClientError.BID_AMOUNT_INVALID);
             }
             Optional<Bid> optionalBestBid = bidManager.findMaxBid(lot.getLotId());
-            if(optionalBestBid.isPresent()){
+            if (optionalBestBid.isPresent()) {
                 Bid bestBid = optionalBestBid.get();
-                if(amount.subtract(bestBid.getAmount()).compareTo(minStep)<0){
+                if (amount.subtract(bestBid.getAmount()).compareTo(minStep) < 0) {
                     throw new ClientErrorException(ClientError.BID_AMOUNT_INVALID);
                 }
             }
@@ -119,9 +198,9 @@ public class CommonBidService implements BidService {
                 throw new ClientErrorException(ClientError.BID_AMOUNT_INVALID);
             }
             Optional<Bid> optionalBestBid = bidManager.findMinBid(lot.getLotId());
-            if(optionalBestBid.isPresent()){
+            if (optionalBestBid.isPresent()) {
                 Bid bestBid = optionalBestBid.get();
-                if(bestBid.getAmount().subtract(amount).compareTo(minStep)<0){
+                if (bestBid.getAmount().subtract(amount).compareTo(minStep) < 0) {
                     throw new ClientErrorException(ClientError.BID_AMOUNT_INVALID);
                 }
             }

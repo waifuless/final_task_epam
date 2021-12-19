@@ -80,7 +80,20 @@ public class AjaxCommandFactory {
         FIND_USER_CASH_ACCOUNT("find_user_cash_account", FindUserCashAccountCommand.class),
         ADD_BID("add_bid", AddBidCommand.class),
         FIND_BEST_BID_AND_ITS_BELONGING_TO_USER("find_best_bid_and_its_belonging_to_user",
-                FindBestBidAndItsBelongingToUserCommand.class);
+                FindBestBidAndItsBelongingToUserCommand.class),
+        FIND_LOTS_AND_PAGES_COUNT_OWNED_BY_USER("find_lots_and_pages_count_owned_by_user",
+                FindLotsAndPagesCountOwnedByUserCommand.class),
+        FIND_LOTS_AND_PAGES_COUNT_OWNED_ENDED_WITH_RESULTS_BY_USER
+                ("find_lots_and_pages_count_owned_ended_with_results_by_user",
+                        FindLotsAndPagesCountOwnedEndedWithResultsByUserCommand.class),
+        FIND_LOTS_AND_PAGES_COUNT_PARTICIPATED_BY_USER("find_lots_and_pages_count_participated_by_user",
+                FindLotsAndPagesCountParticipatedByUserCommand.class),
+        FIND_LOTS_AND_PAGES_COUNT_PARTICIPATED_RUNNING_BY_USER
+                ("find_lots_and_pages_count_participated_running_by_user",
+                        FindLotsAndPagesCountParticipatedRunningByUserCommand.class),
+        FIND_LOTS_AND_PAGES_COUNT_PARTICIPATED_ENDED_WITH_RESULTS_BY_USER
+                ("find_lots_and_pages_count_participated_ended_with_results_by_user",
+                        FindLotsAndPagesCountParticipatedEndedWithResultsByUserCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;
