@@ -13,7 +13,7 @@ public enum ClientError {
     LOT_NOT_RUNNING(409, "Lot is not running"),
     FORBIDDEN(403, "Forbidden to execute command"),
     BID_AMOUNT_INVALID(409, "Bid amount should be bigger than init price in forward auction and " +
-            "smaller in reverse");
+            "smaller in reverse. Minimum difference - 5% of initial price");
 
     private final int errorStatus;
     private final String message;

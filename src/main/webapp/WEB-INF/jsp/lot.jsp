@@ -123,6 +123,9 @@
                     <div class="card-body">
                         <h5 class="card-title">Действует ${lot.auctionType} аукцион</h5>
                         <p class="card-text">Лучшая ставка сейчас: <span id="best-bid"></span></p>
+                        <p class="card-text">Минимальный шаг аукциона: <fmt:formatNumber
+                                type="number" maxFractionDigits="2" value="${lot.initialPrice*0.05}"/>
+                        </p>
                         <div class="row col-9" id="div-best-bid-status">
                         </div>
                     </div>
