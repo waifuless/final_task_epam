@@ -54,7 +54,7 @@ public class CommonBidService implements BidService {
     }
 
     @Override
-    public BigDecimal findBestBidAmount(long requesterId, String lotId)
+    public Bid findBestBid(long requesterId, String lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
             clientParameterValidator.validateNotEmpty(lotId);
@@ -67,8 +67,7 @@ public class CommonBidService implements BidService {
             } else {
                 optionalBid = bidManager.findMinBid(longLotId);
             }
-            return optionalBid.orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND))
-                    .getAmount();
+            return optionalBid.orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
         } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage());
             throw new ClientErrorException(ClientError.INVALID_NUMBER);
@@ -87,11 +86,11 @@ public class CommonBidService implements BidService {
         validateUserParticipation(userId, lotId);
         if (lot.getAuctionType().equals(AuctionType.FORWARD)) {
             if (lot.getInitialPrice().compareTo(amount) >= 0) {
-                throw new ClientErrorException(ClientError.BID_SHOULD_BE_BIGGER_THAN_INIT_PRICE);
+                throw new ClientErrorException(ClientError.BID_AMOUNT_INVALID);
             }
         } else {
             if (lot.getInitialPrice().compareTo(amount) <= 0) {
-                throw new ClientErrorException(ClientError.BID_SHOULD_BE_BIGGER_THAN_INIT_PRICE);
+                throw new ClientErrorException(ClientError.BID_AMOUNT_INVALID);
             }
         }
         if (!lot.getAuctionStatus().equals(AuctionStatus.RUNNING)) {
@@ -101,7 +100,7 @@ public class CommonBidService implements BidService {
 
     private void validateUserParticipation(long userId, long lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
-        if (auctionParticipationService.isUserParticipateInLotAuction(userId, lotId)) {
+        if (!auctionParticipationService.isUserParticipateInLotAuction(userId, lotId)) {
             throw new ClientErrorException(ClientError.FORBIDDEN);
         }
     }

@@ -12,7 +12,8 @@ public enum ClientError {
     ENTITY_ALREADY_EXISTS(409, "Entity already exists"),
     LOT_NOT_RUNNING(409, "Lot is not running"),
     FORBIDDEN(403, "Forbidden to execute command"),
-    BID_SHOULD_BE_BIGGER_THAN_INIT_PRICE(409, "Bid amount should be bigger than init price");
+    BID_AMOUNT_INVALID(409, "Bid amount should be bigger than init price in forward auction and " +
+            "smaller in reverse");
 
     private final int errorStatus;
     private final String message;

@@ -116,6 +116,34 @@
             <h2>Начальная цена: ${lot.initialPrice}р</h2>
         </div>
 
+        <c:if test="${lot.auctionStatus eq AuctionStatus.RUNNING && requestScope.get('user_is_participate')}">
+            <div class="row col-9 my-5">
+                <div class="card border-primary mb-3">
+                    <div class="card-header">СТАВКИ</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Действует ${lot.auctionType} аукцион</h5>
+                        <p class="card-text">Лучшая ставка сейчас: <span id="best-bid"></span></p>
+                        <div class="row col-9" id="div-best-bid-status">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row col-9">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" style="color: green;">$</span>
+                    <input type="text" class="form-control" id="new-bid-input"/>
+                    <button class="btn btn-outline-success" type="button" onclick="addBid(${lot.lotId})">
+                        Поставить
+                    </button>
+                </div>
+            </div>
+            <div class="row col-9">
+                <button type="button" class="btn btn-primary w-100" onclick="renewBestBid(${lot.lotId})">
+                    Обновить
+                </button>
+            </div>
+        </c:if>
+
         <c:if test="${lot.auctionStatus eq AuctionStatus.APPROVED_BY_ADMIN}">
             <div class="row col-9 my-5 mx-1">
                 Размер задатка составляет 10% от начальной стоимости лота.
@@ -154,7 +182,8 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="auctionParticipationModalLabel">Сумма залога для участия составляет, р.</h5>
+                        <h5 class="modal-title" id="auctionParticipationModalLabel">Сумма залога для участия составляет,
+                            р.</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" id="auctionParticipationModalBody">
@@ -184,9 +213,12 @@
         let modalBody = $('#auctionParticipationModalBody');
         modalBody.empty();
         modalBody.append(0.1 * ${lot.initialPrice});
+        <c:if test="${lot.auctionStatus eq AuctionStatus.RUNNING && requestScope.get('user_is_participate')}">
+        renewBestBid(${lot.lotId});
+        </c:if>
     });
 
-    function saveAuctionParticipation(lotId){
+    function saveAuctionParticipation(lotId) {
         $.ajax({
             type: 'POST',
             url: 'ControllerServlet',
@@ -205,7 +237,7 @@
         });
     }
 
-    function deleteAuctionParticipation(lotId){
+    function deleteAuctionParticipation(lotId) {
         $.ajax({
             type: 'POST',
             url: 'ControllerServlet',
@@ -219,6 +251,68 @@
                 window.location.replace(window.location.href);
             },
             error: function (xhr, textStatus, thrownError) {
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+            }
+        });
+    }
+
+    function addBid(lotId) {
+        let newBid = $('#new-bid-input');
+        $.ajax({
+            type: 'POST',
+            url: 'ControllerServlet',
+            dataType: "text",
+            data: {
+                requestIsAjax: true,
+                command: "add_bid",
+                lotId: lotId,
+                bidAmount: newBid.val()
+            },
+            success: function (answer) {
+                window.location.replace(window.location.href);
+                renewBestBid(lotId);
+            },
+            error: function (xhr, textStatus, thrownError) {
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+            }
+        });
+    }
+
+    function renewBestBid(lotId) {
+        let bestBid = $('#best-bid');
+        let bestBidStatus = $('#div-best-bid-status');
+        $.ajax({
+            type: 'GET',
+            url: 'ControllerServlet',
+            dataType: "json",
+            cache: false,
+            data: {
+                requestIsAjax: true,
+                command: "find_best_bid_and_its_belonging_to_user",
+                lotId: lotId
+            },
+            success: function (answer) {
+                bestBid.empty();
+                bestBid.append(answer[0]);
+                bestBidStatus.empty();
+                if (answer[1]) {
+                    bestBidStatus.append("Вы выигрываете");
+                    bestBidStatus.addClass('text-success');
+                    bestBidStatus.remove('text-danger');
+                } else {
+                    bestBidStatus.append("Вы не выигрываете");
+                    bestBidStatus.addClass('text-danger');
+                    bestBidStatus.remove('text-success');
+                }
+            },
+            error: function (xhr, textStatus, thrownError) {
+                if (xhr.status == 404) {
+                    bestBid.empty();
+                    bestBid.append('не существует');
+                    bestBidStatus.empty();
+                    bestBidStatus.append('Нет ни одной ставки');
+                    return;
+                }
                 alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
             }
         });

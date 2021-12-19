@@ -79,7 +79,8 @@ public class AjaxCommandFactory {
                 DeleteAuctionParticipationCommand.class),
         FIND_USER_CASH_ACCOUNT("find_user_cash_account", FindUserCashAccountCommand.class),
         ADD_BID("add_bid", AddBidCommand.class),
-        FIND_BEST_BID_AMOUNT("find_best_bid_amount", FindBestBidAmountCommand.class);
+        FIND_BEST_BID_AND_ITS_BELONGING_TO_USER("find_best_bid_and_its_belonging_to_user",
+                FindBestBidAndItsBelongingToUserCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;
