@@ -17,6 +17,9 @@ public interface AuctionParticipationService {
     void deleteParticipation(long requestedUserId, String lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
 
+    void retrieveWinnerParticipationByLotOwner(long requestedUserId, String lotId)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
+
     boolean isUserParticipateInLotAuction(long userId, String lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
 

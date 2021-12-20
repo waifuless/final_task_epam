@@ -58,20 +58,25 @@ public class CommonBidService implements BidService {
     }
 
     @Override
-    public Bid findBestBid(long requesterId, String lotId)
+    public Optional<Bid> findBestBid(long requesterId, String lotId)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        clientParameterValidator.validateNotEmpty(lotId);
+        return findBestBid(requesterId, Long.parseLong(lotId));
+    }
+
+    @Override
+    public Optional<Bid> findBestBid(long requesterId, long lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            clientParameterValidator.validateNotEmpty(lotId);
-            long longLotId = Long.parseLong(lotId);
-            Lot lot = lotService.findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
-            validateUserParticipation(requesterId, longLotId);
+            Lot lot = lotService.findLot(lotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+            validateUserParticipationOrOwner(requesterId, lot);
             Optional<Bid> optionalBid;
             if (lot.getAuctionType().equals(AuctionType.FORWARD)) {
-                optionalBid = bidManager.findMaxBid(longLotId);
+                optionalBid = bidManager.findMaxBid(lotId);
             } else {
-                optionalBid = bidManager.findMinBid(longLotId);
+                optionalBid = bidManager.findMinBid(lotId);
             }
-            return optionalBid.orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+            return optionalBid;
         } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage());
             throw new ClientErrorException(ClientError.INVALID_NUMBER);
@@ -85,7 +90,7 @@ public class CommonBidService implements BidService {
     }
 
     @Override
-    public Map<LotWithImages, AuctionResult> findUserWonLotsWithAuctionResult(long page, long userId)
+    public Map<LotWithImages, AuctionResult> findUserParticipatedEndedLotsWithAuctionResult(long page, long userId)
             throws ServiceCanNotCompleteCommandRequest {
         try {
             Map<LotWithImages, AuctionParticipation> lotsWithAuctionParticipations = auctionParticipationService
@@ -104,7 +109,8 @@ public class CommonBidService implements BidService {
                         Optional<User> optionalUser = userService.findUserById(entry.getKey().getOwnerId());
                         if (optionalUser.isPresent()) {
                             participationByWonLots.put(entry.getKey(), new AuctionResult(bid.getAmount(),
-                                    optionalUser.get().getEmail(), entry.getValue().getDeposit()));
+                                    optionalUser.get().getEmail(), entry.getValue().getDeposit(),
+                                    entry.getValue().isDepositIsTakenByOwner()));
                         } else {
                             participationByWonLots.put(entry.getKey(), null);
                         }
@@ -123,7 +129,7 @@ public class CommonBidService implements BidService {
     }
 
     @Override
-    public Map<LotWithImages, AuctionResult> findUsersEndedLotsWithAuctionResult(long page, long userId)
+    public Map<LotWithImages, AuctionResult> findUserOwnedEndedLotsWithAuctionResult(long page, long userId)
             throws ServiceCanNotCompleteCommandRequest {
         try {
             List<LotWithImages> lots = lotService.findLotsByPageAndContext(page, LotContext.builder().setOwnerId(userId)
@@ -144,7 +150,8 @@ public class CommonBidService implements BidService {
                                 .findParticipation(bid.getUserId(), bid.getLotId());
                         if (optionalParticipation.isPresent()) {
                             wonEmailByUserLots.put(lot, new AuctionResult(bid.getAmount(),
-                                    optionalUser.get().getEmail(), optionalParticipation.get().getDeposit()));
+                                    optionalUser.get().getEmail(), optionalParticipation.get().getDeposit(),
+                                    optionalParticipation.get().isDepositIsTakenByOwner()));
                         } else {
                             wonEmailByUserLots.put(lot, null);
                         }
@@ -175,6 +182,14 @@ public class CommonBidService implements BidService {
     private void validateUserParticipation(long userId, long lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         if (!auctionParticipationService.isUserParticipateInLotAuction(userId, lotId)) {
+            throw new ClientErrorException(ClientError.FORBIDDEN);
+        }
+    }
+
+    private void validateUserParticipationOrOwner(long userId, Lot lot)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        if (!auctionParticipationService.isUserParticipateInLotAuction(userId, lot.getLotId())
+                && userId!=lot.getOwnerId()) {
             throw new ClientErrorException(ClientError.FORBIDDEN);
         }
     }

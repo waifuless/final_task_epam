@@ -93,7 +93,9 @@ public class AjaxCommandFactory {
                         FindLotsAndPagesCountParticipatedRunningByUserCommand.class),
         FIND_LOTS_AND_PAGES_COUNT_PARTICIPATED_ENDED_WITH_RESULTS_BY_USER
                 ("find_lots_and_pages_count_participated_ended_with_results_by_user",
-                        FindLotsAndPagesCountParticipatedEndedWithResultsByUserCommand.class);
+                        FindLotsAndPagesCountParticipatedEndedWithResultsByUserCommand.class),
+        RETRIEVE_PARTICIPATION_DEPOSIT_FROM_WINNER("retrieve_auction_participation_deposit_from_winner",
+                RetrieveAuctionParticipationDepositFromWinnerCommand.class);
 
         private final String commandName;
         private final Class<? extends AjaxCommand> commandClass;

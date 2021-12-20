@@ -131,28 +131,6 @@
             'requestParticipatedEndedLots', printEndedParticipatedLots);
     }
 
-    // function requestLotsWithResults(page, command, funcNameToRequestLots, funcToPrintLots){
-    //     $.ajax({
-    //         type: 'GET',
-    //         url: 'ControllerServlet',
-    //         processData: false,
-    //         dataType: "json",
-    //         cache: false,
-    //         data: {
-    //             page: page,
-    //             command: command,
-    //             requestIsAjax: true
-    //         },
-    //         success: function (answer) {
-    //             funcToPrintLots(answer[0]);
-    //             printPagination(page, answer[1], funcNameToRequestLots, 'pagination');
-    //         },
-    //         error: function (xhr, textStatus, thrownError) {
-    //             alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
-    //         }
-    //     });
-    // }
-
     function requestLots(page, command, funcNameToRequestLots, funcToPrintLots) {
         $.ajax({
             type: 'GET',
@@ -268,20 +246,26 @@
         lotsWithResults.forEach(function (val) {
             let key = val[0];
             let value = val[1];
-            let additionalInfo = value == null ? `<div class="text-primary col-6 my-5">Никто не сделал ставок</div>` :
-                `<div class="text-primary col-6">
+            let additionalInfo;
+            if(value == null){
+                additionalInfo = `<div class="text-primary col-6 my-5">Никто не сделал ставок</div>`;
+            } else{
+                let takeDepositInfo = value.depositIsTakenByOwner? `Вы уже забрали задаток` :
+                    `<button type="button" class="btn btn-primary" onclick="retrieveAuctionParticipationDepositFromWinner(` + key.lotId + `)">
+                    Забрать задаток в: ` + value.deposit + `р
+                </button>`;
+                additionalInfo = `<div class="text-primary col-6">
                 <div class="card border-primary" style="width: 540px; height: 213px">
                     <div class="card-header">Результат</div>
                     <div class="card-body">
                         <h5 class="card-title">Определен победитель аукциона</h5>
                         <p class="card-text">Со ставкой: ` + value.winnerBidAmount + `</p>
-                        <p class="card-text"><button type="button" class="btn btn-primary" onclick="retrieveAuctionParticipationDepositFromWinner(` + key.lotId + `)">
-                    Забрать задаток в: ` + value.deposit + `р
-                </button></p>
+                        <p class="card-text">`+takeDepositInfo+`</p>
                         <p class="card-text">Email победителя: ` + value.emailToContact + `р</p>
                     </div>
                 </div>
                 </div>`;
+            }
             divForLots.append(findSimpleLotCard(key) + additionalInfo);
         });
     }
@@ -334,8 +318,7 @@
                 lotId: lotId
             },
             success: function (answer) {
-                let currentPage = $('.pagination li.active').children(":first")[0].innerHTML;
-                requestUsers(currentPage);
+                requestOwnedEndedLots(1);
             },
             error: function (xhr, textStatus, thrownError) {
                 alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
@@ -354,8 +337,7 @@
                 lotId: lotId
             },
             success: function (answer) {
-                let currentPage = $('.pagination li.active').children(":first")[0].innerHTML;
-                requestUsers(currentPage);
+                requestParticipatedEndedLots(1);
             },
             error: function (xhr, textStatus, thrownError) {
                 alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);

@@ -8,7 +8,6 @@ import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.model.*;
 import by.epam.finaltask.service.AuctionParticipationService;
 import by.epam.finaltask.service.BidService;
-import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
@@ -48,7 +47,7 @@ public class FindLotsAndPagesCountParticipatedEndedWithResultsByUserCommand impl
             long userId = (Long) request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
             LotContext context = LotContext.builder().setOwnerId(userId).build();
             LOG.debug("Lot by user context: {}", context);
-            Map<LotWithImages, AuctionResult> lots = bidService.findUserWonLotsWithAuctionResult(pageNumber, userId);
+            Map<LotWithImages, AuctionResult> lots = bidService.findUserParticipatedEndedLotsWithAuctionResult(pageNumber, userId);
             long pagesCount = participationService.findPageCountParticipatedByUser(userId, AuctionStatus.ENDED);
             Gson gson = new Gson().newBuilder().enableComplexMapKeySerialization().serializeNulls().create();
             Object[] answer = new Object[2];

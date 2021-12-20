@@ -4,17 +4,17 @@ import by.epam.finaltask.dao.AuctionParticipationManager;
 import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
-import by.epam.finaltask.model.AuctionParticipation;
-import by.epam.finaltask.model.AuctionStatus;
-import by.epam.finaltask.model.Lot;
-import by.epam.finaltask.model.LotWithImages;
+import by.epam.finaltask.model.*;
 import by.epam.finaltask.validation.StringClientParameterValidator;
 import by.epam.finaltask.validation.ValidatorFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class CommonAuctionParticipationService implements AuctionParticipationService {
 
@@ -23,6 +23,7 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     private final static BigDecimal DEFAULT_DEPOSIT_COEFFICIENT = BigDecimal.valueOf(0.1);
     private final static int LOTS_PER_PAGE = 8;
 
+    private final ServiceFactory serviceFactory = ServiceFactory.getFactoryInstance();
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
     private final UserService userService = ServiceFactory.getFactoryInstance().userService();
     private final StringClientParameterValidator validator = ValidatorFactory
@@ -49,7 +50,6 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
                 throw new ClientErrorException(ClientError.FORBIDDEN);
             }
             BigDecimal deposit = lot.getInitialPrice().multiply(DEFAULT_DEPOSIT_COEFFICIENT);
-            //todo: transaction
             userService.minusFromCashAccount(requestedUserId, deposit);
             auctionParticipationManager
                     .saveParticipation(new AuctionParticipation(requestedUserId, longLotId, deposit));
@@ -75,13 +75,41 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
                     .findParticipation(requestedUserId, longLotId)
                     .orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             Lot lot = lotService.findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
-            if (lot.getOwnerId() == requestedUserId ||
-                    !lot.getAuctionStatus().equals(AuctionStatus.APPROVED_BY_ADMIN)) {
-                throw new ClientErrorException(ClientError.FORBIDDEN);
-            }
-            //todo: transaction
+            validateUserAccessToDeleteParticipation(requestedUserId, lot);
             userService.plusToCashAccount(requestedUserId, participation.getDeposit());
             auctionParticipationManager.deleteParticipation(requestedUserId, longLotId);
+        } catch (NumberFormatException ex) {
+            LOG.warn(ex.getMessage());
+            throw new ClientErrorException(ClientError.INVALID_NUMBER);
+        } catch (ClientErrorException ex) {
+            LOG.warn(ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public void retrieveWinnerParticipationByLotOwner(long requestedUserId, String lotId)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        try {
+            validator.validateNotEmpty(lotId);
+            long longLotId = Long.parseLong(lotId);
+            Lot lot = lotService.findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+            if (lot.getOwnerId() != requestedUserId || !lot.getAuctionStatus().equals(AuctionStatus.ENDED)) {
+                throw new ClientErrorException(ClientError.FORBIDDEN);
+            }
+            Optional<Bid> optionalBid = serviceFactory.bidService().findBestBid(requestedUserId, longLotId);
+            Bid bestBid = optionalBid.orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+            AuctionParticipation participation = findParticipation(bestBid.getUserId(), longLotId)
+                    .orElseThrow(() -> new ServiceCanNotCompleteCommandRequest("Inconsistent data"));
+            if(participation.isDepositIsTakenByOwner()){
+                throw new ClientErrorException(ClientError.FORBIDDEN);
+            }
+            userService.plusToCashAccount(requestedUserId, participation.getDeposit());
+            auctionParticipationManager.updateParticipation(new AuctionParticipation(participation.getParticipantId(),
+                    participation.getLotId(), participation.getDeposit(), true));
         } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage());
             throw new ClientErrorException(ClientError.INVALID_NUMBER);
@@ -189,5 +217,21 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
             optionalLot.ifPresent(lot -> lotsWithParticipations.put(lot, auctionParticipation));
         }
         return lotsWithParticipations;
+    }
+
+    private boolean hasUserBestBid(long userId, long lotId)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        Optional<Bid> optionalBid = serviceFactory.bidService().findBestBid(userId, lotId);
+        return optionalBid.filter(bid -> bid.getUserId() == userId).isPresent();
+    }
+
+    private void validateUserAccessToDeleteParticipation(long userId, Lot lot)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        if (lot.getOwnerId() == userId
+                || (!lot.getAuctionStatus().equals(AuctionStatus.APPROVED_BY_ADMIN)
+                && !lot.getAuctionStatus().equals(AuctionStatus.SUSPENDED)
+                && !(lot.getAuctionStatus().equals(AuctionStatus.ENDED) && !hasUserBestBid(userId, lot.getLotId())))) {
+            throw new ClientErrorException(ClientError.FORBIDDEN);
+        }
     }
 }

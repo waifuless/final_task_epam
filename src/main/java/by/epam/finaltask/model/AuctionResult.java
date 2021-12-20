@@ -7,11 +7,14 @@ public class AuctionResult {
     private final BigDecimal winnerBidAmount;
     private final String emailToContact;
     private final BigDecimal deposit;
+    private final boolean depositIsTakenByOwner;
 
-    public AuctionResult(BigDecimal winnerBidAmount, String emailToContact, BigDecimal deposit) {
+    public AuctionResult(BigDecimal winnerBidAmount, String emailToContact, BigDecimal deposit,
+                         boolean depositIsTakenByOwner) {
         this.winnerBidAmount = winnerBidAmount;
         this.emailToContact = emailToContact;
         this.deposit = deposit;
+        this.depositIsTakenByOwner = depositIsTakenByOwner;
     }
 
     public BigDecimal getWinnerBidAmount() {
@@ -26,6 +29,10 @@ public class AuctionResult {
         return deposit;
     }
 
+    public boolean isDepositIsTakenByOwner() {
+        return depositIsTakenByOwner;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -33,11 +40,12 @@ public class AuctionResult {
 
         AuctionResult that = (AuctionResult) o;
 
-        if (winnerBidAmount != null ? winnerBidAmount.compareTo(that.winnerBidAmount)!=0 : that.winnerBidAmount != null)
+        if (depositIsTakenByOwner != that.depositIsTakenByOwner) return false;
+        if (winnerBidAmount != null ? winnerBidAmount.compareTo(that.winnerBidAmount) != 0 : that.winnerBidAmount != null)
             return false;
         if (emailToContact != null ? !emailToContact.equals(that.emailToContact) : that.emailToContact != null)
             return false;
-        return deposit != null ? deposit.compareTo(that.deposit)==0 : that.deposit == null;
+        return deposit != null ? deposit.compareTo(that.deposit) == 0 : that.deposit == null;
     }
 
     @Override
@@ -45,6 +53,7 @@ public class AuctionResult {
         int result = winnerBidAmount != null ? winnerBidAmount.toPlainString().hashCode() : 0;
         result = 31 * result + (emailToContact != null ? emailToContact.hashCode() : 0);
         result = 31 * result + (deposit != null ? deposit.toPlainString().hashCode() : 0);
+        result = 31 * result + (depositIsTakenByOwner ? 1 : 0);
         return result;
     }
 
@@ -54,6 +63,7 @@ public class AuctionResult {
                 "winnerBidAmount=" + winnerBidAmount +
                 ", emailToContact='" + emailToContact + '\'' +
                 ", deposit=" + deposit +
+                ", depositIsTakenByOwner=" + depositIsTakenByOwner +
                 '}';
     }
 }

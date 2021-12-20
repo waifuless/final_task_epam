@@ -17,6 +17,9 @@ public interface AuctionParticipationManager {
     void saveParticipation(AuctionParticipation participation)
             throws SQLException, DataSourceDownException, InterruptedException;
 
+    void updateParticipation(AuctionParticipation participation)
+            throws SQLException, DataSourceDownException, InterruptedException;
+
     boolean isUserParticipateInLotAuction(long userId, long lotId)
             throws SQLException, DataSourceDownException, InterruptedException;
 

@@ -5,7 +5,6 @@ import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.AuctionParticipation;
 import by.epam.finaltask.model.AuctionStatus;
-import by.epam.finaltask.model.Bid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +12,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-public class MariaAuctionParticipationManager implements AuctionParticipationManager{
+public class MariaAuctionParticipationManager implements AuctionParticipationManager {
 
     private final static Logger LOG = LoggerFactory.getLogger(MariaAuctionParticipationManager.class);
 
@@ -24,15 +25,18 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
     private final static String PARTICIPANT_ID_COLUMN = "participant_id";
     private final static String LOT_ID_COLUMN = "lot_id";
     private final static String DEPOSIT_COLUMN = "deposit";
-    private final static String DEPOSIT_IS_RETURNED_COLUMN = "deposit_is_returned";
+    private final static String DEPOSIT_IS_TAKEN_BY_OWNER_COLUMN = "deposit_is_taken_by_owner";
 
     private final static String SAVE_PARTICIPATION_QUERY = "INSERT INTO auction_participation(participant_id, lot_id," +
-            " deposit, deposit_is_returned)" +
+            " deposit, deposit_is_taken_by_owner)" +
             " VALUES (?,?,?,?)";
+    private final static String UPDATE_PARTICIPATION_QUERY = "UPDATE auction_participation " +
+            " SET deposit = ?, deposit_is_taken_by_owner = ?" +
+            " WHERE participant_id = ? AND lot_id = ?";
     private final static String IS_USER_PARTICIPATE_QUERY = "SELECT EXISTS(SELECT 1 FROM auction_participation" +
             " WHERE participant_id=? AND lot_id=?) as participation_existence";
     private final static String FIND_ALL_USER_PARTICIPATES_QUERY = "SELECT participant_id AS participant_id," +
-            " auction_participation.lot_id AS lot_id, deposit AS deposit, deposit_is_returned AS deposit_is_returned" +
+            " auction_participation.lot_id AS lot_id, deposit AS deposit, deposit_is_taken_by_owner AS deposit_is_taken_by_owner" +
             " FROM auction_participation";
     private final static String FIND_USER_PARTICIPATE_QUERY = FIND_ALL_USER_PARTICIPATES_QUERY +
             " WHERE participant_id=? AND lot_id=?";
@@ -71,21 +75,23 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
     @Override
     public void saveParticipation(AuctionParticipation participation)
             throws SQLException, DataSourceDownException, InterruptedException {
-        try (Connection connection = connectionPool.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(SAVE_PARTICIPATION_QUERY);
+        postParticipation(SAVE_PARTICIPATION_QUERY, (statement -> {
             statement.setLong(1, participation.getParticipantId());
             statement.setLong(2, participation.getLotId());
             statement.setBigDecimal(3, participation.getDeposit());
-            statement.setBoolean(4, participation.isDepositIsReturned());
-            statement.execute();
-        } catch (SQLException | DataSourceDownException e) {
-            LOG.error(e.getMessage(), e);
-            throw e;
-        } catch (InterruptedException e) {
-            LOG.error(e.getMessage(), e);
-            Thread.currentThread().interrupt();
-            throw e;
-        }
+            statement.setBoolean(4, participation.isDepositIsTakenByOwner());
+        }));
+    }
+
+    @Override
+    public void updateParticipation(AuctionParticipation participation)
+            throws SQLException, DataSourceDownException, InterruptedException {
+        postParticipation(UPDATE_PARTICIPATION_QUERY, (statement -> {
+            statement.setBigDecimal(1, participation.getDeposit());
+            statement.setBoolean(2, participation.isDepositIsTakenByOwner());
+            statement.setLong(3, participation.getParticipantId());
+            statement.setLong(4, participation.getLotId());
+        }));
     }
 
     @Override
@@ -116,9 +122,9 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
             statement.setLong(1, userId);
             statement.setLong(2, lotId);
             ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 return Optional.of(extractEntity(resultSet));
-            }else{
+            } else {
                 return Optional.empty();
             }
         } catch (SQLException | DataSourceDownException e) {
@@ -152,7 +158,7 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
     @Override
     public List<AuctionParticipation> findUsersParticipations(long userId, long offset, long count)
             throws SQLException, DataSourceDownException, InterruptedException {
-        return findAuctionParticipations(FIND_USERS_PARTICIPATIONS_QUERY, (statement)->{
+        return findAuctionParticipations(FIND_USERS_PARTICIPATIONS_QUERY, (statement) -> {
             statement.setLong(1, userId);
             statement.setLong(2, count);
             statement.setLong(3, offset);
@@ -163,7 +169,7 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
     public List<AuctionParticipation> findUsersParticipations(long userId, long offset, long count,
                                                               AuctionStatus auctionStatus)
             throws SQLException, DataSourceDownException, InterruptedException {
-        return findAuctionParticipations(FIND_USERS_PARTICIPATIONS_BY_AUCTION_STATUS_QUERY, (statement)->{
+        return findAuctionParticipations(FIND_USERS_PARTICIPATIONS_BY_AUCTION_STATUS_QUERY, (statement) -> {
             statement.setLong(1, userId);
             statement.setString(2, auctionStatus.name());
             statement.setLong(3, count);
@@ -174,7 +180,7 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
     @Override
     public long findUsersParticipationsCount(long userId)
             throws SQLException, DataSourceDownException, InterruptedException {
-        return findCount(FIND_COUNT_BY_USER_ID_QUERY, (statement)->{
+        return findCount(FIND_COUNT_BY_USER_ID_QUERY, (statement) -> {
             statement.setLong(1, userId);
         });
     }
@@ -182,7 +188,7 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
     @Override
     public long findUsersParticipationsCount(long userId, AuctionStatus auctionStatus)
             throws SQLException, DataSourceDownException, InterruptedException {
-        return findCount(FIND_COUNT_BY_USER_ID_AND_AUCTION_STATUS_QUERY, (statement)->{
+        return findCount(FIND_COUNT_BY_USER_ID_AND_AUCTION_STATUS_QUERY, (statement) -> {
             statement.setLong(1, userId);
             statement.setString(2, auctionStatus.name());
         });
@@ -191,7 +197,7 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
     protected AuctionParticipation extractEntity(ResultSet resultSet) throws ExtractionException {
         try {
             return new AuctionParticipation(resultSet.getLong(PARTICIPANT_ID_COLUMN), resultSet.getLong(LOT_ID_COLUMN),
-                    resultSet.getBigDecimal(DEPOSIT_COLUMN), resultSet.getBoolean(DEPOSIT_IS_RETURNED_COLUMN));
+                    resultSet.getBigDecimal(DEPOSIT_COLUMN), resultSet.getBoolean(DEPOSIT_IS_TAKEN_BY_OWNER_COLUMN));
         } catch (Exception ex) {
             throw new ExtractionException(ex.getMessage(), ex);
         }
@@ -235,6 +241,22 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
             preparator.accept(statement);
             ResultSet resultSet = statement.executeQuery();
             return extractAll(resultSet);
+        } catch (SQLException | DataSourceDownException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw e;
+        }
+    }
+
+    private void postParticipation(String query, StatementPreparator preparator)
+            throws SQLException, InterruptedException {
+        try (Connection connection = connectionPool.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(query);
+            preparator.accept(statement);
+            statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
             throw e;

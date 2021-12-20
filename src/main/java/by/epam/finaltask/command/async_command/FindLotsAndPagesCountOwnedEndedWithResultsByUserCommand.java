@@ -10,8 +10,6 @@ import by.epam.finaltask.service.BidService;
 import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +42,7 @@ public class FindLotsAndPagesCountOwnedEndedWithResultsByUserCommand implements 
             LOG.debug("PageParam:{}, PageToFind: {}", pageNumberParam, pageNumber);
             long userId = (Long) request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
             Map<LotWithImages, AuctionResult> resultsByLots = bidService
-                    .findUsersEndedLotsWithAuctionResult(pageNumber, userId);
+                    .findUserOwnedEndedLotsWithAuctionResult(pageNumber, userId);
             long pagesCount = lotService.findLotPagesCount(LotContext.builder()
                     .setOwnerId(userId)
                     .setAuctionStatus(AuctionStatus.ENDED.name())

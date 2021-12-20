@@ -3,6 +3,8 @@ package by.epam.finaltask.command.async_command;
 import by.epam.finaltask.command.AjaxCommandResponse;
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.UserSessionAttribute;
+import by.epam.finaltask.exception.ClientError;
+import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.model.Bid;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.BidService;
@@ -36,7 +38,8 @@ public class FindBestBidAndItsBelongingToUserCommand implements AjaxCommand {
     public AjaxCommandResponse execute(CommandRequest request) throws Exception {
         String lotId = request.getParameter("lotId");
         long userId = (Long) request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
-        Bid bestBid = bidService.findBestBid(userId, lotId);
+        Bid bestBid = bidService.findBestBid(userId, lotId)
+                .orElseThrow(()->new ClientErrorException(ClientError.NOT_FOUND));
         Object[] answer = new Object[2];
         answer[0] = bestBid.getAmount();
         answer[1] = userId == bestBid.getUserId();
