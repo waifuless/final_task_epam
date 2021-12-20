@@ -124,6 +124,8 @@
                         <fmt:message bundle="${filters}" key="filters.reset"/>
                     </button>
                 </div>
+                <div class="col-12 mb-3" id="error-place">
+                </div>
             </div>
         </form>
 
@@ -154,6 +156,7 @@
 
 <script src="js/jquery-3.6.0.js" type="text/javascript"></script>
 <script src="js/escape-text.js" type="text/javascript"></script>
+<script src="js/jquery.validate.js"></script>
 <script src="js/region-cities-select.js" type="text/javascript"></script>
 
 <script src="js/nav-link.js" type="text/javascript"></script>
@@ -177,11 +180,41 @@
         $('#reset-button').click(function () {
             window.location.replace("${pageContext.request.contextPath}/ControllerServlet?command=show_main_page");
         });
+
+        form.validate({
+            rules:{
+                'price-from': {
+                    number: true,
+                    maxlength: 14
+                },
+                'price-to':{
+                    number: true,
+                    maxlength: 14
+                }
+            },
+            messages: {
+                'price-from': {
+                    number: "Цена должна содержать только числа (дробные)",
+                    maxlength: "Максимальная длинна поля Цена 14 символов"
+                },
+                'price-to':{
+                    number: "Цена должна содержать только числа (дробные)",
+                    maxlength: "Максимальная длинна поля Цена 14 символов"
+                }
+            },
+            errorPlacement: function(error, element) {
+                let errorPlace = $("#error-place");
+                errorPlace.empty();
+                errorPlace.append(error);
+            }
+        });
     });
 
     function applyFilters(e) {
         e.preventDefault();
-        requestLots(1);
+        if($("#filters-form").valid()){
+            requestLots(1);
+        }
     }
 
     function requestLots(page) {

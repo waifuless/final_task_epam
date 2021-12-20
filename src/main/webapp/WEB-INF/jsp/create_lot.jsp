@@ -183,21 +183,6 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
-        // $('#form-new-lot').validate({
-        //     rules: {
-        //         email: {
-        //             required: true,
-        //             email: true
-        //         }
-        //     },
-        //     messages: {
-        //         email: {
-        //             required: "We need your email address to contact you",
-        //             email: "Your email address must be in the format of name@domain.com"
-        //         }
-        //     }
-        // });
-
         $('#form-new-lot').validate({
             ignore: "",
             rules:{
