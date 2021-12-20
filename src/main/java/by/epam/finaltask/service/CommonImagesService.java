@@ -4,6 +4,8 @@ import by.epam.finaltask.dao.ImagesManager;
 import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
+import by.epam.finaltask.validation.NumberValidator;
+import by.epam.finaltask.validation.ValidatorFactory;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
@@ -32,6 +34,8 @@ public class CommonImagesService implements ImagesService {
     private final static String AUCTION_IMAGES_FOLDER = System.getenv("AUCTION_IMAGES_FOLDER");
     private final static int DEFAULT_IMAGE_SIZE = 900;
 
+    private final NumberValidator numberValidator = ValidatorFactory.getFactoryInstance().idValidator();
+
     private final ImagesManager imagesManager;
     private final String contextImageFolder;
 
@@ -51,6 +55,7 @@ public class CommonImagesService implements ImagesService {
     @Override
     public String saveImage(Part image, long userId) throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
+            numberValidator.validateNumberIsPositive(userId);
             LOG.debug("Image file name: {}", image.getSubmittedFileName());
             validateImage(image);
             BufferedImage preparedImage = prepareImageToSave(image);
@@ -97,7 +102,6 @@ public class CommonImagesService implements ImagesService {
         return resizedBufferedImage;
     }
 
-    //todo: read about it
     private Optional<Scalr.Rotation> findRotation(Part image) throws IOException, ImageProcessingException,
             MetadataException {
         Metadata metadata = ImageMetadataReader.readMetadata(image.getInputStream());

@@ -6,6 +6,7 @@ import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
+import by.epam.finaltask.validation.NumberValidator;
 import by.epam.finaltask.validation.StringClientParameterValidator;
 import by.epam.finaltask.validation.ValidatorFactory;
 import org.slf4j.Logger;
@@ -25,6 +26,12 @@ public class CommonLotService implements LotService {
     private final static String LOT_DID_NOT_SAVED_ERROR_MESSAGE =
             "Error occurred while saving lot to database. Lot: {}";
 
+    private final static int MAX_IMAGE_PATH_SIZE = 256;
+    private final static int MAX_TITLE_SIZE = 256;
+    private final static int MAX_CATEGORY_SIZE = 64;
+    private final static int MAX_REGION_SIZE = 60;
+    private final static int MAX_CITY_OR_DISTRICT_SIZE = 60;
+    private final static int MAX_INIT_PRICE_LENGTH = 14;
     private final static int MAX_BIAS_IN_MINUTES = 5;
     private final static int ZERO_BIAS = 0;
     private final static int LOTS_PER_PAGE = 8;
@@ -34,8 +41,11 @@ public class CommonLotService implements LotService {
     private final static int ONE_HOUR_IN_MILLIS = 60 * 60 * 1000;
 
     private final ServiceFactory serviceFactory = ServiceFactory.getFactoryInstance();
-    private final StringClientParameterValidator validator = ValidatorFactory.getFactoryInstance()
+
+    private final BigDecimalNormalizer bigDecimalNormalizer = BigDecimalNormalizer.getInstance();
+    private final StringClientParameterValidator stringValidator = ValidatorFactory.getFactoryInstance()
             .stringParameterValidator();
+    private final NumberValidator numberValidator = ValidatorFactory.getFactoryInstance().idValidator();
 
     private final LotManager lotManager;
     private final ImagesManager imagesManager;
@@ -48,6 +58,7 @@ public class CommonLotService implements LotService {
     @Override
     public Optional<LotWithImages> findLotWithImages(long id) throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(id);
             Optional<Lot> optionalLot = lotManager.find(id);
             if (optionalLot.isPresent()) {
                 LotWithImages lotWithImages = new LotWithImages(optionalLot.get(),
@@ -66,8 +77,12 @@ public class CommonLotService implements LotService {
     public LotWithImages findLotWithImagesValidateUserAccess(long userId, String lotId, Role userRole)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            validator.validateNotEmpty(lotId);
+            stringValidator.validateNotEmpty(lotId);
             long longLotId = Long.parseLong(lotId);
+            numberValidator.validateNumberIsPositive(longLotId);
+            if (userRole == null) {
+                throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
+            }
             Optional<LotWithImages> optionalLot = findLotWithImages(longLotId);
             LotWithImages lot = optionalLot.orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             if (lot.getAuctionStatus().equals(AuctionStatus.APPROVED_BY_ADMIN)
@@ -75,7 +90,7 @@ public class CommonLotService implements LotService {
                     || lot.getOwnerId() == userId) {
                 return lot;
             }
-            if(userRole.equals(Role.NOT_AUTHORIZED)){
+            if (userRole.equals(Role.NOT_AUTHORIZED)) {
                 throw new ClientErrorException(ClientError.FORBIDDEN);
             }
             AuctionParticipationService participationService = serviceFactory.auctionParticipationService();
@@ -98,6 +113,7 @@ public class CommonLotService implements LotService {
     @Override
     public Optional<Lot> findLot(long id) throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(id);
             return lotManager.find(id);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -108,6 +124,7 @@ public class CommonLotService implements LotService {
     @Override
     public List<LotWithImages> findLotsByPage(long pageNumber) throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(pageNumber);
             List<Lot> lots = lotManager.find((pageNumber - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
             return findLotsWithImages(lots);
         } catch (Exception ex) {
@@ -123,18 +140,19 @@ public class CommonLotService implements LotService {
                                  String cityOrDistrict)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            validateCreationParams(mainImagePath, otherImagePaths, title, category, auctionType, condition,
+            validateParams(userId, mainImagePath, otherImagePaths, title, category, auctionType, condition,
                     description, initPrice, auctionStart, duration, region, cityOrDistrict);
             Timestamp startDatetime = Timestamp.valueOf(reformatForTimestamp(auctionStart));
-            int intDuration = Integer.parseInt(duration);
             validateAuctionStartDate(startDatetime, MAX_BIAS_IN_MINUTES);
-            startDatetime = roundTimeToHours(startDatetime);
+            int intDuration = Integer.parseInt(duration);
             validateDuration(intDuration);
+            startDatetime = roundTimeToHours(startDatetime);
             Timestamp endDatetime =
                     new Timestamp(startDatetime.getTime() + (long) Integer.parseInt(duration) * ONE_HOUR_IN_MILLIS);
+            BigDecimal bigDecimalInitPrice = bigDecimalNormalizer.normalize(new BigDecimal(initPrice));
             Lot lot = Lot.builder().setOwnerId(userId).setCategory(category).
                     setAuctionType(AuctionType.valueOf(auctionType)).setTitle(title).setStartDatetime(startDatetime)
-                    .setEndDatetime(endDatetime).setInitialPrice(new BigDecimal(initPrice)).setRegion(region)
+                    .setEndDatetime(endDatetime).setInitialPrice(bigDecimalInitPrice).setRegion(region)
                     .setCityOrDistrict(cityOrDistrict).setDescription(description)
                     .setAuctionStatus(AuctionStatus.NOT_VERIFIED)
                     .setProductCondition(ProductCondition.valueOf(condition)).build();
@@ -149,6 +167,9 @@ public class CommonLotService implements LotService {
                 LOG.error(LOT_DID_NOT_SAVED_ERROR_MESSAGE, lot);
                 throw new ServiceCanNotCompleteCommandRequest(LOT_DID_NOT_SAVED_ERROR_MESSAGE);
             }
+        } catch (IllegalArgumentException ex) {
+            LOG.warn(ex.getMessage());
+            throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
         } catch (ClientErrorException ex) {
             LOG.warn(ex.getMessage());
             throw ex;
@@ -168,6 +189,7 @@ public class CommonLotService implements LotService {
     public List<LotWithImages> findLotsByPageAndContext(long pageNumber, LotContext context)
             throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(pageNumber);
             List<Lot> lots = lotManager.findByLotContext(context,
                     (pageNumber - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
             return findLotsWithImages(lots);
@@ -270,23 +292,6 @@ public class CommonLotService implements LotService {
         return Timestamp.valueOf(timestamp.toLocalDateTime().truncatedTo(ChronoUnit.HOURS));
     }
 
-    private void validateCreationParams(String mainImagePath, String[] otherImagePaths, String title,
-                                        String category, String auctionType, String condition, String description,
-                                        String initPrice, String auctionStart, String duration, String region,
-                                        String cityOrDistrict) throws ClientErrorException {
-        if (isStringEmpty(mainImagePath) || isStringEmpty(title) || isStringEmpty(category)
-                || isStringEmpty(auctionType) || isStringEmpty(condition) || isStringEmpty(description)
-                || isStringEmpty(initPrice) || isStringEmpty(auctionStart) || isStringEmpty(duration)
-                || isStringEmpty(region) || isStringEmpty(cityOrDistrict)) {
-            LOG.debug("One of required fields is empty");
-            throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
-        }
-    }
-
-    private boolean isStringEmpty(String str) {
-        return str == null || str.trim().isEmpty();
-    }
-
     private String reformatForTimestamp(String time) {
         time = time.replace("T", " ");
         return time.indexOf(':') == time.lastIndexOf(':') ? time.concat(":00") : time;
@@ -304,5 +309,32 @@ public class CommonLotService implements LotService {
         if (duration < MIN_DURATION_HOURS || duration > MAX_DURATION_HOURS) {
             throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
         }
+    }
+
+    private void validateParams(long userId, String mainImagePath, String[] otherImagePaths, String title,
+                                String category, String auctionType, String condition, String description,
+                                String initPrice, String auctionStart, String duration, String region,
+                                String cityOrDistrict) throws ClientErrorException {
+        numberValidator.validateNumberIsPositive(userId);
+        stringValidator.validateNotEmpty(mainImagePath, title, category, auctionType, condition,
+                description, initPrice, auctionStart, duration, region, cityOrDistrict);
+        if (otherImagePaths != null) {
+            for (String p : otherImagePaths) {
+                if (p.length() > MAX_IMAGE_PATH_SIZE) {
+                    throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
+                }
+            }
+        }
+        if (mainImagePath.length() > MAX_IMAGE_PATH_SIZE || title.length() > MAX_TITLE_SIZE
+                || category.length() > MAX_CATEGORY_SIZE
+                || integerDigits(new BigDecimal(initPrice)) > MAX_INIT_PRICE_LENGTH
+                || region.length() > MAX_REGION_SIZE || cityOrDistrict.length() > MAX_CITY_OR_DISTRICT_SIZE) {
+            throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
+        }
+    }
+
+    private int integerDigits(BigDecimal n) {
+        n = n.stripTrailingZeros();
+        return n.precision() - n.scale();
     }
 }

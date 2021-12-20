@@ -113,7 +113,7 @@
                 },
                 password:{
                     minlength: 8,
-                    maxlength: 256
+                    maxlength: 40
                 },
                 passwordRepeat:{
                     equalTo: "#PasswordInput"

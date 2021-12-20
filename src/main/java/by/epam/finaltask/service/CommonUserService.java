@@ -7,6 +7,9 @@ import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.User;
 import by.epam.finaltask.model.UserContext;
 import by.epam.finaltask.model.UserFactory;
+import by.epam.finaltask.validation.NumberValidator;
+import by.epam.finaltask.validation.StringClientParameterValidator;
+import by.epam.finaltask.validation.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +24,17 @@ public class CommonUserService implements UserService {
     public final static Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
     public final static int MAX_EMAIL_LENGTH = 254;
+    public final static int MIN_PASSWORD_LENGTH = 8;
+    public final static int MAX_PASSWORD_LENGTH = 40;
     private final static int USERS_PER_PAGE = 8;
+    private final static int MAX_BIG_DECIMAL_LENGTH = 15;
     private final static Logger LOG = LoggerFactory.getLogger(CommonUserService.class);
+
+    private final BigDecimalNormalizer bigDecimalNormalizer = BigDecimalNormalizer.getInstance();
+    private final StringClientParameterValidator stringValidator = ValidatorFactory.getFactoryInstance()
+            .stringParameterValidator();
+    private final NumberValidator numberValidator = ValidatorFactory.getFactoryInstance().idValidator();
+
     private final UserManager userManager;
 
     CommonUserService(UserManager userManager) {
@@ -47,6 +59,9 @@ public class CommonUserService implements UserService {
     @Override
     public Optional<User> authenticate(String email, String password) throws ServiceCanNotCompleteCommandRequest {
         try {
+            if (!isEMailValid(email) || !isPasswordValid(password)) {
+                throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
+            }
             return userManager.findUserByEmailAndPassword(email, password);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -57,6 +72,7 @@ public class CommonUserService implements UserService {
     @Override
     public Optional<User> findUserById(long id) throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(id);
             return userManager.find(id);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -68,6 +84,7 @@ public class CommonUserService implements UserService {
     public List<User> findUsersByPageAndContext(long pageNumber, UserContext context)
             throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(pageNumber);
             return userManager.findByUserContext(context, (pageNumber - 1) * USERS_PER_PAGE, USERS_PER_PAGE);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -90,9 +107,8 @@ public class CommonUserService implements UserService {
     public void changeUserBannedStatus(long id, String action) throws ServiceCanNotCompleteCommandRequest,
             ClientErrorException {
         try {
-            if (action == null || action.trim().isEmpty()) {
-                throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
-            }
+            numberValidator.validateNumberIsPositive(id);
+            stringValidator.validateNotEmpty(action);
             boolean bannedAction = action.equals("ban");
             Optional<User> optionalOldUserState = userManager.find(id);
             if (optionalOldUserState.isPresent() && optionalOldUserState.get().isBanned() != bannedAction) {
@@ -113,6 +129,7 @@ public class CommonUserService implements UserService {
     @Override
     public void plusToCashAccount(long userId, BigDecimal cash)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        numberValidator.validateNumberIsPositive(userId);
         validateCash(cash);
         addToCashAccount(userId, cash);
     }
@@ -120,22 +137,26 @@ public class CommonUserService implements UserService {
     @Override
     public void minusFromCashAccount(long userId, BigDecimal cash)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        numberValidator.validateNumberIsPositive(userId);
         validateCash(cash);
         addToCashAccount(userId, cash.negate());
     }
 
-    private void validateCash(BigDecimal cash) throws ClientErrorException, ServiceCanNotCompleteCommandRequest {
+    private void validateCash(BigDecimal cash)
+            throws ClientErrorException, ServiceCanNotCompleteCommandRequest {
         if (cash == null) {
             throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
         }
-        if (cash.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ServiceCanNotCompleteCommandRequest("Cash amount should be >= 0");
+        if (cash.compareTo(BigDecimal.ZERO) <= 0 || integerDigits(cash) > MAX_BIG_DECIMAL_LENGTH) {
+            throw new ServiceCanNotCompleteCommandRequest("Cash amount should be >= 0 and its length <" +
+                    MAX_BIG_DECIMAL_LENGTH);
         }
     }
 
     private void addToCashAccount(long userId, BigDecimal cash)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
+            cash = bigDecimalNormalizer.normalize(cash);
             Optional<User> optionalOldUserState = userManager.find(userId);
             if (optionalOldUserState.isPresent()) {
                 User oldUserState = optionalOldUserState.get();
@@ -156,10 +177,12 @@ public class CommonUserService implements UserService {
     }
 
     private boolean isPasswordValid(String password) {
-        return password != null && password.length() >= 8 && password.length() <= 256;
+        password = password == null ? null : password.trim();
+        return password != null && password.length() >= MIN_PASSWORD_LENGTH && password.length() <= MAX_PASSWORD_LENGTH;
     }
 
     private boolean isEMailValid(String email) {
+        email = email == null ? null : email.trim();
         return email != null && VALID_EMAIL_ADDRESS_REGEX.matcher(email).matches()
                 && email.length() <= MAX_EMAIL_LENGTH;
     }
@@ -185,5 +208,10 @@ public class CommonUserService implements UserService {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
         }
+    }
+
+    private int integerDigits(BigDecimal n) {
+        n = n.stripTrailingZeros();
+        return n.precision() - n.scale();
     }
 }

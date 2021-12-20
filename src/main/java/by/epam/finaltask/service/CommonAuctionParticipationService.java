@@ -5,6 +5,7 @@ import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
+import by.epam.finaltask.validation.NumberValidator;
 import by.epam.finaltask.validation.StringClientParameterValidator;
 import by.epam.finaltask.validation.ValidatorFactory;
 import org.slf4j.Logger;
@@ -23,11 +24,15 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     private final static BigDecimal DEFAULT_DEPOSIT_COEFFICIENT = BigDecimal.valueOf(0.1);
     private final static int LOTS_PER_PAGE = 8;
 
+    private final BigDecimalNormalizer bigDecimalNormalizer = BigDecimalNormalizer.getInstance();
+
+    private final StringClientParameterValidator stringValidator =
+            ValidatorFactory.getFactoryInstance().stringParameterValidator();
+    private final NumberValidator numberValidator = ValidatorFactory.getFactoryInstance().idValidator();
+
     private final ServiceFactory serviceFactory = ServiceFactory.getFactoryInstance();
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
     private final UserService userService = ServiceFactory.getFactoryInstance().userService();
-    private final StringClientParameterValidator validator = ValidatorFactory
-            .getFactoryInstance().stringParameterValidator();
 
     private final AuctionParticipationManager auctionParticipationManager;
 
@@ -39,8 +44,10 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     public void saveParticipant(long requestedUserId, String lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            validator.validateNotEmpty(lotId);
+            numberValidator.validateNumberIsPositive(requestedUserId);
+            stringValidator.validateNotEmpty(lotId);
             long longLotId = Long.parseLong(lotId);
+            numberValidator.validateNumberIsPositive(longLotId);
             if (isUserParticipateInLotAuction(requestedUserId, longLotId)) {
                 throw new ClientErrorException(ClientError.ENTITY_ALREADY_EXISTS);
             }
@@ -49,7 +56,8 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
                     !lot.getAuctionStatus().equals(AuctionStatus.APPROVED_BY_ADMIN)) {
                 throw new ClientErrorException(ClientError.FORBIDDEN);
             }
-            BigDecimal deposit = lot.getInitialPrice().multiply(DEFAULT_DEPOSIT_COEFFICIENT);
+            BigDecimal deposit = bigDecimalNormalizer.normalize(lot.getInitialPrice()
+                    .multiply(DEFAULT_DEPOSIT_COEFFICIENT));
             userService.minusFromCashAccount(requestedUserId, deposit);
             auctionParticipationManager
                     .saveParticipation(new AuctionParticipation(requestedUserId, longLotId, deposit));
@@ -69,8 +77,10 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     public void deleteParticipation(long requestedUserId, String lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            validator.validateNotEmpty(lotId);
+            numberValidator.validateNumberIsPositive(requestedUserId);
+            stringValidator.validateNotEmpty(lotId);
             long longLotId = Long.parseLong(lotId);
+            numberValidator.validateNumberIsPositive(longLotId);
             AuctionParticipation participation = auctionParticipationManager
                     .findParticipation(requestedUserId, longLotId)
                     .orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
@@ -95,8 +105,10 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     public void retrieveWinnerParticipationByLotOwner(long requestedUserId, String lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            validator.validateNotEmpty(lotId);
+            numberValidator.validateNumberIsPositive(requestedUserId);
+            stringValidator.validateNotEmpty(lotId);
             long longLotId = Long.parseLong(lotId);
+            numberValidator.validateNumberIsPositive(longLotId);
             Lot lot = lotService.findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             if (lot.getOwnerId() != requestedUserId || !lot.getAuctionStatus().equals(AuctionStatus.ENDED)) {
                 throw new ClientErrorException(ClientError.FORBIDDEN);
@@ -127,8 +139,10 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     public boolean isUserParticipateInLotAuction(long userId, String lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            validator.validateNotEmpty(lotId);
+            numberValidator.validateNumberIsPositive(userId);
+            stringValidator.validateNotEmpty(lotId);
             long longLotId = Long.parseLong(lotId);
+            numberValidator.validateNumberIsPositive(longLotId);
             return isUserParticipateInLotAuction(userId, longLotId);
         } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage());
@@ -140,6 +154,7 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     public boolean isUserParticipateInLotAuction(long userId, long lotId)
             throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(userId, lotId);
             return auctionParticipationManager.isUserParticipateInLotAuction(userId, lotId);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -151,6 +166,7 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     public Map<LotWithImages, AuctionParticipation> findLotsParticipatedByUser(long page, long userId)
             throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(page, userId);
             List<AuctionParticipation> auctionParticipations = auctionParticipationManager
                     .findUsersParticipations(userId, (page - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE);
             return findResultsByLotsWithImages(auctionParticipations);
@@ -163,6 +179,7 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     @Override
     public long findPageCountParticipatedByUser(long userId) throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(userId);
             long participationsCount = auctionParticipationManager.findUsersParticipationsCount(userId);
             return participationsCount / LOTS_PER_PAGE + (participationsCount % LOTS_PER_PAGE == 0 ? 0 : 1);
         } catch (Exception ex) {
@@ -176,6 +193,8 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
                                                                                AuctionStatus status)
             throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(page, userId);
+            validateObjectNotNull(status);
             List<AuctionParticipation> auctionParticipations = auctionParticipationManager
                     .findUsersParticipations(userId,
                             (page - 1) * LOTS_PER_PAGE, LOTS_PER_PAGE, status);
@@ -190,6 +209,8 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     public long findPageCountParticipatedByUser(long userId, AuctionStatus status)
             throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(userId);
+            validateObjectNotNull(status);
             long participationsCount = auctionParticipationManager.findUsersParticipationsCount(userId, status);
             return participationsCount / LOTS_PER_PAGE + (participationsCount % LOTS_PER_PAGE == 0 ? 0 : 1);
         } catch (Exception ex) {
@@ -202,6 +223,7 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     public Optional<AuctionParticipation> findParticipation(long userId, long lotId)
             throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(userId, lotId);
             return auctionParticipationManager.findParticipation(userId, lotId);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -232,6 +254,12 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
                 || lot.getOwnerId() == userId
                 || (lot.getAuctionStatus().equals(AuctionStatus.ENDED) && hasUserBestBid(userId, lot.getLotId()))) {
             throw new ClientErrorException(ClientError.FORBIDDEN);
+        }
+    }
+
+    private void validateObjectNotNull(Object obj) throws ClientErrorException {
+        if (obj == null) {
+            throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
         }
     }
 }

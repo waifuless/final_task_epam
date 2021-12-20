@@ -5,6 +5,9 @@ import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Category;
+import by.epam.finaltask.validation.NumberValidator;
+import by.epam.finaltask.validation.StringClientParameterValidator;
+import by.epam.finaltask.validation.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +16,11 @@ import java.util.List;
 public class CommonCategoryService implements CategoryService {
 
     private final static Logger LOG = LoggerFactory.getLogger(CommonCategoryService.class);
+    private final static int MAX_CATEGORY_SIZE = 64;
+
+    private final StringClientParameterValidator stringValidator = ValidatorFactory.getFactoryInstance()
+            .stringParameterValidator();
+    private final NumberValidator numberValidator = ValidatorFactory.getFactoryInstance().idValidator();
 
     private final CategoryManager categoryManager;
 
@@ -23,9 +31,10 @@ public class CommonCategoryService implements CategoryService {
     @Override
     public void saveCategory(String categoryName) throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            if (categoryName == null || categoryName.trim().isEmpty()) {
-                throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
+            if (categoryName.length() > MAX_CATEGORY_SIZE) {
+                throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
             }
+            stringValidator.validateNotEmpty(categoryName);
             if (categoryManager.isCategoryExists(categoryName)) {
                 throw new ClientErrorException(ClientError.ENTITY_ALREADY_EXISTS);
             }
@@ -43,10 +52,12 @@ public class CommonCategoryService implements CategoryService {
     public void updateCategory(String idParam, String newCategoryName)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            long id = Integer.parseInt(idParam);
-            if (newCategoryName == null || newCategoryName.trim().isEmpty()) {
-                throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
+            if (newCategoryName.length() > MAX_CATEGORY_SIZE) {
+                throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
             }
+            long id = Integer.parseInt(idParam);
+            numberValidator.validateNumberIsPositive(id);
+            stringValidator.validateNotEmpty(newCategoryName);
             if (categoryManager.isCategoryExists(newCategoryName)) {
                 throw new ClientErrorException(ClientError.ENTITY_ALREADY_EXISTS);
             }
@@ -75,7 +86,9 @@ public class CommonCategoryService implements CategoryService {
                 ids[i] = Integer.parseInt(categoryIds[i]);
             }
             for (int categoryId : ids) {
-                categoryManager.delete(categoryId);
+                if (categoryId > 0) {
+                    categoryManager.delete(categoryId);
+                }
             }
         } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage(), ex);

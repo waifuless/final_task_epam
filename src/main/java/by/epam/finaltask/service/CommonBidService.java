@@ -5,6 +5,7 @@ import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
+import by.epam.finaltask.validation.NumberValidator;
 import by.epam.finaltask.validation.StringClientParameterValidator;
 import by.epam.finaltask.validation.ValidatorFactory;
 import org.slf4j.Logger;
@@ -22,9 +23,14 @@ public class CommonBidService implements BidService {
     private final static Logger LOG = LoggerFactory.getLogger(CommonBidService.class);
 
     private final static BigDecimal MIN_AUCTION_STEP_COEFFICIENT = BigDecimal.valueOf(0.05);
+    private final static int MAX_BIG_DECIMAL_LENGTH = 15;
 
-    private final StringClientParameterValidator clientParameterValidator =
+    private final BigDecimalNormalizer bigDecimalNormalizer = BigDecimalNormalizer.getInstance();
+
+    private final StringClientParameterValidator stringValidator =
             ValidatorFactory.getFactoryInstance().stringParameterValidator();
+    private final NumberValidator numberValidator = ValidatorFactory.getFactoryInstance().idValidator();
+
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
     private final AuctionParticipationService auctionParticipationService =
             ServiceFactory.getFactoryInstance().auctionParticipationService();
@@ -40,9 +46,11 @@ public class CommonBidService implements BidService {
     public void addBid(long userId, String lotId, String amount)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
-            clientParameterValidator.validateNotEmpty(lotId, amount);
+            numberValidator.validateNumberIsPositive(userId);
+            stringValidator.validateNotEmpty(lotId, amount);
             long longLotId = Long.parseLong(lotId);
-            BigDecimal bigDecimalAmount = new BigDecimal(amount);
+            numberValidator.validateNumberIsPositive(longLotId);
+            BigDecimal bigDecimalAmount = bigDecimalNormalizer.normalize(new BigDecimal(amount));
             validateBid(userId, longLotId, bigDecimalAmount);
             bidManager.save(Bid.builder().setUserId(userId).setLotId(longLotId).setAmount(bigDecimalAmount).build());
         } catch (NumberFormatException ex) {
@@ -60,7 +68,8 @@ public class CommonBidService implements BidService {
     @Override
     public Optional<Bid> findBestBid(long requesterId, String lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
-        clientParameterValidator.validateNotEmpty(lotId);
+        numberValidator.validateNumberIsPositive(requesterId);
+        stringValidator.validateNotEmpty(lotId);
         return findBestBid(requesterId, Long.parseLong(lotId));
     }
 
@@ -68,6 +77,7 @@ public class CommonBidService implements BidService {
     public Optional<Bid> findBestBid(long requesterId, long lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
+            numberValidator.validateNumberIsPositive(requesterId, lotId);
             Lot lot = lotService.findLot(lotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             validateUserParticipationOrOwner(requesterId, lot);
             Optional<Bid> optionalBid;
@@ -93,6 +103,7 @@ public class CommonBidService implements BidService {
     public Map<LotWithImages, AuctionResult> findUserParticipatedEndedLotsWithAuctionResult(long page, long userId)
             throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(page, userId);
             Map<LotWithImages, AuctionParticipation> lotsWithAuctionParticipations = auctionParticipationService
                     .findLotsParticipatedByUser(page, userId, AuctionStatus.ENDED);
             Optional<Bid> optionalBid;
@@ -132,6 +143,7 @@ public class CommonBidService implements BidService {
     public Map<LotWithImages, AuctionResult> findUserOwnedEndedLotsWithAuctionResult(long page, long userId)
             throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(page, userId);
             List<LotWithImages> lots = lotService.findLotsByPageAndContext(page, LotContext.builder().setOwnerId(userId)
                     .setAuctionStatus(AuctionStatus.ENDED.name()).build());
             Optional<Bid> optionalBid;
@@ -172,6 +184,7 @@ public class CommonBidService implements BidService {
     @Override
     public void deleteUsersLotBids(long userId, long lotId) throws ServiceCanNotCompleteCommandRequest {
         try {
+            numberValidator.validateNumberIsPositive(userId, lotId);
             bidManager.deleteByUserIdAndLotId(userId, lotId);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -207,6 +220,9 @@ public class CommonBidService implements BidService {
     private void validateBidAmount(Lot lot, BigDecimal amount)
             throws ClientErrorException, SQLException, InterruptedException {
         BigDecimal minStep = lot.getInitialPrice().multiply(MIN_AUCTION_STEP_COEFFICIENT);
+        if (amount.compareTo(BigDecimal.ZERO) <= 0 || integerDigits(amount) > MAX_BIG_DECIMAL_LENGTH) {
+            throw new ClientErrorException(ClientError.INVALID_NUMBER);
+        }
         if (lot.getAuctionType().equals(AuctionType.FORWARD)) {
             if (lot.getInitialPrice().compareTo(amount) >= 0) {
                 throw new ClientErrorException(ClientError.BID_AMOUNT_INVALID);
@@ -230,5 +246,10 @@ public class CommonBidService implements BidService {
                 }
             }
         }
+    }
+
+    private int integerDigits(BigDecimal n) {
+        n = n.stripTrailingZeros();
+        return n.precision() - n.scale();
     }
 }

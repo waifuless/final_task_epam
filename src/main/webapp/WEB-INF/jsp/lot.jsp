@@ -258,7 +258,7 @@
     $(document).ready(function () {
         let modalBody = $('#auctionParticipationModalBody');
         modalBody.empty();
-        modalBody.append(0.1 * ${lot.initialPrice});
+        modalBody.append(<fmt:formatNumber type="number" maxFractionDigits="2" value="${lot.initialPrice*0.1}"/>);
         <c:if test="${lot.auctionStatus eq AuctionStatus.RUNNING && requestScope.get('user_is_participate')}">
         renewBestBid(${lot.lotId});
         </c:if>

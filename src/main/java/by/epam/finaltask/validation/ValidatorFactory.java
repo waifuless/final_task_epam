@@ -4,6 +4,7 @@ public class ValidatorFactory {
 
     private static volatile ValidatorFactory factoryInstance;
     private static volatile StringClientParameterValidator stringValidatorInstance;
+    private static volatile NumberValidator numberValidatorInstance;
 
     private ValidatorFactory() {
     }
@@ -28,5 +29,16 @@ public class ValidatorFactory {
             }
         }
         return stringValidatorInstance;
+    }
+
+    public NumberValidator idValidator() {
+        if (numberValidatorInstance == null) {
+            synchronized (CommonNumberValidator.class) {
+                if (numberValidatorInstance == null) {
+                    numberValidatorInstance = new CommonNumberValidator();
+                }
+            }
+        }
+        return numberValidatorInstance;
     }
 }
