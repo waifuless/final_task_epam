@@ -85,6 +85,7 @@
 </div>
 
 <script src="js/escape-text.js" type="text/javascript"></script>
+<script src="js/jquery.validate.js"></script>
 <script src="js/nav-link.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function () {
@@ -99,7 +100,25 @@
         let form = $('#add-category-form');
         form.submit(e => addCategory(e));
 
+        form.validate({
+            rules:{
+                'category-name':{
+                    required: true,
+                    maxlength: 64
+                }
+            },
+            messages: {
+                'category-name':{
+                    required: "Поле не должно быть пустым",
+                    maxlength: "Максимальная длинна поля 64 символа"
+                }
+            }
+        });
+
         function addCategory(e) {
+            if(!form.valid()){
+                return false;
+            }
             e.preventDefault();
             $.ajax({
                 type: 'POST',
