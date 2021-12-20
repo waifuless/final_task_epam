@@ -311,6 +311,18 @@
 
     function addBid(lotId) {
         let newBid = $('#new-bid-input');
+        if(isNaN(newBid.val())){
+            alert("Ставка может содержать только числа (дробные)")
+            return;
+        }
+        if(newBid.val().length>15 || newBid.val().length<1){
+            alert("Ставка должна содержать от 1 до 15 символов");
+            return;
+        }
+        if(newBid.val()<0.01){
+            alert("Минимальная ставка: 0.01");
+            return;
+        }
         $.ajax({
             type: 'POST',
             url: 'ControllerServlet',
@@ -326,6 +338,11 @@
                 renewBestBid(lotId);
             },
             error: function (xhr, textStatus, thrownError) {
+                if(xhr.status==409){
+                    alert('Ставка должна быть больше чем лучшая ставка сейчас (начальная цена) в прямом аукционе и ' +
+                        'меньще в обратном. Минимальная разница - 5% от лучшей ставки сейчас (начальной цены)');
+                    return;
+                }
                 alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
             }
         });
