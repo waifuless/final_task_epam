@@ -33,7 +33,15 @@
 
     <div class="container-lg">
 
-        <c:if test="${sessionScope.get(UserSessionAttribute.USER_ROLE.name()) eq Role.ADMIN.name()}">
+        <c:if test="${lot.auctionStatus eq AuctionStatus.ENDED}">
+            <div class="row my-3" style="border: 1px solid green; border-radius: 15px;
+             align-items: center; justify-content: center;">
+                Аукцион закончился. Его статус нельзя изменить.
+            </div>
+        </c:if>
+
+        <c:if test="${sessionScope.get(UserSessionAttribute.USER_ROLE.name()) eq Role.ADMIN.name()
+        && lot.auctionStatus ne AuctionStatus.ENDED}">
             <div class="row my-3" style="border: 1px solid green; border-radius: 15px;
              align-items: center; justify-content: center;">
                 <div class="col">Статус сейчас: <c:out value="${lot.auctionStatus}"/></div>
@@ -199,25 +207,27 @@
                             Для записи на участие вы должны авторизоваться
                         </button>
                     </c:when>
-                    <c:when test="${requestScope.get('user_is_participate')}">
-                        <button type="button" class="btn btn-danger w-100"
-                                onclick="deleteAuctionParticipation(${lot.lotId})">
-                            Отменить участие (вам вернется <fmt:formatNumber type="number" maxFractionDigits="2"
-                                                                             value="${lot.initialPrice*0.1}"/> рублей)
-                        </button>
-                    </c:when>
                     <c:when test="${sessionScope.get(UserSessionAttribute.USER_ID.name()) eq lot.ownerId}">
                         <button type="button" class="btn btn-success w-100 disabled">
                             Участие недоступно для владельца лота
                         </button>
                     </c:when>
-                    <c:otherwise>
+                    <c:when test="${!requestScope.get('user_is_participate')}">
                         <button type="button" class="btn btn-success w-100" data-bs-toggle="modal"
                                 data-bs-target="#auctionParticipationModal">
                             Записаться на участие
                         </button>
-                    </c:otherwise>
+                    </c:when>
                 </c:choose>
+            </div>
+        </c:if>
+        <c:if test="${requestScope.get('user_is_participate') && lot.auctionStatus ne AuctionStatus.RUNNING}">
+            <div class="row col-9 my-5">
+                <button type="button" class="btn btn-danger w-100"
+                        onclick="deleteAuctionParticipation(${lot.lotId})">
+                    Отменить участие (вам вернется <fmt:formatNumber type="number" maxFractionDigits="2"
+                                                                     value="${lot.initialPrice*0.1}"/> рублей)
+                </button>
             </div>
         </c:if>
 
@@ -231,7 +241,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" id="auctionParticipationModalBody">
-
+                        <fmt:formatNumber type="number" maxFractionDigits="2" value="${lot.initialPrice*0.1}"/>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
@@ -256,9 +266,6 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-        let modalBody = $('#auctionParticipationModalBody');
-        modalBody.empty();
-        modalBody.append(<fmt:formatNumber type="number" maxFractionDigits="2" value="${lot.initialPrice*0.1}"/>);
         <c:if test="${lot.auctionStatus eq AuctionStatus.RUNNING && requestScope.get('user_is_participate')}">
         renewBestBid(${lot.lotId});
         </c:if>

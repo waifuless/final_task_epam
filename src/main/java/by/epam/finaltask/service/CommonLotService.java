@@ -224,7 +224,8 @@ public class CommonLotService implements LotService {
             }
             for (int lotId : ids) {
                 Optional<Lot> optionalLot = lotManager.find(lotId);
-                if (optionalLot.filter(lot -> !lot.getAuctionStatus().equals(newAuctionStatus)).isPresent()) {
+                if (optionalLot.filter(lot -> !lot.getAuctionStatus().equals(newAuctionStatus)
+                        && !lot.getAuctionStatus().equals(AuctionStatus.ENDED)).isPresent()) {
                     lotManager.update(Lot.builder().setLot(optionalLot.get())
                             .setAuctionStatus(newAuctionStatus).build());
                 }
