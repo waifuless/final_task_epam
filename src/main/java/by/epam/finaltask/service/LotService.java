@@ -5,6 +5,7 @@ import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Lot;
 import by.epam.finaltask.model.LotContext;
 import by.epam.finaltask.model.LotWithImages;
+import by.epam.finaltask.model.Role;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,9 @@ import java.util.Optional;
 public interface LotService {
 
     Optional<LotWithImages> findLotWithImages(long id) throws ServiceCanNotCompleteCommandRequest;
+
+    LotWithImages findLotWithImagesValidateUserAccess(long userId, String lotId, Role userRole)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException;
 
     Optional<Lot> findLot(long id) throws ServiceCanNotCompleteCommandRequest;
 

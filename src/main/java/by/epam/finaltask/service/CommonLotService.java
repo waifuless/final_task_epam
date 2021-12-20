@@ -6,6 +6,8 @@ import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
+import by.epam.finaltask.validation.StringClientParameterValidator;
+import by.epam.finaltask.validation.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,8 @@ public class CommonLotService implements LotService {
     private final static int ONE_HOUR_IN_MILLIS = 60 * 60 * 1000;
 
     private final ServiceFactory serviceFactory = ServiceFactory.getFactoryInstance();
+    private final StringClientParameterValidator validator = ValidatorFactory.getFactoryInstance()
+            .stringParameterValidator();
 
     private final LotManager lotManager;
     private final ImagesManager imagesManager;
@@ -52,6 +56,39 @@ public class CommonLotService implements LotService {
                 return Optional.of(lotWithImages);
             }
             return Optional.empty();
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
+    @Override
+    public LotWithImages findLotWithImagesValidateUserAccess(long userId, String lotId, Role userRole)
+            throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
+        try {
+            validator.validateNotEmpty(lotId);
+            long longLotId = Long.parseLong(lotId);
+            Optional<LotWithImages> optionalLot = findLotWithImages(longLotId);
+            LotWithImages lot = optionalLot.orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+            if (lot.getAuctionStatus().equals(AuctionStatus.APPROVED_BY_ADMIN)
+                    || userRole.equals(Role.ADMIN)
+                    || lot.getOwnerId() == userId) {
+                return lot;
+            }
+            if(userRole.equals(Role.NOT_AUTHORIZED)){
+                throw new ClientErrorException(ClientError.FORBIDDEN);
+            }
+            AuctionParticipationService participationService = serviceFactory.auctionParticipationService();
+            if (!participationService.isUserParticipateInLotAuction(userId, longLotId)) {
+                throw new ClientErrorException(ClientError.FORBIDDEN);
+            }
+            return lot;
+        } catch (NumberFormatException ex) {
+            LOG.warn(ex.getMessage());
+            throw new ClientErrorException(ClientError.INVALID_NUMBER);
+        } catch (ClientErrorException ex) {
+            LOG.warn(ex.getMessage());
+            throw ex;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);

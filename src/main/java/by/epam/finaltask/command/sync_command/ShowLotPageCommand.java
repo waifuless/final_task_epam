@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class ShowLotPageCommand implements SyncCommand {
 
@@ -39,18 +38,15 @@ public class ShowLotPageCommand implements SyncCommand {
     public SyncCommandResponse execute(CommandRequest request) throws ClientErrorException,
             ServiceCanNotCompleteCommandRequest {
         try {
-            int lot_id = Integer.parseInt(request.getParameter("lot_id"));
-            Optional<LotWithImages> optionalLotWithImages = lotService.findLotWithImages(lot_id);
-            if (optionalLotWithImages.isPresent()) {
-                request.setAttribute("lot", optionalLotWithImages.get());
-                Role userRole = (Role) request.getSession().getAttribute(UserSessionAttribute.USER_ROLE.name());
-                if (!userRole.equals(Role.NOT_AUTHORIZED)) {
-                    long userId = (Long) request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
-                    request.setAttribute("user_is_participate",
-                            auctionParticipationService.isUserParticipateInLotAuction(userId, lot_id));
-                }
-            } else {
-                throw new ClientErrorException(ClientError.NOT_FOUND);
+            String lotId = request.getParameter("lot_id");
+            Role userRole = (Role) request.getSession().getAttribute(UserSessionAttribute.USER_ROLE.name());
+            long userId = userRole.equals(Role.NOT_AUTHORIZED) ?
+                    -1 : (Long) request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
+            LotWithImages lot = lotService.findLotWithImagesValidateUserAccess(userId, lotId, userRole);
+            request.setAttribute("lot", lot);
+            if (!userRole.equals(Role.NOT_AUTHORIZED)) {
+                request.setAttribute("user_is_participate",
+                        auctionParticipationService.isUserParticipateInLotAuction(userId, lotId));
             }
             return new SyncCommandResponse(false, PagePath.LOT.getPath());
         } catch (NumberFormatException ex) {
