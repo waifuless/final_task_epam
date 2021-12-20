@@ -201,10 +201,13 @@
         $('#form-new-lot').validate({
             ignore: "",
             rules:{
+                title:{
+                    maxlength: 256
+                },
                 'init-price': {
                     required: true,
-                    digits: true,
-                    maxlength: 20
+                    number: true,
+                    maxlength: 14
                 },
                 duration: {
                     digits: true,
@@ -213,8 +216,24 @@
                 'auction-start':{
                     startDateValidation: true
                 }
+            },
+            messages: {
+                title:{
+                    maxlength: "Максимальная длинна поля 256 символов"
+                },
+                'init-price': {
+                    required: "Поле не должно быть пустым",
+                    number: "Поле должно содержать только числа (дробные)",
+                    maxlength: "Максимальная длинна поля 14 символов"
+                },
+                duration: {
+                    digits: "Поле должно содержать только числа (целые)",
+                    range: "Ограничения продолжительности: от 2 до 24 часов"
+                },
+                'auction-start':{
+                    startDateValidation: "Начало должно быть как минимум через 4 дня"
+                }
             }
-            //todo: messages
         });
 
         $.validator.addMethod("startDateValidation", function (value, element) {
@@ -240,21 +259,21 @@
                 }
             });
             return test;
-        }, "Start date should be at least after 4 days");
+        }, "Начало должно быть как минимум через 4 дня");
 
-        $.validator.addMethod("cRequired", $.validator.methods.required, "Fields should not be empty");
+        $.validator.addMethod("cRequired", $.validator.methods.required, "Поле не должно быть пустым");
 
         $.validator.addMethod("imageRequired", function (value, element) {
             const test = $('.div__added-image').length > 0;
             if(!test){
-                alert("Please, add an image.");
+                alert("Пожалуйста, добавьте картинку");
             }
             return test;
-        }, "There should be at least one image");
+        }, "Должна быть минимум одна картинка");
 
         $.validator.addMethod("cSelectedNotNull", function (value, element) {
             return value !== null;
-        }, "Please select some value");
+        }, "Выберите один из вариантов");
 
         $.validator.addClassRules({
             "form-control": {
