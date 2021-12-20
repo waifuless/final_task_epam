@@ -70,7 +70,7 @@
                                             <input class="form-check-input ids" type="checkbox" name="ids[]"
                                                    value="${category.categoryId}">
                                         </th>
-                                        <td class="category-name">${category.categoryName}</td>
+                                        <td class="category-name"><c:out value="${category.categoryName}"/></td>
                                         <td><a class="link-dark rename-link">переименовать</a></td>
                                     </tr>
                                 </c:forEach>
@@ -84,6 +84,7 @@
     </div>
 </div>
 
+<script src="js/escape-text.js" type="text/javascript"></script>
 <script src="js/nav-link.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function () {

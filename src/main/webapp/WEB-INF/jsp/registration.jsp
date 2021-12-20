@@ -37,7 +37,7 @@
                     <input type="email" id="email" required class="form-control <c:if test="${requestScope.containsKey('EMAIL_INVALID')
                 || requestScope.containsKey('USER_WITH_EMAIL_ALREADY_EXISTS')}">is-invalid</c:if>"
                            name="email" placeholder="name@example.com"
-                           <c:if test="${not empty requestScope.get('email')}">value="${requestScope.get('email')}"</c:if>>
+                           <c:if test="${not empty requestScope.get('email')}">value="<c:out value="${requestScope.get('email')}"/>"</c:if>>
                     <label for="email"><fmt:message bundle="${loc}" key="email.label"/></label>
                     <div class="invalid-feedback">
                         <c:if test="${requestScope.containsKey('EMAIL_INVALID')}">
@@ -88,6 +88,7 @@
 <%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
 <script src="js/jquery-3.6.0.js"></script>
+<script src="js/escape-text.js" type="text/javascript"></script>
 <script src="js/jquery.validate.js"></script>
 
 <script type="text/javascript">

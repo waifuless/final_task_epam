@@ -84,7 +84,7 @@
                     <jsp:useBean id="categories" scope="request"
                                  type="java.util.List<by.epam.finaltask.model.Category>"/>
                     <c:forEach items="${categories}" var="category">
-                        <option value="${category.categoryName}">${category.categoryName}</option>
+                        <option value="<c:out value="${category.categoryName}"/>"><c:out value="${category.categoryName}"/></option>
                     </c:forEach>
                 </select>
             </div>
@@ -148,7 +148,7 @@
                     </option>
                     <jsp:useBean id="regions" scope="request" type="java.util.List<by.epam.finaltask.model.Region>"/>
                     <c:forEach items="${regions}" var="region">
-                        <option value="${region.regionName}">${region.regionName}</option>
+                        <option value="<c:out value="${region.regionName}"/>"><c:out value="${region.regionName}"/></option>
                     </c:forEach>
                 </select>
             </div>
@@ -177,6 +177,8 @@
 </div>
 
 <%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
+
+<script src="js/escape-text.js" type="text/javascript"></script>
 
 <script type="text/javascript">
     $(document).ready(function () {

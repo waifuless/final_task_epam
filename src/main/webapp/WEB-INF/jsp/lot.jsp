@@ -36,7 +36,7 @@
         <c:if test="${sessionScope.get(UserSessionAttribute.USER_ROLE.name()) eq Role.ADMIN.name()}">
             <div class="row my-3" style="border: 1px solid green; border-radius: 15px;
              align-items: center; justify-content: center;">
-                <div class="col">Статус сейчас: ${lot.auctionStatus}</div>
+                <div class="col">Статус сейчас: <c:out value="${lot.auctionStatus}"/></div>
                 <div class="col mb-3">
                     <label class="mb-2" for="auction-status-update">
                         Выберите новый статус для аукциона
@@ -71,18 +71,18 @@
         </c:if>
 
         <div class="row my-3">
-            <h1>${lot.title}</h1>
+            <h1><c:out value="${lot.title}"/></h1>
         </div>
 
         <div class="row">
             <div id="carouselExampleControls" class="carousel carousel-dark slide" data-bs-ride="carousel">
                 <div class="carousel-inner wrapper-div-image">
                     <div class="carousel-item div-image active">
-                        <img src="${lot.images.mainImage.path}" class="d-block w-100" alt=""/>
+                        <img src="<c:out value="${lot.images.mainImage.path}"/>" class="d-block w-100" alt=""/>
                     </div>
                     <c:forEach var="image" items="${lot.images.otherImages}">
                         <div class="carousel-item div-image">
-                            <img src="${image.path}" class="d-block w-100" alt=""/>
+                            <img src="<c:out value="${image.path}"/>" class="d-block w-100" alt=""/>
                         </div>
                     </c:forEach>
                 </div>
@@ -112,35 +112,35 @@
                 <tbody>
                 <tr>
                     <th scope="row">Категория</th>
-                    <td>${lot.category}</td>
+                    <td><c:out value="${lot.category}"/></td>
                 </tr>
                 <tr>
                     <th scope="row">Тип аукциона</th>
-                    <td>${lot.auctionType}</td>
+                    <td><c:out value="${lot.auctionType}"/></td>
                 </tr>
                 <tr>
                     <th scope="row">Состояние</th>
-                    <td>${lot.productCondition}</td>
+                    <td><c:out value="${lot.productCondition}"/></td>
                 </tr>
                 <tr>
                     <th scope="row">Начало аукциона</th>
-                    <td>${lot.startDatetime}</td>
+                    <td><c:out value="${lot.startDatetime}"/></td>
                 </tr>
                 <tr>
                     <th scope="row">Окончание аукциона</th>
-                    <td>${lot.endDatetime}</td>
+                    <td><c:out value="${lot.endDatetime}"/></td>
                 </tr>
                 <tr>
                     <th scope="row">Регион</th>
-                    <td>${lot.region}</td>
+                    <td><c:out value="${lot.region}"/></td>
                 </tr>
                 <tr>
                     <th scope="row">Город(район)</th>
-                    <td>${lot.cityOrDistrict}</td>
+                    <td><c:out value="${lot.cityOrDistrict}"/></td>
                 </tr>
                 <tr>
                     <th scope="row">Статус аукциона</th>
-                    <td>${lot.auctionStatus}</td>
+                    <td><c:out value="${lot.auctionStatus}"/></td>
                 </tr>
                 </tbody>
             </table>
@@ -150,7 +150,7 @@
             <h2>Описание</h2>
         </div>
         <div class="row col-9">
-            <p id="description">${lot.description}</p>
+            <p id="description"><c:out value="${lot.description}"/></p>
         </div>
 
         <div class="row col-9">
@@ -162,7 +162,7 @@
                 <div class="card border-primary mb-3">
                     <div class="card-header">СТАВКИ</div>
                     <div class="card-body">
-                        <h5 class="card-title">Действует ${lot.auctionType} аукцион</h5>
+                        <h5 class="card-title">Действует <c:out value="${lot.auctionType}"/> аукцион</h5>
                         <p class="card-text">Лучшая ставка сейчас: <span id="best-bid"></span></p>
                         <p class="card-text">Минимальный шаг аукциона: <fmt:formatNumber
                                 type="number" maxFractionDigits="2" value="${lot.initialPrice*0.05}"/>
@@ -251,6 +251,8 @@
 
 <%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
+<script src="js/escape-text.js" type="text/javascript"></script>
+
 <script type="text/javascript">
 
     $(document).ready(function () {
@@ -337,7 +339,7 @@
             },
             success: function (answer) {
                 bestBid.empty();
-                bestBid.append(answer[0]);
+                bestBid.append(escapeText(answer[0]));
                 bestBidStatus.empty();
                 if (answer[1]) {
                     bestBidStatus.append("Вы выигрываете");

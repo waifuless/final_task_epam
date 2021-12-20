@@ -109,6 +109,7 @@
     </div>
 </div>
 
+<script src="js/escape-text.js" type="text/javascript"></script>
 <script src="js/nav-link.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function () {
@@ -173,7 +174,7 @@
             }
             divForUsers.append(`<tr class="`+rowColorClass+`">
                             <td>`+user.userId+`</td>
-                            <td>`+user.email+`</td>
+                            <td>`+escapeText(user.email)+`</td>
                             <td>`+bannedStatus+`</td>
                             <td>`+user.cashAccount+`</td>
                             <td>

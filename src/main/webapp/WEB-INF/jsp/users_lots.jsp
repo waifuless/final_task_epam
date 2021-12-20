@@ -67,6 +67,7 @@
 <%@include file="/WEB-INF/jsp_fragment/footer.jsp" %>
 
 <script src="js/jquery-3.6.0.js" type="text/javascript"></script>
+<script src="js/escape-text.js" type="text/javascript"></script>
 <script src="js/region-cities-select.js" type="text/javascript"></script>
 
 <script src="js/nav-link.js" type="text/javascript"></script>
@@ -168,37 +169,37 @@
         }
         lots.forEach(function (lot) {
             let additionalInfo = printWithStatus ? `<p class="card-text auction-status">
-                                        Статус аукциона: ` + lot.auctionStatus +
+                                        Статус аукциона: ` + escapeText(lot.auctionStatus) +
                 `</p>` : '';
             divForLots.append('<a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=' + lot.lotId + '"' +
                 `class="container__row__a col-12 col-lg-6 mb-3 mb-3" target="_blank">
                     <div class="card border-dark h-100" style="max-width: 540px; max-height: 250px">
                         <div class="row g-0">
                             <div class="col-4 div-image">` +
-                `<img src="` + lot.images.mainImage.path + `" class="img-fluid rounded-start"
+                `<img src="` + escapeText(lot.images.mainImage.path) + `" class="img-fluid rounded-start"
                                      alt="...">
                             </div>
                             <div class="col-8">
                                 <div class="card-body">
-                                    <h5 class="card-title">` + lot.title + `</h5>
-                                    <p class="card-text category">` + lot.category + `</p>
+                                    <h5 class="card-title">` + escapeText(lot.title) + `</h5>
+                                    <p class="card-text category">` + escapeText(lot.category) + `</p>
                                     <p class="card-text auction-type">
                                         <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_type"/>` + lot.auctionType +
+                                                     key="container.lot.auction_type"/>` + escapeText(lot.auctionType) +
                 `</p>
                                     <p class="card-text region">
-                                        <fmt:message bundle="${loc}" key="container.lot.region"/>` + lot.region +
+                                        <fmt:message bundle="${loc}" key="container.lot.region"/>` + escapeText(lot.region) +
                 `</p>
                                     <p class="card-text address">
-                                        <fmt:message bundle="${loc}" key="container.lot.city"/>` + lot.cityOrDistrict +
+                                        <fmt:message bundle="${loc}" key="container.lot.city"/>` + escapeText(lot.cityOrDistrict) +
                 `</p>
                                     <p class="card-text initial-price">
-                                        <fmt:message bundle="${loc}" key="container.lot.price"/>` + lot.initialPrice +
+                                        <fmt:message bundle="${loc}" key="container.lot.price"/>` + escapeText(lot.initialPrice) +
                 `</p>
                                     ` + additionalInfo + `
                                     <p class="card-text auction-start"><small class="text-muted">
                                         <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_start_datetime"/>` + lot.startDatetime + `</small>
+                                                     key="container.lot.auction_start_datetime"/>` + escapeText(lot.startDatetime) + `</small>
                                     </p>
                                 </div>
                             </div>
@@ -229,7 +230,7 @@
                         <h5 class="card-title">Вы выиграли аукцион</h5>
                         <p class="card-text">Со ставкой: ` + value.winnerBidAmount + `</p>
                         <p class="card-text">Владельцу лота будет выдан ваш задаток в: ` + value.deposit + `р</p>
-                        <p class="card-text">Email владельца лота: ` + value.emailToContact + `р</p>
+                        <p class="card-text">Email владельца лота: ` + escapeText(value.emailToContact) + `р</p>
                     </div>
                 </div>
                 </div>`;
@@ -261,7 +262,7 @@
                         <h5 class="card-title">Определен победитель аукциона</h5>
                         <p class="card-text">Со ставкой: ` + value.winnerBidAmount + `</p>
                         <p class="card-text">`+takeDepositInfo+`</p>
-                        <p class="card-text">Email победителя: ` + value.emailToContact + `р</p>
+                        <p class="card-text">Email победителя: ` + escapeText(value.emailToContact) + `р</p>
                     </div>
                 </div>
                 </div>`;
@@ -276,29 +277,29 @@
                     <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
                         <div class="row g-0">
                             <div class="col-4 div-image">` +
-            `<img src="` + key.images.mainImage.path + `" class="img-fluid rounded-start"
+            `<img src="` + escapeText(key.images.mainImage.path) + `" class="img-fluid rounded-start"
                                      alt="...">
                             </div>
                             <div class="col-8">
                                 <div class="card-body">
-                                    <h5 class="card-title">` + key.title + `</h5>
-                                    <p class="card-text category">` + key.category + `</p>
+                                    <h5 class="card-title">` + escapeText(key.title) + `</h5>
+                                    <p class="card-text category">` + escapeText(key.category) + `</p>
                                     <p class="card-text auction-type">
                                         <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_type"/>` + key.auctionType +
+                                                     key="container.lot.auction_type"/>` + escapeText(key.auctionType) +
             `</p>
                                     <p class="card-text region">
-                                        <fmt:message bundle="${loc}" key="container.lot.region"/>` + key.region +
+                                        <fmt:message bundle="${loc}" key="container.lot.region"/>` + escapeText(key.region) +
             `</p>
                                     <p class="card-text address">
-                                        <fmt:message bundle="${loc}" key="container.lot.city"/>` + key.cityOrDistrict +
+                                        <fmt:message bundle="${loc}" key="container.lot.city"/>` + escapeText(key.cityOrDistrict) +
             `</p>
                                     <p class="card-text initial-price">
                                         <fmt:message bundle="${loc}" key="container.lot.price"/>` + key.initialPrice +
             `</p>
                                     <p class="card-text auction-start"><small class="text-muted">
                                         <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_start_datetime"/>` + key.startDatetime + `</small>
+                                                     key="container.lot.auction_start_datetime"/>` + escapeText(key.startDatetime) + `</small>
                                     </p>
                                 </div>
                             </div>

@@ -97,7 +97,7 @@
                                 <jsp:useBean id="categories" scope="request"
                                              type="java.util.List<by.epam.finaltask.model.Category>"/>
                                 <c:forEach items="${categories}" var="category">
-                                    <option value="${category.categoryName}">${category.categoryName}</option>
+                                    <option value="<c:out value="${category.categoryName}"/>"><c:out value="${category.categoryName}"/></option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -112,7 +112,7 @@
                                 <jsp:useBean id="regions" scope="request"
                                              type="java.util.List<by.epam.finaltask.model.Region>"/>
                                 <c:forEach items="${regions}" var="region">
-                                    <option value="${region.regionName}">${region.regionName}</option>
+                                    <option value="<c:out value="${region.regionName}"/>"><c:out value="${region.regionName}"/></option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -211,6 +211,7 @@
     </div>
 </div>
 
+<script src="js/escape-text.js" type="text/javascript"></script>
 <script src="js/nav-link.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function () {
@@ -264,29 +265,29 @@
                     <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
                         <div class="row g-0">
                             <div class="col-4 div-image">`+
-                `<img src="`+lot.images.mainImage.path+`" class="img-fluid rounded-start"
+                `<img src="`+escapeText(lot.images.mainImage.path)+`" class="img-fluid rounded-start"
                                      alt="...">
                             </div>
                             <div class="col-8">
                                 <div class="card-body">
-                                    <h5 class="card-title">`+lot.title+`</h5>
-                                    <p class="card-text category">`+lot.category+`</p>
+                                    <h5 class="card-title">`+escapeText(lot.title)+`</h5>
+                                    <p class="card-text category">`+escapeText(lot.category)+`</p>
                                     <p class="card-text auction-type">
                                         <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_type"/>` +lot.auctionType+
+                                                     key="container.lot.auction_type"/>` +escapeText(lot.auctionType)+
                 `</p>
                                     <p class="card-text region">
-                                        <fmt:message bundle="${loc}" key="container.lot.region"/>` +lot.region+
+                                        <fmt:message bundle="${loc}" key="container.lot.region"/>` +escapeText(lot.region)+
                 `</p>
                                     <p class="card-text address">
-                                        <fmt:message bundle="${loc}" key="container.lot.city"/>` +lot.cityOrDistrict+
+                                        <fmt:message bundle="${loc}" key="container.lot.city"/>` +escapeText(lot.cityOrDistrict)+
                 `</p>
                                     <p class="card-text initial-price">
-                                        <fmt:message bundle="${loc}" key="container.lot.price"/>` +lot.initialPrice+
+                                        <fmt:message bundle="${loc}" key="container.lot.price"/>` +escapeText(lot.initialPrice)+
                 `</p>
                                     <p class="card-text auction-start"><small class="text-muted">
                                         <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_start_datetime"/>`+lot.startDatetime+`</small>
+                                                     key="container.lot.auction_start_datetime"/>`+escapeText(lot.startDatetime)+`</small>
                                     </p>
                                 </div>
                             </div>

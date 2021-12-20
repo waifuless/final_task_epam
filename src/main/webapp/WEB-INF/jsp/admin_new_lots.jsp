@@ -66,6 +66,7 @@
     </div>
 </div>
 
+<script src="js/escape-text.js" type="text/javascript"></script>
 <script src="js/nav-link.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function () {
@@ -138,7 +139,7 @@
                         </th>
                         <td>`+lot.lotId+`</td>
                         <td>`+lot.ownerId+`</td>
-                        <td>`+lot.title+`</td>
+                        <td>`+escapeText(lot.title)+`</td>
                         <td>
                             <a class="link-dark" target="_blank" href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=`+lot.lotId+`">
                                 Перейти
