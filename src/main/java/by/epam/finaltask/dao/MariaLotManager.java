@@ -8,9 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MariaLotManager extends GenericDao<Lot> implements LotManager {
 
@@ -176,14 +175,14 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     @Override
     public List<Lot> findByLotContext(LotContext context, long offset, long count)
             throws SQLException, DataSourceDownException, InterruptedException {
-        LinkedHashMap<Object, Integer> params = new LinkedHashMap<>();
-        String findByContextQuery = FIND_ALL_LOTS_QUERY + createFilterByContextAndFillParamsMap(context, params) +
+        List<Pair<Object, Integer>> params = new ArrayList<>();
+        String findByContextQuery = FIND_ALL_LOTS_QUERY + createFilterByContextAndFillParamsList(context, params) +
                 " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
         return findListWithPreparator(findByContextQuery, statement ->
         {
             int i = 0;
-            for (Map.Entry<Object, Integer> entry : params.entrySet()) {
-                statement.setObject(++i, entry.getKey(), entry.getValue());
+            for (Pair<Object, Integer> param : params) {
+                statement.setObject(++i, param.getL(), param.getR());
             }
             statement.setLong(++i, count);
             statement.setLong(++i, offset);
@@ -194,12 +193,12 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
     public long findLotsCount(LotContext context)
             throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
-            LinkedHashMap<Object, Integer> params = new LinkedHashMap<>();
+            List<Pair<Object, Integer>> params = new ArrayList<>();
             PreparedStatement statement = connection.prepareStatement(COUNT_QUERY_WITH_JOINS +
-                    createFilterByContextAndFillParamsMap(context, params));
+                    createFilterByContextAndFillParamsList(context, params));
             int i = 0;
-            for (Map.Entry<Object, Integer> entry : params.entrySet()) {
-                statement.setObject(++i, entry.getKey(), entry.getValue());
+            for (Pair<Object, Integer> param : params) {
+                statement.setObject(++i, param.getL(), param.getR());
             }
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
@@ -249,31 +248,31 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
         }
     }
 
-    private String createFilterByContextAndFillParamsMap(LotContext context, LinkedHashMap<Object, Integer> params) {
+    private String createFilterByContextAndFillParamsList(LotContext context, List<Pair<Object, Integer>> params) {
         StringBuilder filter = new StringBuilder(" WHERE ");
         if (context.getOwnerId() != null) {
             filter.append(String.format(" %s = ? ", OWNER_ID_COLUMN));
-            params.put(context.getOwnerId(), Types.INTEGER);
+            params.add(new Pair<>(context.getOwnerId(), Types.INTEGER));
         }
-        checkParamAndFillFilterAndParamMap(context.getCategory(), Types.VARCHAR, EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getCategory(), Types.VARCHAR, EQUALS_TEMPLATE,
                 CATEGORY_NAME_COLUMN, filter, params);
-        checkParamAndFillFilterAndParamMap(context.getAuctionType(), Types.VARCHAR, EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getAuctionType(), Types.VARCHAR, EQUALS_TEMPLATE,
                 AUCTION_TYPE_NAME_COLUMN, filter, params);
         String title = context.getTitle();
         title = title != null ? "%" + title + "%" : null;
-        checkParamAndFillFilterAndParamMap(title, Types.VARCHAR, LIKE_STRING_TEMPLATE, TITLE_COLUMN,
+        checkParamAndFillFilterAndParamList(title, Types.VARCHAR, LIKE_STRING_TEMPLATE, TITLE_COLUMN,
                 filter, params);
-        checkParamAndFillFilterAndParamMap(context.getMinInitialPrice(), Types.DECIMAL, GREATER_THAN_OR_EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getMinInitialPrice(), Types.DECIMAL, GREATER_THAN_OR_EQUALS_TEMPLATE,
                 INITIAL_PRICE_COLUMN, filter, params);
-        checkParamAndFillFilterAndParamMap(context.getMaxInitialPrice(), Types.DECIMAL, LESS_THAN_OR_EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getMaxInitialPrice(), Types.DECIMAL, LESS_THAN_OR_EQUALS_TEMPLATE,
                 INITIAL_PRICE_COLUMN, filter, params);
-        checkParamAndFillFilterAndParamMap(context.getRegion(), Types.VARCHAR, EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getRegion(), Types.VARCHAR, EQUALS_TEMPLATE,
                 REGION_NAME_COLUMN, filter, params);
-        checkParamAndFillFilterAndParamMap(context.getCityOrDistrict(), Types.VARCHAR, EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getCityOrDistrict(), Types.VARCHAR, EQUALS_TEMPLATE,
                 CITY_OR_DISTRICT_NAME_COLUMN, filter, params);
-        checkParamAndFillFilterAndParamMap(context.getAuctionStatus(), Types.VARCHAR, EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getAuctionStatus(), Types.VARCHAR, EQUALS_TEMPLATE,
                 AUCTION_STATUS_NAME_COLUMN, filter, params);
-        checkParamAndFillFilterAndParamMap(context.getProductCondition(), Types.VARCHAR, EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getProductCondition(), Types.VARCHAR, EQUALS_TEMPLATE,
                 PRODUCT_CONDITION_NAME_COLUMN, filter, params);
         LOG.debug("Filter query: {}", filter);
         LOG.debug("Params map: {}", params);
@@ -283,15 +282,15 @@ public class MariaLotManager extends GenericDao<Lot> implements LotManager {
         return new String(filter);
     }
 
-    private void checkParamAndFillFilterAndParamMap(Object param, Integer paramType, String filterPartTemplate,
-                                                    String columnName, StringBuilder filter,
-                                                    LinkedHashMap<Object, Integer> params) {
+    private void checkParamAndFillFilterAndParamList(Object param, Integer paramType, String filterPartTemplate,
+                                                     String columnName, StringBuilder filter,
+                                                     List<Pair<Object, Integer>> params) {
         if (param != null) {
             if (!params.isEmpty()) {
                 filter.append(" AND ");
             }
             filter.append(String.format(filterPartTemplate, columnName));
-            params.put(param, paramType);
+            params.add(new Pair<>(param, paramType));
         }
     }
 

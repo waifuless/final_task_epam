@@ -175,7 +175,6 @@
 
         let title = escapeText('${requestScope.get("title")}');
         setInput('title', title);
-        requestLots(1);
 
         $('#reset-button').click(function () {
             window.location.replace("${pageContext.request.contextPath}/ControllerServlet?command=show_main_page");
@@ -208,6 +207,8 @@
                 errorPlace.append(error);
             }
         });
+
+        requestLots(1);
     });
 
     function applyFilters(e) {
@@ -218,6 +219,9 @@
     }
 
     function requestLots(page) {
+        if(!$("#filters-form").valid()){
+            return false;
+        }
         $.ajax({
             type: 'GET',
             url: 'ControllerServlet?page=' + page,

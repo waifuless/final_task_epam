@@ -68,7 +68,8 @@ public class MariaBidManager extends GenericDao<Bid> implements BidManager {
     }
 
     @Override
-    public void deleteByUserIdAndLotId(long userId, long lotId) throws SQLException, DataSourceDownException, InterruptedException {
+    public void deleteByUserIdAndLotId(long userId, long lotId)
+            throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_BID_BY_LOT_ID_QUERY);
             statement.setLong(1, userId);

@@ -3,18 +3,14 @@ package by.epam.finaltask.dao;
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
-import by.epam.finaltask.model.Role;
-import by.epam.finaltask.model.User;
-import by.epam.finaltask.model.UserContext;
-import by.epam.finaltask.model.UserFactory;
+import by.epam.finaltask.model.*;
 import by.epam.finaltask.security.PasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class MariaUserManager extends GenericDao<User> implements UserManager {
@@ -151,9 +147,9 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     public List<User> findByUserContext(UserContext context, long offset, long count)
             throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
-            LinkedHashMap<Object, Integer> params = new LinkedHashMap<>();
+            List<Pair<Object, Integer>> params = new ArrayList<>();
             PreparedStatement statement = connection.prepareStatement(FIND_ALL_USER_QUERY +
-                    createFilterByContextAndFillParamsMap(context, params) +
+                    createFilterByContextAndFillParamsList(context, params) +
                     " ORDER BY user_id DESC LIMIT ? OFFSET ?");
             int i = prepareParams(statement, params);
             statement.setLong(++i, count);
@@ -173,9 +169,9 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     @Override
     public long findUsersCount(UserContext context) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
-            LinkedHashMap<Object, Integer> params = new LinkedHashMap<>();
+            List<Pair<Object, Integer>> params = new ArrayList<>();
             PreparedStatement statement = connection.prepareStatement(COUNT_QUERY_WITH_JOINS +
-                    createFilterByContextAndFillParamsMap(context, params));
+                    createFilterByContextAndFillParamsList(context, params));
             prepareParams(statement, params);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
@@ -190,27 +186,27 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
         }
     }
 
-    private int prepareParams(PreparedStatement statement, LinkedHashMap<Object, Integer> params) throws SQLException {
+    private int prepareParams(PreparedStatement statement, List<Pair<Object, Integer>> params) throws SQLException {
         int i = 0;
-        for (Map.Entry<Object, Integer> entry : params.entrySet()) {
-            statement.setObject(++i, entry.getKey(), entry.getValue());
+        for (Pair<Object, Integer> param : params) {
+            statement.setObject(++i, param.getL(), param.getR());
         }
         return i;
     }
 
-    private String createFilterByContextAndFillParamsMap(UserContext context, LinkedHashMap<Object, Integer> params) {
+    private String createFilterByContextAndFillParamsList(UserContext context, List<Pair<Object, Integer>> params) {
         StringBuilder filter = new StringBuilder(" WHERE ");
         if (context.getUserId() != null) {
             filter.append(String.format(" %s = ? ", USER_ID_COLUMN));
-            params.put(context.getUserId(), Types.INTEGER);
+            params.add(new Pair<>(context.getUserId(), Types.INTEGER));
         }
         String email = context.getEmail();
         email = email != null ? "%" + email + "%" : null;
-        checkParamAndFillFilterAndParamMap(email, Types.VARCHAR, LIKE_STRING_TEMPLATE, "email",
+        checkParamAndFillFilterAndParamList(email, Types.VARCHAR, LIKE_STRING_TEMPLATE, "email",
                 filter, params);
-        checkParamAndFillFilterAndParamMap(context.getRole().name(), Types.VARCHAR, EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getRole().name(), Types.VARCHAR, EQUALS_TEMPLATE,
                 ROLE_COLUMN, filter, params);
-        checkParamAndFillFilterAndParamMap(context.getBanned(), Types.BOOLEAN, EQUALS_TEMPLATE,
+        checkParamAndFillFilterAndParamList(context.getBanned(), Types.BOOLEAN, EQUALS_TEMPLATE,
                 BANNED_COLUMN, filter, params);
         LOG.debug("Filter query: {}", filter);
         LOG.debug("Params map: {}", params);
@@ -220,15 +216,15 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
         return new String(filter);
     }
 
-    private void checkParamAndFillFilterAndParamMap(Object param, Integer paramType, String filterPartTemplate,
-                                                    String columnName, StringBuilder filter,
-                                                    LinkedHashMap<Object, Integer> params) {
+    private void checkParamAndFillFilterAndParamList(Object param, Integer paramType, String filterPartTemplate,
+                                                     String columnName, StringBuilder filter,
+                                                     List<Pair<Object, Integer>> params) {
         if (param != null) {
             if (!params.isEmpty()) {
                 filter.append(" AND ");
             }
             filter.append(String.format(filterPartTemplate, columnName));
-            params.put(param, paramType);
+            params.add(new Pair<>(param, paramType));
         }
     }
 }

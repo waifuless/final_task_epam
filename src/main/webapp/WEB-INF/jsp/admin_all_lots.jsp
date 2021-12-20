@@ -1,6 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.lots_filters" var="filters"/>
@@ -97,7 +97,8 @@
                                 <jsp:useBean id="categories" scope="request"
                                              type="java.util.List<by.epam.finaltask.model.Category>"/>
                                 <c:forEach items="${categories}" var="category">
-                                    <option value="<c:out value="${category.categoryName}"/>"><c:out value="${category.categoryName}"/></option>
+                                    <option value="<c:out value="${category.categoryName}"/>"><c:out
+                                            value="${category.categoryName}"/></option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -112,7 +113,8 @@
                                 <jsp:useBean id="regions" scope="request"
                                              type="java.util.List<by.epam.finaltask.model.Region>"/>
                                 <c:forEach items="${regions}" var="region">
-                                    <option value="<c:out value="${region.regionName}"/>"><c:out value="${region.regionName}"/></option>
+                                    <option value="<c:out value="${region.regionName}"/>"><c:out
+                                            value="${region.regionName}"/></option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -134,8 +136,10 @@
                                 <option value="" selected>
                                     <fmt:message bundle="${filters}" key="filter.condition.any"/>
                                 </option>
-                                <option value="NEW"><fmt:message bundle="${filters}" key="filter.condition.new"/></option>
-                                <option value="USED"><fmt:message bundle="${filters}" key="filter.condition.used"/></option>
+                                <option value="NEW"><fmt:message bundle="${filters}"
+                                                                 key="filter.condition.new"/></option>
+                                <option value="USED"><fmt:message bundle="${filters}"
+                                                                  key="filter.condition.used"/></option>
                                 <option value="NOT_SPECIFIED">
                                     <fmt:message bundle="${filters}" key="filter.condition.not_specified"/>
                                 </option>
@@ -151,7 +155,8 @@
                                        placeholder="<fmt:message bundle="${filters}" key="filter.price.from"/>"
                                        id="price-from">
                                 <input type="text" name="price-to" aria-label="to" class="form-control"
-                                       placeholder="<fmt:message bundle="${filters}" key="filter.price.to"/>" id="price-to">
+                                       placeholder="<fmt:message bundle="${filters}" key="filter.price.to"/>"
+                                       id="price-to">
                             </div>
                         </div>
                         <div class="col-lg-3 col-sm-6 mb-3">
@@ -184,6 +189,8 @@
                                 <fmt:message bundle="${filters}" key="filters.reset"/>
                             </button>
                         </div>
+                        <div class="col-12 mb-3" id="error-place">
+                        </div>
                     </div>
                 </form>
 
@@ -212,6 +219,7 @@
 </div>
 
 <script src="js/escape-text.js" type="text/javascript"></script>
+<script src="js/jquery.validate.js"></script>
 <script src="js/nav-link.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function () {
@@ -224,12 +232,55 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
-        $('#reset-button').click(function (){
+        $('#reset-button').click(function () {
             window.location.replace(window.location.href)
         });
 
         let form = $('#filters-form');
-        form.submit(e=>applyFilters(e));
+        form.submit(e => applyFilters(e));
+
+        form.validate({
+            rules: {
+                'price-from': {
+                    number: true,
+                    maxlength: 14
+                },
+                'price-to': {
+                    number: true,
+                    maxlength: 14
+                },
+                'owner-id': {
+                    digits: true,
+                    min: 1
+                },
+                'title': {
+                    maxlength: 256
+                }
+            },
+            messages: {
+                'price-from': {
+                    number: "Цена должна содержать только числа (дробные)",
+                    maxlength: "Максимальная длинна поля Цена 14 символов"
+                },
+                'price-to': {
+                    number: "Цена должна содержать только числа (дробные)",
+                    maxlength: "Максимальная длинна поля Цена 14 символов"
+                },
+                'owner-id': {
+                    digits: "ID должен содержать только числа (целые)",
+                    min: "Минимальный id - 1"
+                },
+                'title': {
+                    maxlength: "Максимальная длинна названия 256 символов"
+                }
+            },
+            errorPlacement: function (error, element) {
+                let errorPlace = $("#error-place");
+                errorPlace.empty();
+                errorPlace.append(error);
+            }
+        });
+
         requestLots(1);
     });
 
@@ -239,6 +290,9 @@
     }
 
     function requestLots(page) {
+        if(!$("#filters-form").valid()){
+            return false;
+        }
         $.ajax({
             type: 'GET',
             url: 'ControllerServlet?page=' + page,
@@ -256,38 +310,38 @@
         });
     }
 
-    function printLots(lots){
+    function printLots(lots) {
         let divForLots = $('#div-lots');
         divForLots.empty();
-        lots.forEach(function (lot){
-            divForLots.append('<a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id='+lot.lotId+'"'+
+        lots.forEach(function (lot) {
+            divForLots.append('<a href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=' + lot.lotId + '"' +
                 `class="container__row__a col-12 col-lg-6 mb-3 mb-3" target="_blank">
                     <div class="card border-dark h-100" style="max-width: 540px; max-height: 213px">
                         <div class="row g-0">
-                            <div class="col-4 div-image">`+
-                `<img src="`+escapeText(lot.images.mainImage.path)+`" class="img-fluid rounded-start"
+                            <div class="col-4 div-image">` +
+                `<img src="` + escapeText(lot.images.mainImage.path) + `" class="img-fluid rounded-start"
                                      alt="...">
                             </div>
                             <div class="col-8">
                                 <div class="card-body">
-                                    <h5 class="card-title">`+escapeText(lot.title)+`</h5>
-                                    <p class="card-text category">`+escapeText(lot.category)+`</p>
+                                    <h5 class="card-title">` + escapeText(lot.title) + `</h5>
+                                    <p class="card-text category">` + escapeText(lot.category) + `</p>
                                     <p class="card-text auction-type">
                                         <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_type"/>` +escapeText(lot.auctionType)+
+                                                     key="container.lot.auction_type"/>` + escapeText(lot.auctionType) +
                 `</p>
                                     <p class="card-text region">
-                                        <fmt:message bundle="${loc}" key="container.lot.region"/>` +escapeText(lot.region)+
+                                        <fmt:message bundle="${loc}" key="container.lot.region"/>` + escapeText(lot.region) +
                 `</p>
                                     <p class="card-text address">
-                                        <fmt:message bundle="${loc}" key="container.lot.city"/>` +escapeText(lot.cityOrDistrict)+
+                                        <fmt:message bundle="${loc}" key="container.lot.city"/>` + escapeText(lot.cityOrDistrict) +
                 `</p>
                                     <p class="card-text initial-price">
-                                        <fmt:message bundle="${loc}" key="container.lot.price"/>` +escapeText(lot.initialPrice)+
+                                        <fmt:message bundle="${loc}" key="container.lot.price"/>` + escapeText(lot.initialPrice) +
                 `</p>
                                     <p class="card-text auction-start"><small class="text-muted">
                                         <fmt:message bundle="${loc}"
-                                                     key="container.lot.auction_start_datetime"/>`+escapeText(lot.startDatetime)+`</small>
+                                                     key="container.lot.auction_start_datetime"/>` + escapeText(lot.startDatetime) + `</small>
                                     </p>
                                 </div>
                             </div>
