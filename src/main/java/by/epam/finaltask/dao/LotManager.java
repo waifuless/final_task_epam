@@ -1,14 +1,12 @@
 package by.epam.finaltask.dao;
 
 import by.epam.finaltask.exception.DataSourceDownException;
-import by.epam.finaltask.model.AuctionParticipation;
 import by.epam.finaltask.model.Lot;
 import by.epam.finaltask.model.LotContext;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 public interface LotManager extends Dao<Lot> {
 
@@ -21,7 +19,7 @@ public interface LotManager extends Dao<Lot> {
     List<Lot> findByLotContext(LotContext context, long offset, long count)
             throws SQLException, DataSourceDownException, InterruptedException;
 
-    long findLotsCount(LotContext context)throws SQLException, DataSourceDownException, InterruptedException;
+    long findLotsCount(LotContext context) throws SQLException, DataSourceDownException, InterruptedException;
 
     void executeLotsRenewAndCreateEventSchedule(Timestamp scheduleStart)
             throws SQLException, DataSourceDownException, InterruptedException;

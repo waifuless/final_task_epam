@@ -8,8 +8,8 @@ import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class CreateLotCommand implements SyncCommand {
 
-    private final static Logger LOG = LogManager.getLogger(CreateLotCommand.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CreateLotCommand.class);
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.ADMIN, Role.USER));

@@ -7,8 +7,8 @@ import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.User;
 import by.epam.finaltask.model.UserContext;
 import by.epam.finaltask.model.UserFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -18,11 +18,11 @@ import java.util.regex.Pattern;
 
 public class CommonUserService implements UserService {
 
-    private final static int USERS_PER_PAGE = 8;
     public final static Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
     public final static int MAX_EMAIL_LENGTH = 254;
-    private final static Logger LOG = LogManager.getLogger(CommonUserService.class);
+    private final static int USERS_PER_PAGE = 8;
+    private final static Logger LOG = LoggerFactory.getLogger(CommonUserService.class);
     private final UserManager userManager;
 
     CommonUserService(UserManager userManager) {
@@ -90,22 +90,21 @@ public class CommonUserService implements UserService {
     public void changeUserBannedStatus(long id, String action) throws ServiceCanNotCompleteCommandRequest,
             ClientErrorException {
         try {
-            if(action==null || action.trim().isEmpty()){
+            if (action == null || action.trim().isEmpty()) {
                 throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
             }
             boolean bannedAction = action.equals("ban");
             Optional<User> optionalOldUserState = userManager.find(id);
-            if(optionalOldUserState.isPresent() && optionalOldUserState.get().isBanned() != bannedAction){
+            if (optionalOldUserState.isPresent() && optionalOldUserState.get().isBanned() != bannedAction) {
                 User oldUserState = optionalOldUserState.get();
                 userManager.update(new User(oldUserState.getUserId(), oldUserState.getEmail(),
                         oldUserState.getPasswordHash(), oldUserState.getRole(), bannedAction,
                         oldUserState.getCashAccount()));
             }
-        } catch (ClientErrorException ex){
+        } catch (ClientErrorException ex) {
             LOG.warn(ex.getMessage());
             throw ex;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
         }
@@ -126,10 +125,10 @@ public class CommonUserService implements UserService {
     }
 
     private void validateCash(BigDecimal cash) throws ClientErrorException, ServiceCanNotCompleteCommandRequest {
-        if(cash==null){
+        if (cash == null) {
             throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
         }
-        if(cash.compareTo(BigDecimal.ZERO) <= 0){
+        if (cash.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ServiceCanNotCompleteCommandRequest("Cash amount should be >= 0");
         }
     }
@@ -138,20 +137,19 @@ public class CommonUserService implements UserService {
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
             Optional<User> optionalOldUserState = userManager.find(userId);
-            if(optionalOldUserState.isPresent()){
+            if (optionalOldUserState.isPresent()) {
                 User oldUserState = optionalOldUserState.get();
-                if(oldUserState.isBanned()){
+                if (oldUserState.isBanned()) {
                     throw new ClientErrorException(ClientError.FORBIDDEN);
                 }
                 userManager.update(new User(oldUserState.getUserId(), oldUserState.getEmail(),
                         oldUserState.getPasswordHash(), oldUserState.getRole(), oldUserState.isBanned(),
                         oldUserState.getCashAccount().add(cash)));
             }
-        } catch (ClientErrorException ex){
+        } catch (ClientErrorException ex) {
             LOG.warn(ex.getMessage());
             throw ex;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new ServiceCanNotCompleteCommandRequest(ex);
         }

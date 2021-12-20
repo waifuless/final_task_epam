@@ -10,8 +10,8 @@ import by.epam.finaltask.model.UserContext;
 import by.epam.finaltask.service.ServiceFactory;
 import by.epam.finaltask.service.UserService;
 import com.google.gson.Gson;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class FindUsersAndPagesCountByAdminCommand implements AjaxCommand {
 
-    private final static Logger LOG = LogManager.getLogger(FindUsersAndPagesCountByAdminCommand.class);
+    private final static Logger LOG = LoggerFactory.getLogger(FindUsersAndPagesCountByAdminCommand.class);
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.ADMIN));

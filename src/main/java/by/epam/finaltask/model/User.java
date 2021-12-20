@@ -69,7 +69,7 @@ public class User implements DaoEntity<User> {
         if (email != null ? !email.equals(user.email) : user.email != null) return false;
         if (passwordHash != null ? !passwordHash.equals(user.passwordHash) : user.passwordHash != null) return false;
         if (role != user.role) return false;
-        return cashAccount != null ? cashAccount.compareTo(user.cashAccount)==0 : user.cashAccount == null;
+        return cashAccount != null ? cashAccount.compareTo(user.cashAccount) == 0 : user.cashAccount == null;
     }
 
     @Override

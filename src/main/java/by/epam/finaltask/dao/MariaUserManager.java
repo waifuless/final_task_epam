@@ -3,7 +3,10 @@ package by.epam.finaltask.dao;
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
-import by.epam.finaltask.model.*;
+import by.epam.finaltask.model.Role;
+import by.epam.finaltask.model.User;
+import by.epam.finaltask.model.UserContext;
+import by.epam.finaltask.model.UserFactory;
 import by.epam.finaltask.security.PasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +47,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
                     " WHERE user_id = ?";
     private final static String DELETE_USER_QUERY =
             "DELETE FROM app_user WHERE user_id = ?";
-    private final static String COUNT_QUERY_WITH_JOINS = "SELECT COUNT(1) AS rows_count FROM app_user"+
+    private final static String COUNT_QUERY_WITH_JOINS = "SELECT COUNT(1) AS rows_count FROM app_user" +
             " LEFT JOIN role ON app_user.role_id = role.role_id";
     private final static String LIKE_STRING_TEMPLATE = " %s LIKE ? ";
     private final static String EQUALS_TEMPLATE = " %s = ? ";
@@ -149,7 +152,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
             throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             LinkedHashMap<Object, Integer> params = new LinkedHashMap<>();
-            PreparedStatement statement = connection.prepareStatement(FIND_ALL_USER_QUERY + 
+            PreparedStatement statement = connection.prepareStatement(FIND_ALL_USER_QUERY +
                     createFilterByContextAndFillParamsMap(context, params) +
                     " ORDER BY user_id DESC LIMIT ? OFFSET ?");
             int i = prepareParams(statement, params);
@@ -171,7 +174,7 @@ public class MariaUserManager extends GenericDao<User> implements UserManager {
     public long findUsersCount(UserContext context) throws SQLException, DataSourceDownException, InterruptedException {
         try (Connection connection = connectionPool.getConnection()) {
             LinkedHashMap<Object, Integer> params = new LinkedHashMap<>();
-            PreparedStatement statement = connection.prepareStatement(COUNT_QUERY_WITH_JOINS+
+            PreparedStatement statement = connection.prepareStatement(COUNT_QUERY_WITH_JOINS +
                     createFilterByContextAndFillParamsMap(context, params));
             prepareParams(statement, params);
             ResultSet resultSet = statement.executeQuery();

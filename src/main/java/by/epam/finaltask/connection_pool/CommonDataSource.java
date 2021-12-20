@@ -85,7 +85,7 @@ public class CommonDataSource implements DataSource {
     private void initConnections(String databaseUrl, String login, String password) throws SQLException {
         for (int i = 0; i < SIZE; i++) {
             PooledConnection connection = new PooledConnection(DriverManager.
-                    getConnection(databaseUrl+"?allowMultiQueries=true", login, password), this);
+                    getConnection(databaseUrl + "?allowMultiQueries=true", login, password), this);
             allConnections.add(connection);
             availableConnections.add(connection);
             LOG.info(CONNECTION_ADDED_MCG, connection);

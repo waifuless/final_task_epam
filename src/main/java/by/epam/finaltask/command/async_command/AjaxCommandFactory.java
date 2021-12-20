@@ -1,7 +1,7 @@
 package by.epam.finaltask.command.async_command;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class AjaxCommandFactory {
 
-    private final static Logger LOG = LogManager.getLogger(AjaxCommandFactory.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AjaxCommandFactory.class);
 
     private static volatile AjaxCommandFactory instance;
     private final ConcurrentMap<AjaxCommandVariant, AjaxCommand> commands = new ConcurrentHashMap<>();

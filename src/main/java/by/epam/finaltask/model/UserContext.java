@@ -14,6 +14,10 @@ public class UserContext {
         this.banned = banned;
     }
 
+    public static UserContextBuilder builder() {
+        return new UserContextBuilder();
+    }
+
     public Long getUserId() {
         return userId;
     }
@@ -60,10 +64,6 @@ public class UserContext {
                 ", role=" + role +
                 ", banned=" + banned +
                 '}';
-    }
-
-    public static UserContextBuilder builder(){
-        return new UserContextBuilder();
     }
 
     public static class UserContextBuilder {

@@ -6,7 +6,6 @@ import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +17,7 @@ public class UpdateAuctionStatusCommand implements AjaxCommand {
 
     private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
 
-    UpdateAuctionStatusCommand() throws IOException {
+    UpdateAuctionStatusCommand() {
     }
 
     @Override

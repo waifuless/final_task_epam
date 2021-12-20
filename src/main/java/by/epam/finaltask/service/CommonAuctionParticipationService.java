@@ -7,8 +7,8 @@ import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
 import by.epam.finaltask.validation.StringClientParameterValidator;
 import by.epam.finaltask.validation.ValidatorFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class CommonAuctionParticipationService implements AuctionParticipationService {
 
-    private final static Logger LOG = LogManager.getLogger(CommonAuctionParticipationService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CommonAuctionParticipationService.class);
 
     private final static BigDecimal DEFAULT_DEPOSIT_COEFFICIENT = BigDecimal.valueOf(0.1);
     private final static int LOTS_PER_PAGE = 8;
@@ -104,7 +104,7 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
             Bid bestBid = optionalBid.orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             AuctionParticipation participation = findParticipation(bestBid.getUserId(), longLotId)
                     .orElseThrow(() -> new ServiceCanNotCompleteCommandRequest("Inconsistent data"));
-            if(participation.isDepositIsTakenByOwner()){
+            if (participation.isDepositIsTakenByOwner()) {
                 throw new ClientErrorException(ClientError.FORBIDDEN);
             }
             userService.plusToCashAccount(requestedUserId, participation.getDeposit());

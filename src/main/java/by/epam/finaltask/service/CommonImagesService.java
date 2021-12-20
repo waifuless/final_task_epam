@@ -10,9 +10,9 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import jakarta.servlet.http.Part;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.imgscalr.Scalr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,7 +27,7 @@ import java.util.Properties;
 
 public class CommonImagesService implements ImagesService {
 
-    private final static Logger LOG = LogManager.getLogger(CommonImagesService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CommonImagesService.class);
 
     private final static String AUCTION_IMAGES_FOLDER = System.getenv("AUCTION_IMAGES_FOLDER");
     private final static int DEFAULT_IMAGE_SIZE = 900;

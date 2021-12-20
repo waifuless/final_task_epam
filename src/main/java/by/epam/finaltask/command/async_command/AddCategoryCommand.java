@@ -6,7 +6,6 @@ import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.CategoryService;
 import by.epam.finaltask.service.ServiceFactory;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +17,7 @@ public class AddCategoryCommand implements AjaxCommand {
 
     private final CategoryService categoryService = ServiceFactory.getFactoryInstance().categoryService();
 
-    AddCategoryCommand() throws IOException {
+    AddCategoryCommand() {
     }
 
     @Override

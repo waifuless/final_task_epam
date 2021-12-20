@@ -3,14 +3,14 @@ package by.epam.finaltask.service;
 import by.epam.finaltask.dao.RegionManager;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.Region;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class CommonRegionService implements RegionService {
 
-    private final static Logger LOG = LogManager.getLogger(CommonRegionService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CommonRegionService.class);
 
     private final RegionManager regionManager;
 

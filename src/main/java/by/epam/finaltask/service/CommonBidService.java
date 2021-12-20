@@ -7,8 +7,8 @@ import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
 import by.epam.finaltask.validation.StringClientParameterValidator;
 import by.epam.finaltask.validation.ValidatorFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public class CommonBidService implements BidService {
 
-    private final static Logger LOG = LogManager.getLogger(CommonBidService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CommonBidService.class);
 
     private final static BigDecimal MIN_AUCTION_STEP_COEFFICIENT = BigDecimal.valueOf(0.05);
 
@@ -189,7 +189,7 @@ public class CommonBidService implements BidService {
     private void validateUserParticipationOrOwner(long userId, Lot lot)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         if (!auctionParticipationService.isUserParticipateInLotAuction(userId, lot.getLotId())
-                && userId!=lot.getOwnerId()) {
+                && userId != lot.getOwnerId()) {
             throw new ClientErrorException(ClientError.FORBIDDEN);
         }
     }

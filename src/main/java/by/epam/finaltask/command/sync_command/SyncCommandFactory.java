@@ -1,7 +1,7 @@
 package by.epam.finaltask.command.sync_command;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class SyncCommandFactory {
 
-    private final static Logger LOG = LogManager.getLogger(SyncCommandFactory.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SyncCommandFactory.class);
 
     private static volatile SyncCommandFactory instance;
     private final ConcurrentMap<SyncCommandVariant, SyncCommand> commands = new ConcurrentHashMap<>();

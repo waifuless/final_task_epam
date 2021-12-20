@@ -11,14 +11,14 @@ import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class SyncCommandHandler implements CommandHandler {
 
-    private final static Logger LOG = LogManager.getLogger(SyncCommandHandler.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SyncCommandHandler.class);
     private final static String OPERATION_NOT_FOUND_MCG = "Operation %s not found";
     private final static String SERVICE_ERROR_MCG = "An error occurred during service execution";
     private final static String UNKNOWN_ERROR_MCG = "An unknown error occurred on server";

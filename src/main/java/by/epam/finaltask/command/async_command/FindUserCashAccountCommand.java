@@ -9,8 +9,8 @@ import by.epam.finaltask.model.User;
 import by.epam.finaltask.service.ServiceFactory;
 import by.epam.finaltask.service.UserService;
 import com.google.gson.Gson;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public class FindUserCashAccountCommand implements AjaxCommand {
 
-    private final static Logger LOG = LogManager.getLogger(FindUserCashAccountCommand.class);
+    private final static Logger LOG = LoggerFactory.getLogger(FindUserCashAccountCommand.class);
     private final static String USER_NOT_FOUND_MCG = "user not found";
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays

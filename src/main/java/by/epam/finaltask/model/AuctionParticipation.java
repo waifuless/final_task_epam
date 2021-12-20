@@ -51,7 +51,7 @@ public class AuctionParticipation {
         if (participantId != that.participantId) return false;
         if (lotId != that.lotId) return false;
         if (depositIsTakenByOwner != that.depositIsTakenByOwner) return false;
-        return deposit != null ? deposit.compareTo(that.deposit)==0 : that.deposit == null;
+        return deposit != null ? deposit.compareTo(that.deposit) == 0 : that.deposit == null;
     }
 
     @Override

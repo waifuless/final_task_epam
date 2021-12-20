@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class FindLotsAndPagesCountParticipatedEndedWithResultsByUserCommand implements AjaxCommand{
+public class FindLotsAndPagesCountParticipatedEndedWithResultsByUserCommand implements AjaxCommand {
 
     private final static Logger LOG = LoggerFactory
             .getLogger(FindLotsAndPagesCountParticipatedEndedWithResultsByUserCommand.class);

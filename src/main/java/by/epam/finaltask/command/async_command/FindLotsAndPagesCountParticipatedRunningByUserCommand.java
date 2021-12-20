@@ -10,7 +10,6 @@ import by.epam.finaltask.model.LotContext;
 import by.epam.finaltask.model.LotWithImages;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.AuctionParticipationService;
-import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
@@ -21,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class FindLotsAndPagesCountParticipatedRunningByUserCommand implements AjaxCommand{
+public class FindLotsAndPagesCountParticipatedRunningByUserCommand implements AjaxCommand {
 
     private final static Logger LOG = LoggerFactory.getLogger(FindLotsAndPagesCountParticipatedRunningByUserCommand.class);
 

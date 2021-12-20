@@ -180,9 +180,7 @@ public class MariaAuctionParticipationManager implements AuctionParticipationMan
     @Override
     public long findUsersParticipationsCount(long userId)
             throws SQLException, DataSourceDownException, InterruptedException {
-        return findCount(FIND_COUNT_BY_USER_ID_QUERY, (statement) -> {
-            statement.setLong(1, userId);
-        });
+        return findCount(FIND_COUNT_BY_USER_ID_QUERY, (statement) -> statement.setLong(1, userId));
     }
 
     @Override

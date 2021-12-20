@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class ShowAdminUsersPageCommand implements SyncCommand{
+public class ShowAdminUsersPageCommand implements SyncCommand {
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.ADMIN));

@@ -6,8 +6,6 @@ import by.epam.finaltask.command.async_command.AjaxCommandFactory;
 import by.epam.finaltask.command.handler.HandlerFactory;
 import by.epam.finaltask.command.sync_command.SyncCommandFactory;
 import by.epam.finaltask.model.Role;
-import by.epam.finaltask.service.LotService;
-import by.epam.finaltask.service.ServiceFactory;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,7 +45,7 @@ public class UserPermissionFilter implements Filter {
         boolean requestIsAjax = handlerFactory.isRequestAjax(request);
 
         final boolean bannedStatus = retrieveUserBannedStatus(request);
-        if(bannedStatus){
+        if (bannedStatus) {
             LOG.debug(BAN_ERROR_MESSAGE);
             sendError(SC_FORBIDDEN, BAN_ERROR_MESSAGE, requestIsAjax, response);
             return;
@@ -91,7 +89,7 @@ public class UserPermissionFilter implements Filter {
             return Role.NOT_AUTHORIZED;
         }
         Role role = (Role) session.getAttribute(UserSessionAttribute.USER_ROLE.name());
-        if(role==null){
+        if (role == null) {
             session.setAttribute(UserSessionAttribute.USER_ROLE.name(), Role.NOT_AUTHORIZED);
             role = Role.NOT_AUTHORIZED;
         }

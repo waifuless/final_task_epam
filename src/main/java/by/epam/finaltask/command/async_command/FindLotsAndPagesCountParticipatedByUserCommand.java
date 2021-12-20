@@ -5,20 +5,20 @@ import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
-import by.epam.finaltask.model.AuctionStatus;
-import by.epam.finaltask.model.LotContext;
 import by.epam.finaltask.model.LotWithImages;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.AuctionParticipationService;
-import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-public class FindLotsAndPagesCountParticipatedByUserCommand implements AjaxCommand{
+public class FindLotsAndPagesCountParticipatedByUserCommand implements AjaxCommand {
 
     private final static Logger LOG = LoggerFactory.getLogger(FindLotsAndPagesCountParticipatedByUserCommand.class);
 

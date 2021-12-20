@@ -7,8 +7,6 @@ import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.ImagesService;
 import by.epam.finaltask.service.ServiceFactory;
 import jakarta.servlet.http.Part;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,8 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class UploadImageCommand implements AjaxCommand {
-
-    private final static Logger LOG = LogManager.getLogger(UploadImageCommand.class);
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.ADMIN, Role.USER));

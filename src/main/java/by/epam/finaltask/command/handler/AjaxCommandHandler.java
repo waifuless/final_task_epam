@@ -9,15 +9,15 @@ import by.epam.finaltask.exception.OperationNotSupportedException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class AjaxCommandHandler implements CommandHandler {
 
-    private final static Logger LOG = LogManager.getLogger(AjaxCommandHandler.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AjaxCommandHandler.class);
     private final static String OPERATION_NOT_FOUND_MCG = "Operation %s not found";
     private final static String UNKNOWN_ERROR_MCG = "An unknown error occurred on server";
 

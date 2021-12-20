@@ -39,7 +39,7 @@ public class FindBestBidAndItsBelongingToUserCommand implements AjaxCommand {
         String lotId = request.getParameter("lotId");
         long userId = (Long) request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
         Bid bestBid = bidService.findBestBid(userId, lotId)
-                .orElseThrow(()->new ClientErrorException(ClientError.NOT_FOUND));
+                .orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
         Object[] answer = new Object[2];
         answer[0] = bestBid.getAmount();
         answer[1] = userId == bestBid.getUserId();

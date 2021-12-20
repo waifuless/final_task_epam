@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class RetrieveAuctionParticipationDepositFromWinnerCommand implements AjaxCommand{
+public class RetrieveAuctionParticipationDepositFromWinnerCommand implements AjaxCommand {
 
     private final static Logger LOG = LoggerFactory
             .getLogger(RetrieveAuctionParticipationDepositFromWinnerCommand.class);

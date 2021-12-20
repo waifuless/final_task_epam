@@ -1,8 +1,6 @@
 package by.epam.finaltask.dao;
 
 import by.epam.finaltask.exception.DataSourceDownException;
-import by.epam.finaltask.model.Lot;
-import by.epam.finaltask.model.LotContext;
 import by.epam.finaltask.model.User;
 import by.epam.finaltask.model.UserContext;
 
@@ -24,5 +22,5 @@ public interface UserManager extends Dao<User> {
     List<User> findByUserContext(UserContext context, long offset, long count)
             throws SQLException, DataSourceDownException, InterruptedException;
 
-    long findUsersCount(UserContext context)throws SQLException, DataSourceDownException, InterruptedException;
+    long findUsersCount(UserContext context) throws SQLException, DataSourceDownException, InterruptedException;
 }

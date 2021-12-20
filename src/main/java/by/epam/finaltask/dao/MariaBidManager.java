@@ -99,9 +99,9 @@ public class MariaBidManager extends GenericDao<Bid> implements BidManager {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setLong(1, lotId);
             ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 return Optional.of(extractEntity(resultSet));
-            }else{
+            } else {
                 return Optional.empty();
             }
         } catch (SQLException | DataSourceDownException e) {

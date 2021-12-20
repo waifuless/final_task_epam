@@ -6,7 +6,7 @@ import by.epam.finaltask.model.Bid;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public interface BidManager extends Dao<Bid>{
+public interface BidManager extends Dao<Bid> {
 
     static BidManager getInstance() throws DataSourceDownException {
         return MariaBidManager.getInstance();

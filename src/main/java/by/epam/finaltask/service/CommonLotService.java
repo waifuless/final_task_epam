@@ -6,8 +6,8 @@ import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
 import by.epam.finaltask.model.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -18,7 +18,7 @@ import java.util.*;
 
 public class CommonLotService implements LotService {
 
-    private final static Logger LOG = LogManager.getLogger(CommonLotService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CommonLotService.class);
 
     private final static String LOT_DID_NOT_SAVED_ERROR_MESSAGE =
             "Error occurred while saving lot to database. Lot: {}";
@@ -33,7 +33,6 @@ public class CommonLotService implements LotService {
 
     private final LotManager lotManager;
     private final ImagesManager imagesManager;
-    private final UserService userService = ServiceFactory.getFactoryInstance().userService();
 
     CommonLotService(LotManager lotManager, ImagesManager imagesManager) {
         this.lotManager = lotManager;
@@ -236,7 +235,6 @@ public class CommonLotService implements LotService {
                                         String category, String auctionType, String condition, String description,
                                         String initPrice, String auctionStart, String duration, String region,
                                         String cityOrDistrict) throws ClientErrorException {
-        //todo: add validation to date and images(should be in database)
         if (isStringEmpty(mainImagePath) || isStringEmpty(title) || isStringEmpty(category)
                 || isStringEmpty(auctionType) || isStringEmpty(condition) || isStringEmpty(description)
                 || isStringEmpty(initPrice) || isStringEmpty(auctionStart) || isStringEmpty(duration)
