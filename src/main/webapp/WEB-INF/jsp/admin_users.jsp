@@ -73,6 +73,8 @@
                                 Сбросить
                             </button>
                         </div>
+                        <div class="col-12 mb-3" id="error-place">
+                        </div>
                     </div>
                 </form>
 
@@ -111,6 +113,7 @@
 
 <script src="js/escape-text.js" type="text/javascript"></script>
 <script src="js/nav-link.js" type="text/javascript"></script>
+<script src="js/jquery.validate.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         selectActiveNavPage('users');
@@ -128,6 +131,33 @@
 
         let form = $('#filters-form');
         form.submit(e=>applyFilters(e));
+
+        form.validate({
+            rules:{
+                'user-id': {
+                    digits: true,
+                    min: 1
+                },
+                email:{
+                    maxlength: 254
+                }
+            },
+            messages: {
+                'user-id': {
+                    digits: "ID должен содержать только числа (целые)",
+                    min: "Минимальный id - 1"
+                },
+                email:{
+                    maxlength: "Максимальная длинна поля 254 символа"
+                }
+            },
+            errorPlacement: function(error, element) {
+                let errorPlace = $("#error-place");
+                errorPlace.empty();
+                errorPlace.append(error);
+            }
+        });
+
         requestUsers(1);
     });
 
@@ -137,6 +167,9 @@
     }
 
     function requestUsers(page) {
+        if(!$("#filters-form").valid()){
+            return false;
+        }
         $.ajax({
             type: 'GET',
             url: 'ControllerServlet?page=' + page,

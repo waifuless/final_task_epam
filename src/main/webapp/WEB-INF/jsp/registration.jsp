@@ -109,7 +109,8 @@
             },
             rules: {
                 email: {
-                    email: true
+                    email: true,
+                    maxlength: 254
                 },
                 password:{
                     minlength: 8,
