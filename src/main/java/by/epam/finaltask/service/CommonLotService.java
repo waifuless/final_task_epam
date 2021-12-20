@@ -31,6 +31,8 @@ public class CommonLotService implements LotService {
     private final static int MAX_DURATION_HOURS = 24;
     private final static int ONE_HOUR_IN_MILLIS = 60 * 60 * 1000;
 
+    private final ServiceFactory serviceFactory = ServiceFactory.getFactoryInstance();
+
     private final LotManager lotManager;
     private final ImagesManager imagesManager;
 
@@ -156,16 +158,16 @@ public class CommonLotService implements LotService {
             if (lotIds == null || lotIds.length < 1 || newStatus == null || newStatus.trim().isEmpty()) {
                 throw new ClientErrorException(ClientError.EMPTY_ARGUMENTS);
             }
-            AuctionStatus auctionStatus = AuctionStatus.valueOf(newStatus);
+            AuctionStatus newAuctionStatus = AuctionStatus.valueOf(newStatus);
             int[] ids = new int[lotIds.length];
             for (int i = 0; i < lotIds.length; i++) {
                 ids[i] = Integer.parseInt(lotIds[i]);
             }
             for (int lotId : ids) {
                 Optional<Lot> optionalLot = lotManager.find(lotId);
-                if (optionalLot.isPresent()) {
+                if (optionalLot.filter(lot -> !lot.getAuctionStatus().equals(newAuctionStatus)).isPresent()) {
                     lotManager.update(Lot.builder().setLot(optionalLot.get())
-                            .setAuctionStatus(auctionStatus).build());
+                            .setAuctionStatus(newAuctionStatus).build());
                 }
             }
         } catch (NumberFormatException ex) {

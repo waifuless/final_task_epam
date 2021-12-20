@@ -37,6 +37,7 @@ public class MariaBidManager extends GenericDao<Bid> implements BidManager {
             " (SELECT MAX(amount) FROM bid WHERE lot_id = ?) ORDER BY bid_id LIMIT 1";
     private final static String FIND_MIN_BID_QUERY = FIND_ALL_BIDS_QUERY + " WHERE amount = " +
             " (SELECT MIN(amount) FROM bid WHERE lot_id = ?) ORDER BY bid_id LIMIT 1";
+    private final static String DELETE_BID_BY_LOT_ID_QUERY = "DELETE FROM bid WHERE user_id = ? AND lot_id = ?";
 
     private static volatile MariaBidManager instance;
 
@@ -64,6 +65,23 @@ public class MariaBidManager extends GenericDao<Bid> implements BidManager {
     @Override
     public Optional<Bid> findMinBid(long lotId) throws SQLException, DataSourceDownException, InterruptedException {
         return findBestBid(lotId, FIND_MIN_BID_QUERY);
+    }
+
+    @Override
+    public void deleteByUserIdAndLotId(long userId, long lotId) throws SQLException, DataSourceDownException, InterruptedException {
+        try (Connection connection = connectionPool.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(DELETE_BID_BY_LOT_ID_QUERY);
+            statement.setLong(1, userId);
+            statement.setLong(2, lotId);
+            statement.execute();
+        } catch (SQLException | DataSourceDownException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw e;
+        }
     }
 
     @Override

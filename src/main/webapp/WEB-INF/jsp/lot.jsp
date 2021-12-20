@@ -2,8 +2,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
-         import="by.epam.finaltask.model.AuctionStatus, by.epam.finaltask.command.UserSessionAttribute" %>
+         import="by.epam.finaltask.model.AuctionStatus,
+                 by.epam.finaltask.command.UserSessionAttribute,
+                 by.epam.finaltask.model.Role" %>
 
+<fmt:setLocale value="${cookie.get('lang').value}"/>
+<fmt:setBundle basename="l10n.page.lots_filters" var="filters"/>
 <fmt:setBundle basename="path-to-images-folder" var="imgFolderPath"/>
 
 <!DOCTYPE html>
@@ -28,6 +32,43 @@
     <%@include file="/WEB-INF/jsp_fragment/header.jsp" %>
 
     <div class="container-lg">
+
+        <c:if test="${sessionScope.get(UserSessionAttribute.USER_ROLE.name()) eq Role.ADMIN.name()}">
+            <div class="row my-3" style="border: 1px solid green; border-radius: 15px;
+             align-items: center; justify-content: center;">
+                <div class="col">Статус сейчас: ${lot.auctionStatus}</div>
+                <div class="col mb-3">
+                    <label class="mb-2" for="auction-status-update">
+                        Выберите новый статус для аукциона
+                    </label>
+                    <select id="auction-status-update" name="auction-status" class="form-select">
+                        <option value="NOT_VERIFIED">
+                            NOT_VERIFIED
+                        </option>
+                        <option value="APPROVED_BY_ADMIN">
+                            APPROVED_BY_ADMIN
+                        </option>
+                        <option value="RUNNING">
+                            RUNNING
+                        </option>
+                        <option value="SUSPENDED">
+                            SUSPENDED
+                        </option>
+                        <option value="ENDED">
+                            ENDED
+                        </option>
+                        <option value="DENIED">
+                            DENIED
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <button class="btn btn-warning w-100" onclick="updateAuctionStatus(${lot.lotId})">
+                        Обновить
+                    </button>
+                </div>
+            </div>
+        </c:if>
 
         <div class="row my-3">
             <h1>${lot.title}</h1>
@@ -316,6 +357,27 @@
                     bestBidStatus.append('Нет ни одной ставки');
                     return;
                 }
+                alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
+            }
+        });
+    }
+
+    function updateAuctionStatus(lotId) {
+        let newStatus = $('#auction-status-update');
+        $.ajax({
+            type: 'POST',
+            url: 'ControllerServlet',
+            dataType: "text",
+            data: {
+                requestIsAjax: true,
+                command: "update_auction_status",
+                'ids[]': lotId,
+                new_status: newStatus.val()
+            },
+            success: function (answer) {
+                window.location.replace(window.location.href);
+            },
+            error: function (xhr, textStatus, thrownError) {
                 alert("Code error: " + xhr.status + "\nMessage: " + xhr.responseText);
             }
         });

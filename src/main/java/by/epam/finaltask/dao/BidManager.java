@@ -15,4 +15,7 @@ public interface BidManager extends Dao<Bid> {
     Optional<Bid> findMaxBid(long lotId) throws SQLException, DataSourceDownException, InterruptedException;
 
     Optional<Bid> findMinBid(long lotId) throws SQLException, DataSourceDownException, InterruptedException;
+
+    void deleteByUserIdAndLotId(long userId, long lotId)
+            throws SQLException, DataSourceDownException, InterruptedException;
 }

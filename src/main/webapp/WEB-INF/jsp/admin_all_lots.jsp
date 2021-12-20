@@ -4,7 +4,6 @@
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.lots_filters" var="filters"/>
-<%--todo: replace main l10n {loc} to new l10n with extended cards --%>
 <fmt:setBundle basename="l10n.page.main" var="loc"/>
 
 <!doctype html>

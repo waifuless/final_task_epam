@@ -76,6 +76,7 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
                     .orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             Lot lot = lotService.findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             validateUserAccessToDeleteParticipation(requestedUserId, lot);
+            serviceFactory.bidService().deleteUsersLotBids(requestedUserId, longLotId);
             userService.plusToCashAccount(requestedUserId, participation.getDeposit());
             auctionParticipationManager.deleteParticipation(requestedUserId, longLotId);
         } catch (NumberFormatException ex) {
@@ -227,10 +228,9 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
 
     private void validateUserAccessToDeleteParticipation(long userId, Lot lot)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
-        if (lot.getOwnerId() == userId
-                || (!lot.getAuctionStatus().equals(AuctionStatus.APPROVED_BY_ADMIN)
-                && !lot.getAuctionStatus().equals(AuctionStatus.SUSPENDED)
-                && !(lot.getAuctionStatus().equals(AuctionStatus.ENDED) && !hasUserBestBid(userId, lot.getLotId())))) {
+        if (lot.getAuctionStatus().equals(AuctionStatus.RUNNING)
+                || lot.getOwnerId() == userId
+                || (lot.getAuctionStatus().equals(AuctionStatus.ENDED) && hasUserBestBid(userId, lot.getLotId()))) {
             throw new ClientErrorException(ClientError.FORBIDDEN);
         }
     }

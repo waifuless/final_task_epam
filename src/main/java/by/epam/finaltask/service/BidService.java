@@ -25,4 +25,6 @@ public interface BidService {
 
     Map<LotWithImages, AuctionResult> findUserOwnedEndedLotsWithAuctionResult(long page, long userId)
             throws ServiceCanNotCompleteCommandRequest;
+
+    void deleteUsersLotBids(long userId, long lotId) throws ServiceCanNotCompleteCommandRequest;
 }

@@ -29,20 +29,20 @@
     <div class="container-lg">
 
         <ul class="nav nav-tabs">
-            <li class="nav-item active">
-                <button class="nav-link" id="owned-lots-button">Мои лоты</button>
+            <li class="nav-item">
+                <button class="nav-link active user-lots-nav-item" id="owned-lots-button">Мои лоты</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="ended-owned-lots-button">Мои завершенные лоты</button>
+                <button class="nav-link user-lots-nav-item" id="ended-owned-lots-button">Мои завершенные лоты</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="participate-lots-button">Записан на участие</button>
+                <button class="nav-link user-lots-nav-item" id="participate-lots-button">Записан на участие</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="running-participate-lots-button">Идут ставки</button>
+                <button class="nav-link user-lots-nav-item" id="running-participate-lots-button">Идут ставки</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="ended-participate-lots-button">Завершенные лоты</button>
+                <button class="nav-link user-lots-nav-item" id="ended-participate-lots-button">Завершенные лоты</button>
             </li>
         </ul>
 
@@ -103,8 +103,8 @@
     });
 
     function disactiveLinksAndActiveOnParent(elem) {
-        $('.nav-link').removeClass('active');
-        $(elem).parent().addClass('active');
+        $('.user-lots-nav-item').removeClass('active');
+        $(elem).addClass('active');
     }
 
     function requestOwnedLots(page) { //Просто посмотреть

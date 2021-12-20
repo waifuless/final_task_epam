@@ -169,6 +169,16 @@ public class CommonBidService implements BidService {
         }
     }
 
+    @Override
+    public void deleteUsersLotBids(long userId, long lotId) throws ServiceCanNotCompleteCommandRequest {
+        try {
+            bidManager.deleteByUserIdAndLotId(userId, lotId);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new ServiceCanNotCompleteCommandRequest(ex);
+        }
+    }
+
     private void validateBid(long userId, long lotId, BigDecimal amount)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException, SQLException, InterruptedException {
         Lot lot = lotService.findLot(lotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
