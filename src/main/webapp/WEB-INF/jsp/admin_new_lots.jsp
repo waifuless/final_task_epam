@@ -4,6 +4,7 @@
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.lots_filters" var="filters"/>
+<fmt:setBundle basename="l10n.page.admin_new_lots" var="admin_new_lots"/>
 
 <!doctype html>
 <html lang="en">
@@ -30,9 +31,9 @@
 
             <div class="container-lg">
 
-                <h2 style="border-bottom: 1px solid green; margin-top: 30px">Новые лоты</h2>
-                <button type="button" class="btn btn-success" id="approve-lots">Одобрить</button>
-                <button type="button" class="btn btn-danger" id="deny-lots">Отклонить</button>
+                <h2 style="border-bottom: 1px solid green; margin-top: 30px"><fmt:message bundle="${admin_new_lots}" key="new.lots"/></h2>
+                <button type="button" class="btn btn-success" id="approve-lots"><fmt:message bundle="${admin_new_lots}" key="button.accept"/></button>
+                <button type="button" class="btn btn-danger" id="deny-lots"><fmt:message bundle="${admin_new_lots}" key="button.deny"/></button>
                 <div class="row col-10">
                     <table class="table table-hover">
                         <thead>
@@ -40,9 +41,9 @@
                             <th scope="col" class="text-center">
                                 <input class="form-check-input" type="checkbox" id="main-checkbox">
                             </th>
-                            <th scope="col">Lot id</th>
-                            <th scope="col">Owner id</th>
-                            <th scope="col">Title</th>
+                            <th scope="col"><fmt:message bundle="${admin_new_lots}" key="lot.id"/></th>
+                            <th scope="col"><fmt:message bundle="${admin_new_lots}" key="owner.id"/></th>
+                            <th scope="col"><fmt:message bundle="${admin_new_lots}" key="title"/></th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
@@ -91,7 +92,7 @@
 
         $('#deny-lots').click(function () {
             let checked = $('.ids:checked');
-            if (!confirm("Отклонить " + checked.length + " лотов?")) {
+            if (!confirm("<fmt:message bundle="${admin_new_lots}" key="deny.confirm.alert.start"/> " + checked.length + " <fmt:message bundle="${admin_new_lots}" key="deny.confirm.alert.end"/>")) {
                 return;
             }
             updateStatus('DENIED', checked);
@@ -99,7 +100,7 @@
 
         $('#approve-lots').click(function () {
             let checked = $('.ids:checked');
-            if (!confirm("Одобрить " + checked.length + " лотов?")) {
+            if (!confirm("<fmt:message bundle="${admin_new_lots}" key="approve.confirm.alert.start"/> " + checked.length + " <fmt:message bundle="${admin_new_lots}" key="approve.confirm.alert.end"/>")) {
                 return;
             }
             updateStatus('APPROVED_BY_ADMIN', checked);
@@ -142,7 +143,7 @@
                         <td>`+escapeText(lot.title)+`</td>
                         <td>
                             <a class="link-dark" target="_blank" href="${pageContext.request.contextPath}/ControllerServlet?command=show_lot_page&lot_id=`+lot.lotId+`">
-                                Перейти
+                                <fmt:message bundle="${admin_new_lots}" key="forward"/>
                             </a>
                         </td>
                     </tr>`);

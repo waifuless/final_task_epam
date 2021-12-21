@@ -5,6 +5,7 @@
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.lots_filters" var="filters"/>
 <fmt:setBundle basename="l10n.page.main" var="loc"/>
+<fmt:setBundle basename="l10n.page.validation" var="validation"/>
 
 <!doctype html>
 <html lang="en">
@@ -259,19 +260,19 @@
             },
             messages: {
                 'price-from': {
-                    number: "Цена должна содержать только числа (дробные)",
-                    maxlength: "Максимальная длинна поля Цена 14 символов"
+                    number: "<fmt:message bundle="${validation}" key="price.number"/>",
+                    maxlength: "<fmt:message bundle="${validation}" key="price.maxlength"/>"
                 },
                 'price-to': {
-                    number: "Цена должна содержать только числа (дробные)",
-                    maxlength: "Максимальная длинна поля Цена 14 символов"
+                    number: "<fmt:message bundle="${validation}" key="price.number"/>",
+                    maxlength: "<fmt:message bundle="${validation}" key="price.maxlength"/>"
                 },
                 'owner-id': {
-                    digits: "ID должен содержать только числа (целые)",
-                    min: "Минимальный id - 1"
+                    digits: "<fmt:message bundle="${validation}" key="ownerid.digits"/>",
+                    min: "<fmt:message bundle="${validation}" key="ownerid.min"/>"
                 },
                 'title': {
-                    maxlength: "Максимальная длинна названия 256 символов"
+                    maxlength: "<fmt:message bundle="${validation}" key="title.maxlength"/>"
                 }
             },
             errorPlacement: function (error, element) {

@@ -4,6 +4,8 @@
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.lots_filters" var="filters"/>
+<fmt:setBundle basename="l10n.page.admin_users" var="admin_users"/>
+<fmt:setBundle basename="l10n.page.validation" var="validation"/>
 
 <!doctype html>
 <html lang="en">
@@ -29,23 +31,23 @@
 
             <div class="container-lg">
 
-                <h2 style="border-bottom: 1px solid green; margin-top: 30px">Фильтры</h2>
+                <h2 style="border-bottom: 1px solid green; margin-top: 30px"><fmt:message bundle="${admin_users}" key="filters.title"/></h2>
                 <form id="filters-form">
                     <input type="hidden" name="command" value="find_users_and_pages_count_by_admin">
                     <input type="hidden" name="requestIsAjax" value="true">
                     <div class="row mt-4">
                         <div class="col-lg-3 col-sm-6 mb-3">
-                            <label class="mb-2" for="ban-status-filter">Статус бана</label>
+                            <label class="mb-2" for="ban-status-filter"><fmt:message bundle="${admin_users}" key="ban.status"/></label>
                             <select id="ban-status-filter" name="ban-status" class="form-select"
                                     aria-label="Default select example">
-                                <option selected value="">Любой</option>
-                                <option value="true">Забанен</option>
-                                <option value="false">Не забанен</option>
+                                <option selected value=""><fmt:message bundle="${admin_users}" key="any"/></option>
+                                <option value="true"><fmt:message bundle="${admin_users}" key="banned"/></option>
+                                <option value="false"><fmt:message bundle="${admin_users}" key="not.banned"/></option>
                             </select>
                         </div>
                         <div class="col-lg-3 col-sm-6 mb-3">
                             <label class="mb-2" for="user-id-filter">
-                                User id
+                                <fmt:message bundle="${admin_users}" key="user.id"/>
                             </label>
                             <div id="user-id-filter">
                                 <input type="text" name="user-id" aria-label="user-id"
@@ -55,7 +57,7 @@
                         </div>
                         <div class="col-lg-3 col-sm-6 mb-3">
                             <label class="mb-2" for="email-filter">
-                                Email
+                                <fmt:message bundle="${admin_users}" key="email"/>
                             </label>
                             <div id="email-filter">
                                 <input type="text" name="email" aria-label="email"
@@ -65,12 +67,12 @@
                         </div>
                         <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
                             <button type="submit" class="btn btn-success w-100">
-                                Применить
+                                <fmt:message bundle="${admin_users}" key="apply"/>
                             </button>
                         </div>
                         <div class="col-lg-3 col-sm-6 mb-3" style="display: flex; align-items: flex-end">
                             <button type="button" id="reset-button" class="btn btn-danger w-100">
-                                Сбросить
+                                <fmt:message bundle="${admin_users}" key="deny"/>
                             </button>
                         </div>
                         <div class="col-12 mb-3" id="error-place">
@@ -78,16 +80,16 @@
                     </div>
                 </form>
 
-                <h2 style="border-bottom: 1px solid green; margin-top: 30px">Users</h2>
+                <h2 style="border-bottom: 1px solid green; margin-top: 30px"><fmt:message bundle="${admin_users}" key="table.users"/></h2>
                 <div class="row col-12">
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th scope="col">User id</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Ban status</th>
-                            <th scope="col">Cash account</th>
-                            <th scope="col">Action</th>
+                            <th scope="col"><fmt:message bundle="${admin_users}" key="table.user.id"/></th>
+                            <th scope="col"><fmt:message bundle="${admin_users}" key="table.email"/></th>
+                            <th scope="col"><fmt:message bundle="${admin_users}" key="table.ban.status"/></th>
+                            <th scope="col"><fmt:message bundle="${admin_users}" key="table.cash.account"/></th>
+                            <th scope="col"><fmt:message bundle="${admin_users}" key="table.action"/></th>
                         </tr>
                         </thead>
                         <tbody id="users-table-body">
@@ -144,11 +146,11 @@
             },
             messages: {
                 'user-id': {
-                    digits: "ID должен содержать только числа (целые)",
-                    min: "Минимальный id - 1"
+                    digits: "<fmt:message bundle="${validation}" key="ownerid.digits"/>",
+                    min: "<fmt:message bundle="${validation}" key="ownerid.min"/>"
                 },
                 email:{
-                    maxlength: "Максимальная длинна поля 254 символа"
+                    maxlength: "<fmt:message bundle="${validation}" key="email.maxlength"/>"
                 }
             },
             errorPlacement: function(error, element) {
@@ -198,12 +200,12 @@
                 bannedStatus = 'banned';
                 rowColorClass = 'table-danger';
                 button = `<button type="button" class="btn btn-success w-100" onclick="actionWithUser(`+
-                    user.userId+`, 'unban')">Unban</button>`;
+                    user.userId+`, 'unban')"><fmt:message bundle="${admin_users}" key="button.unban"/></button>`;
             }else{
                 bannedStatus = 'not banned';
                 rowColorClass = 'table-success';
                 button = `<button type="button" class="btn btn-danger w-100" onclick="actionWithUser(`+
-                    user.userId+`, 'ban')">Ban</button>`;
+                    user.userId+`, 'ban')"><fmt:message bundle="${admin_users}" key="button.ban"/></button>`;
             }
             divForUsers.append(`<tr class="`+rowColorClass+`">
                             <td>`+user.userId+`</td>

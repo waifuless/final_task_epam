@@ -4,6 +4,8 @@
 
 <fmt:setLocale value="${cookie.get('lang').value}"/>
 <fmt:setBundle basename="l10n.page.lots_filters" var="filters"/>
+<fmt:setBundle basename="l10n.page.admin_categories" var="admin_categories"/>
+<fmt:setBundle basename="l10n.page.validation" var="validation"/>
 
 <!doctype html>
 <html lang="en">
@@ -31,24 +33,24 @@
 
             <div class="container-lg">
 
-                <h2 style="border-bottom: 1px solid green; margin-top: 30px">Категории</h2>
+                <h2 style="border-bottom: 1px solid green; margin-top: 30px"><fmt:message bundle="${admin_categories}" key="title"/></h2>
                 <div class="row">
                     <div class="col-5" style="border-right: 1px solid green">
-                        <h4 style="margin-top: 30px">Добавление категорий</h4>
+                        <h4 style="margin-top: 30px"><fmt:message bundle="${admin_categories}" key="title.add.categories"/></h4>
                         <form id="add-category-form">
                             <input type="hidden" name="command" value="add_category">
                             <input type="hidden" name="requestIsAjax" value="true">
 
                             <input type="text" aria-label="category-name" class="form-control my-4"
                                    placeholder="category name" name="category-name" id="category-name">
-                            <button type="submit" class="btn btn-success w-100">Добавить</button>
+                            <button type="submit" class="btn btn-success w-100"><fmt:message bundle="${admin_categories}" key="button.add"/></button>
                         </form>
                     </div>
 
                     <div class="col-7">
-                        <h4 style="margin-top: 30px">Существующие категории</h4>
-                        <p><b>Внимание!</b> Удаление категории приведет к удалению всех лотов в этой категории.</p>
-                        <button type="button" class="btn btn-danger my-2" id="delete-categories">Удалить</button>
+                        <h4 style="margin-top: 30px"><fmt:message bundle="${admin_categories}" key="title.exists.categories"/></h4>
+                        <p><b><fmt:message bundle="${admin_categories}" key="delete.alert"/></b> <fmt:message bundle="${admin_categories}" key="delete.text"/></p>
+                        <button type="button" class="btn btn-danger my-2" id="delete-categories"><fmt:message bundle="${admin_categories}" key="button.delete"/></button>
                         <div class="row col-10">
 
                             <table class="table table-hover">
@@ -57,7 +59,7 @@
                                     <th scope="col" class="text-center">
                                         <input class="form-check-input" type="checkbox" id="main-checkbox">
                                     </th>
-                                    <th scope="col">Название</th>
+                                    <th scope="col"><fmt:message bundle="${admin_categories}" key="table.col.name"/></th>
                                     <th scope="col"></th>
                                 </tr>
                                 </thead>
@@ -71,7 +73,7 @@
                                                    value="${category.categoryId}">
                                         </th>
                                         <td class="category-name"><c:out value="${category.categoryName}"/></td>
-                                        <td><a class="link-dark rename-link">переименовать</a></td>
+                                        <td><a class="link-dark rename-link"><fmt:message bundle="${admin_categories}" key="update.name"/></a></td>
                                     </tr>
                                 </c:forEach>
                                 </tbody>
@@ -109,8 +111,8 @@
             },
             messages: {
                 'category-name':{
-                    required: "Поле не должно быть пустым",
-                    maxlength: "Максимальная длинна поля 64 символа"
+                    required: "<fmt:message bundle="${validation}" key="required"/>",
+                    maxlength: "<fmt:message bundle="${validation}" key="category-name.maxlength"/>"
                 }
             }
         });
@@ -146,7 +148,7 @@
 
         $('#delete-categories').click(function () {
             let checked = $('.ids:checked');
-            if (!confirm("Это действие нельзя будет отменить. Удалить " + checked.length + " категории?")) {
+            if (!confirm("<fmt:message bundle="${admin_categories}" key="confirm.alert.start"/> " + checked.length + " <fmt:message bundle="${admin_categories}" key="confirm.alert.end"/>")) {
                 return;
             }
             $.ajax({
@@ -168,7 +170,7 @@
             let parentRow = $(this).parent().parent();
             let oldCategoryName = parentRow.children('.category-name').text();
             let categoryId = parentRow.find('th > .ids').val();
-            let newName = prompt("Введите новое название для категории " + oldCategoryName);
+            let newName = prompt("<fmt:message bundle="${admin_categories}" key="prompt.update.name"/> " + oldCategoryName);
             if(newName==null || newName.length<=0 || oldCategoryName === newName){
                 return;
             }
