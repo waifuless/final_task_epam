@@ -244,11 +244,13 @@
             rules: {
                 'price-from': {
                     number: true,
-                    maxlength: 14
+                    maxlength: 14,
+                    min: 0.01
                 },
                 'price-to': {
                     number: true,
-                    maxlength: 14
+                    maxlength: 14,
+                    min: 0.01
                 },
                 'owner-id': {
                     digits: true,
@@ -261,11 +263,13 @@
             messages: {
                 'price-from': {
                     number: "<fmt:message bundle="${validation}" key="price.number"/>",
-                    maxlength: "<fmt:message bundle="${validation}" key="price.maxlength"/>"
+                    maxlength: "<fmt:message bundle="${validation}" key="price.maxlength"/>",
+                    min: "<fmt:message bundle="${validation}" key="price.min"/>"
                 },
                 'price-to': {
                     number: "<fmt:message bundle="${validation}" key="price.number"/>",
-                    maxlength: "<fmt:message bundle="${validation}" key="price.maxlength"/>"
+                    maxlength: "<fmt:message bundle="${validation}" key="price.maxlength"/>",
+                    min: "<fmt:message bundle="${validation}" key="price.min"/>"
                 },
                 'owner-id': {
                     digits: "<fmt:message bundle="${validation}" key="ownerid.digits"/>",

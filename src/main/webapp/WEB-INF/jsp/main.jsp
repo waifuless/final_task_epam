@@ -184,21 +184,25 @@
             rules:{
                 'price-from': {
                     number: true,
-                    maxlength: 14
+                    maxlength: 14,
+                    min: 0.01
                 },
                 'price-to':{
                     number: true,
-                    maxlength: 14
+                    maxlength: 14,
+                    min: 0.01
                 }
             },
             messages: {
                 'price-from': {
                     number: "Цена должна содержать только числа (дробные)",
-                    maxlength: "Максимальная длинна поля Цена 14 символов"
+                    maxlength: "Максимальная длинна поля Цена 14 символов",
+                    min: "Минимальная цена 0.01 р"
                 },
                 'price-to':{
                     number: "Цена должна содержать только числа (дробные)",
-                    maxlength: "Максимальная длинна поля Цена 14 символов"
+                    maxlength: "Максимальная длинна поля Цена 14 символов",
+                    min: "Минимальная цена 0.01 р"
                 }
             },
             errorPlacement: function(error, element) {
