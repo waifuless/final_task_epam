@@ -7,17 +7,21 @@ import by.epam.finaltask.controller.PagePath;
 import by.epam.finaltask.exception.ClientError;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.ServiceCanNotCompleteCommandRequest;
+import by.epam.finaltask.model.Bid;
 import by.epam.finaltask.model.LotWithImages;
 import by.epam.finaltask.model.Role;
 import by.epam.finaltask.service.AuctionParticipationService;
+import by.epam.finaltask.service.BidService;
 import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
+import jdk.nashorn.internal.runtime.options.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class ShowLotPageCommand implements SyncCommand {
 
@@ -30,6 +34,7 @@ public class ShowLotPageCommand implements SyncCommand {
 
     private final AuctionParticipationService auctionParticipationService
             = ServiceFactory.getFactoryInstance().auctionParticipationService();
+    private final BidService bidService = ServiceFactory.getFactoryInstance().bidService();
 
     ShowLotPageCommand() {
     }
@@ -45,8 +50,13 @@ public class ShowLotPageCommand implements SyncCommand {
             LotWithImages lot = lotService.findLotWithImagesValidateUserAccess(userId, lotId, userRole);
             request.setAttribute("lot", lot);
             if (!userRole.equals(Role.NOT_AUTHORIZED)) {
-                request.setAttribute("user_is_participate",
-                        auctionParticipationService.isUserParticipateInLotAuction(userId, lotId));
+                boolean userIsParticipate = auctionParticipationService.isUserParticipateInLotAuction(userId, lotId);
+                request.setAttribute("user_is_participate", userIsParticipate);
+                if(userIsParticipate){
+                    Optional<Bid> optionalBid = bidService.findBestBid(userId, lot.getLotId());
+                    boolean userIsWinner = optionalBid.filter(bid -> bid.getUserId()==userId).isPresent();
+                    request.setAttribute("user_is_winner", userIsWinner);
+                }
             }
             return new SyncCommandResponse(false, PagePath.LOT.getPath());
         } catch (NumberFormatException ex) {

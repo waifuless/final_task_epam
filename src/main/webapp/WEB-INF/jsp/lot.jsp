@@ -33,7 +33,8 @@
 
     <div class="container-lg">
 
-        <c:if test="${lot.auctionStatus eq AuctionStatus.ENDED}">
+        <c:if test="${sessionScope.get(UserSessionAttribute.USER_ROLE.name()) eq Role.ADMIN.name()
+        && lot.auctionStatus eq AuctionStatus.ENDED}">
             <div class="row my-3" style="border: 1px solid green; border-radius: 15px;
              align-items: center; justify-content: center;">
                 Аукцион закончился. Его статус нельзя изменить.
@@ -221,7 +222,9 @@
                 </c:choose>
             </div>
         </c:if>
-        <c:if test="${requestScope.get('user_is_participate') && lot.auctionStatus ne AuctionStatus.RUNNING}">
+        <c:if test="${requestScope.get('user_is_participate')
+        && lot.auctionStatus ne AuctionStatus.RUNNING
+        && !requestScope.get('user_is_winner')}">
             <div class="row col-9 my-5">
                 <button type="button" class="btn btn-danger w-100"
                         onclick="deleteAuctionParticipation(${lot.lotId})">
