@@ -120,9 +120,6 @@
                 <li><a style="font-size: 0.75em" class="dropdown-item disabled" href="#">
                     <c:out value="${sessionScope.get('USER_EMAIL')}"/>
                 </a></li>
-                <li><a class="dropdown-item" href="#">
-                    <fmt:message bundle="${adminHeaderLoc}" key="account.personal_link"/>
-                </a></li>
                 <li><a class="dropdown-item"
                        href="${pageContext.request.contextPath}/ControllerServlet?command=show_main_page">
                     <fmt:message bundle="${adminHeaderLoc}" key="account.back_to_users_pages"/>

@@ -11,9 +11,7 @@
             <li class="nav-item"><a href="${pageContext.request.contextPath}/ControllerServlet?command=show_user_lots" class="nav-link px-2 text-muted">
                 <fmt:message bundle="${footerLoc}" key="auctions"/></a>
             </li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted"><fmt:message bundle="${footerLoc}" key="help"/></a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted"><fmt:message bundle="${footerLoc}" key="info"/></a></li>
         </ul>
-        <p class="text-center text-muted">&copy; All rights belong to Vova</p>
+        <p class="text-center text-muted">&copy; All rights belong to Vova (email: vova.prusenok@gmail.com)</p>
     </footer>
 </div>

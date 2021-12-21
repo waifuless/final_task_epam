@@ -39,20 +39,6 @@
                             <fmt:message bundle="${headerLoc}" key="link.auctions"/>
                         </a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            <fmt:message bundle="${headerLoc}" key="link.other"/>
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">
-                                <fmt:message bundle="${headerLoc}" key="link.other.help"/>
-                            </a></li>
-                            <li><a class="dropdown-item" href="#">
-                                <fmt:message bundle="${headerLoc}" key="link.other.info"/>
-                            </a></li>
-                        </ul>
-                    </li>
                 </ul>
 
                 <div class="dropdown my-3 my-lg-0 mx-lg-3">
@@ -104,9 +90,6 @@
                                             onclick="printCashAccountInHeader()">
                                         Мой счет
                                 </button></li>
-                                <li><a class="dropdown-item" href="#">
-                                    <fmt:message bundle="${headerLoc}" key="account.personal_link"/>
-                                </a></li>
                                 <c:if test="${sessionScope.get('USER_ROLE') eq Role.ADMIN}">
                                     <li><a class="dropdown-item" href="${pageContext.request.contextPath}/ControllerServlet?command=show_admin_tools">
                                         <fmt:message bundle="${headerLoc}" key="account.admin_link"/>

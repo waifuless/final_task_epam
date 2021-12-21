@@ -61,13 +61,6 @@
                     <fmt:message bundle="${loc}" key="registration.link"/>
                 </a>
             </div>
-            <div>
-                <fmt:message bundle="${loc}" key="forgot_password"/>
-                <a class="link-primary"
-                   href="${pageContext.request.contextPath}/ControllerServlet?command=show_restore_password">
-                    <fmt:message bundle="${loc}" key="forgot_password.link"/>
-                </a>
-            </div>
         </div>
     </div>
 
