@@ -192,7 +192,8 @@
                 'init-price': {
                     required: true,
                     number: true,
-                    maxlength: 14
+                    maxlength: 14,
+                    min: 0.01
                 },
                 duration: {
                     digits: true,
@@ -209,7 +210,8 @@
                 'init-price': {
                     required: "Поле не должно быть пустым",
                     number: "Цена должна содержать только числа (дробные)",
-                    maxlength: "Максимальная длинна поля 14 символов"
+                    maxlength: "Максимальная длинна поля 14 символов",
+                    min: "Минимальная цена 0.01 р"
                 },
                 duration: {
                     digits: "Поле должно содержать только числа (целые)",
