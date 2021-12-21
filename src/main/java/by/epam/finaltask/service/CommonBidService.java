@@ -31,10 +31,7 @@ public class CommonBidService implements BidService {
             ValidatorFactory.getFactoryInstance().stringParameterValidator();
     private final NumberValidator numberValidator = ValidatorFactory.getFactoryInstance().idValidator();
 
-    private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
-    private final AuctionParticipationService auctionParticipationService =
-            ServiceFactory.getFactoryInstance().auctionParticipationService();
-    private final UserService userService = ServiceFactory.getFactoryInstance().userService();
+    private final ServiceFactory serviceFactory = ServiceFactory.getFactoryInstance();
 
     private final BidManager bidManager;
 
@@ -78,7 +75,8 @@ public class CommonBidService implements BidService {
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
         try {
             numberValidator.validateNumberIsPositive(requesterId, lotId);
-            Lot lot = lotService.findLot(lotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+            Lot lot = serviceFactory.lotService()
+                    .findLot(lotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             validateUserParticipationOrOwner(requesterId, lot);
             Optional<Bid> optionalBid;
             if (lot.getAuctionType().equals(AuctionType.FORWARD)) {
@@ -104,7 +102,8 @@ public class CommonBidService implements BidService {
             throws ServiceCanNotCompleteCommandRequest {
         try {
             numberValidator.validateNumberIsPositive(page, userId);
-            Map<LotWithImages, AuctionParticipation> lotsWithAuctionParticipations = auctionParticipationService
+            Map<LotWithImages, AuctionParticipation> lotsWithAuctionParticipations = serviceFactory
+                    .auctionParticipationService()
                     .findLotsParticipatedByUser(page, userId, AuctionStatus.ENDED);
             Optional<Bid> optionalBid;
             Map<LotWithImages, AuctionResult> participationByWonLots = new LinkedHashMap<>();
@@ -117,7 +116,8 @@ public class CommonBidService implements BidService {
                 if (optionalBid.isPresent()) {
                     Bid bid = optionalBid.get();
                     if (bid.getUserId() == userId) {
-                        Optional<User> optionalUser = userService.findUserById(entry.getKey().getOwnerId());
+                        Optional<User> optionalUser = serviceFactory.userService()
+                                .findUserById(entry.getKey().getOwnerId());
                         if (optionalUser.isPresent()) {
                             participationByWonLots.put(entry.getKey(), new AuctionResult(bid.getAmount(),
                                     optionalUser.get().getEmail(), entry.getValue().getDeposit(),
@@ -144,7 +144,8 @@ public class CommonBidService implements BidService {
             throws ServiceCanNotCompleteCommandRequest {
         try {
             numberValidator.validateNumberIsPositive(page, userId);
-            List<LotWithImages> lots = lotService.findLotsByPageAndContext(page, LotContext.builder().setOwnerId(userId)
+            List<LotWithImages> lots = serviceFactory.lotService()
+                    .findLotsByPageAndContext(page, LotContext.builder().setOwnerId(userId)
                     .setAuctionStatus(AuctionStatus.ENDED.name()).build());
             Optional<Bid> optionalBid;
             Map<LotWithImages, AuctionResult> wonEmailByUserLots = new LinkedHashMap<>();
@@ -156,9 +157,10 @@ public class CommonBidService implements BidService {
                 }
                 if (optionalBid.isPresent()) {
                     Bid bid = optionalBid.get();
-                    Optional<User> optionalUser = userService.findUserById(bid.getUserId());
+                    Optional<User> optionalUser = serviceFactory.userService().findUserById(bid.getUserId());
                     if (optionalUser.isPresent()) {
-                        Optional<AuctionParticipation> optionalParticipation = auctionParticipationService
+                        Optional<AuctionParticipation> optionalParticipation = serviceFactory
+                                .auctionParticipationService()
                                 .findParticipation(bid.getUserId(), bid.getLotId());
                         if (optionalParticipation.isPresent()) {
                             wonEmailByUserLots.put(lot, new AuctionResult(bid.getAmount(),
@@ -194,7 +196,8 @@ public class CommonBidService implements BidService {
 
     private void validateBid(long userId, long lotId, BigDecimal amount)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException, SQLException, InterruptedException {
-        Lot lot = lotService.findLot(lotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+        Lot lot = serviceFactory.lotService()
+                .findLot(lotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
         if (!lot.getAuctionStatus().equals(AuctionStatus.RUNNING)) {
             throw new ClientErrorException(ClientError.LOT_NOT_RUNNING);
         }
@@ -204,14 +207,14 @@ public class CommonBidService implements BidService {
 
     private void validateUserParticipation(long userId, long lotId)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
-        if (!auctionParticipationService.isUserParticipateInLotAuction(userId, lotId)) {
+        if (!serviceFactory.auctionParticipationService().isUserParticipateInLotAuction(userId, lotId)) {
             throw new ClientErrorException(ClientError.FORBIDDEN);
         }
     }
 
     private void validateUserParticipationOrOwner(long userId, Lot lot)
             throws ServiceCanNotCompleteCommandRequest, ClientErrorException {
-        if (!auctionParticipationService.isUserParticipateInLotAuction(userId, lot.getLotId())
+        if (!serviceFactory.auctionParticipationService().isUserParticipateInLotAuction(userId, lot.getLotId())
                 && userId != lot.getOwnerId()) {
             throw new ClientErrorException(ClientError.FORBIDDEN);
         }

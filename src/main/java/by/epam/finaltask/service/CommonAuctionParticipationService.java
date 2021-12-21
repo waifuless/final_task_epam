@@ -31,8 +31,6 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
     private final NumberValidator numberValidator = ValidatorFactory.getFactoryInstance().idValidator();
 
     private final ServiceFactory serviceFactory = ServiceFactory.getFactoryInstance();
-    private final LotService lotService = ServiceFactory.getFactoryInstance().lotService();
-    private final UserService userService = ServiceFactory.getFactoryInstance().userService();
 
     private final AuctionParticipationManager auctionParticipationManager;
 
@@ -51,14 +49,15 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
             if (isUserParticipateInLotAuction(requestedUserId, longLotId)) {
                 throw new ClientErrorException(ClientError.ENTITY_ALREADY_EXISTS);
             }
-            Lot lot = lotService.findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+            Lot lot = serviceFactory.lotService()
+                    .findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             if (lot.getOwnerId() == requestedUserId ||
                     !lot.getAuctionStatus().equals(AuctionStatus.APPROVED_BY_ADMIN)) {
                 throw new ClientErrorException(ClientError.FORBIDDEN);
             }
             BigDecimal deposit = bigDecimalNormalizer.normalize(lot.getInitialPrice()
                     .multiply(DEFAULT_DEPOSIT_COEFFICIENT));
-            userService.minusFromCashAccount(requestedUserId, deposit);
+            serviceFactory.userService().minusFromCashAccount(requestedUserId, deposit);
             auctionParticipationManager
                     .saveParticipation(new AuctionParticipation(requestedUserId, longLotId, deposit));
         } catch (NumberFormatException ex) {
@@ -84,10 +83,11 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
             AuctionParticipation participation = auctionParticipationManager
                     .findParticipation(requestedUserId, longLotId)
                     .orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
-            Lot lot = lotService.findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+            Lot lot = serviceFactory.lotService()
+                    .findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             validateUserAccessToDeleteParticipation(requestedUserId, lot);
             serviceFactory.bidService().deleteUsersLotBids(requestedUserId, longLotId);
-            userService.plusToCashAccount(requestedUserId, participation.getDeposit());
+            serviceFactory.userService().plusToCashAccount(requestedUserId, participation.getDeposit());
             auctionParticipationManager.deleteParticipation(requestedUserId, longLotId);
         } catch (NumberFormatException ex) {
             LOG.warn(ex.getMessage());
@@ -109,7 +109,8 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
             stringValidator.validateNotEmpty(lotId);
             long longLotId = Long.parseLong(lotId);
             numberValidator.validateNumberIsPositive(longLotId);
-            Lot lot = lotService.findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
+            Lot lot = serviceFactory.lotService()
+                    .findLot(longLotId).orElseThrow(() -> new ClientErrorException(ClientError.NOT_FOUND));
             if (lot.getOwnerId() != requestedUserId || !lot.getAuctionStatus().equals(AuctionStatus.ENDED)) {
                 throw new ClientErrorException(ClientError.FORBIDDEN);
             }
@@ -120,7 +121,7 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
             if (participation.isDepositIsTakenByOwner()) {
                 throw new ClientErrorException(ClientError.FORBIDDEN);
             }
-            userService.plusToCashAccount(requestedUserId, participation.getDeposit());
+            serviceFactory.userService().plusToCashAccount(requestedUserId, participation.getDeposit());
             auctionParticipationManager.updateParticipation(new AuctionParticipation(participation.getParticipantId(),
                     participation.getLotId(), participation.getDeposit(), true));
         } catch (NumberFormatException ex) {
@@ -236,7 +237,8 @@ public class CommonAuctionParticipationService implements AuctionParticipationSe
             throws ServiceCanNotCompleteCommandRequest {
         Map<LotWithImages, AuctionParticipation> lotsWithParticipations = new LinkedHashMap<>();
         for (AuctionParticipation auctionParticipation : auctionParticipations) {
-            Optional<LotWithImages> optionalLot = lotService.findLotWithImages(auctionParticipation.getLotId());
+            Optional<LotWithImages> optionalLot = serviceFactory.lotService()
+                    .findLotWithImages(auctionParticipation.getLotId());
             optionalLot.ifPresent(lot -> lotsWithParticipations.put(lot, auctionParticipation));
         }
         return lotsWithParticipations;
