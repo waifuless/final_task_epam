@@ -146,7 +146,7 @@ public class CommonBidService implements BidService {
             numberValidator.validateNumberIsPositive(page, userId);
             List<LotWithImages> lots = serviceFactory.lotService()
                     .findLotsByPageAndContext(page, LotContext.builder().setOwnerId(userId)
-                    .setAuctionStatus(AuctionStatus.ENDED.name()).build());
+                            .setAuctionStatus(AuctionStatus.ENDED.name()).build());
             Optional<Bid> optionalBid;
             Map<LotWithImages, AuctionResult> wonEmailByUserLots = new LinkedHashMap<>();
             for (LotWithImages lot : lots) {
