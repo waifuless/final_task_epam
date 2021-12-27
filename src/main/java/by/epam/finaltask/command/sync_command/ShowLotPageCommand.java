@@ -1,6 +1,7 @@
 package by.epam.finaltask.command.sync_command;
 
 import by.epam.finaltask.command.CommandRequest;
+import by.epam.finaltask.command.SyncCommand;
 import by.epam.finaltask.command.SyncCommandResponse;
 import by.epam.finaltask.command.UserSessionAttribute;
 import by.epam.finaltask.controller.PagePath;
@@ -14,7 +15,6 @@ import by.epam.finaltask.service.AuctionParticipationService;
 import by.epam.finaltask.service.BidService;
 import by.epam.finaltask.service.LotService;
 import by.epam.finaltask.service.ServiceFactory;
-import jdk.nashorn.internal.runtime.options.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

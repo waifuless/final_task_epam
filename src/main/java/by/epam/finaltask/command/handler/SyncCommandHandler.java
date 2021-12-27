@@ -2,7 +2,7 @@ package by.epam.finaltask.command.handler;
 
 import by.epam.finaltask.command.CommandRequest;
 import by.epam.finaltask.command.SyncCommandResponse;
-import by.epam.finaltask.command.sync_command.SyncCommand;
+import by.epam.finaltask.command.SyncCommand;
 import by.epam.finaltask.command.sync_command.SyncCommandFactory;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.InvalidArgumentException;

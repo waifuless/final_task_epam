@@ -1,5 +1,6 @@
 package by.epam.finaltask.command.sync_command;
 
+import by.epam.finaltask.command.SyncCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

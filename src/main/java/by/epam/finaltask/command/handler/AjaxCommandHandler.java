@@ -2,7 +2,7 @@ package by.epam.finaltask.command.handler;
 
 import by.epam.finaltask.command.AjaxCommandResponse;
 import by.epam.finaltask.command.CommandRequest;
-import by.epam.finaltask.command.async_command.AjaxCommand;
+import by.epam.finaltask.command.AjaxCommand;
 import by.epam.finaltask.command.async_command.AjaxCommandFactory;
 import by.epam.finaltask.exception.ClientErrorException;
 import by.epam.finaltask.exception.OperationNotSupportedException;

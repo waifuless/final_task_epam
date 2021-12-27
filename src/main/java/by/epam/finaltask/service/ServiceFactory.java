@@ -1,123 +1,29 @@
 package by.epam.finaltask.service;
 
 import by.epam.finaltask.dao.*;
+import by.epam.finaltask.service.impl.*;
 
 import java.io.IOException;
 
-public class ServiceFactory {
+public interface ServiceFactory {
 
-    private static volatile ServiceFactory factoryInstance;
-    private static volatile UserService userServiceInstance;
-    private static volatile LotService lotServiceInstance;
-    private static volatile ImagesService imagesServiceInstance;
-    private static volatile CategoryService categoryServiceInstance;
-    private static volatile CityOrDistrictService cityOrDistrictServiceInstance;
-    private static volatile RegionService regionServiceInstance;
-    private static volatile AuctionParticipationService auctionParticipationServiceInstance;
-    private static volatile BidService bidServiceInstance;
-
-    private ServiceFactory() {
+    static ServiceFactory getFactoryInstance() {
+        return ServiceFactoryImpl.getFactoryInstance();
     }
 
-    public static ServiceFactory getFactoryInstance() {
-        if (factoryInstance == null) {
-            synchronized (ServiceFactory.class) {
-                if (factoryInstance == null) {
-                    factoryInstance = new ServiceFactory();
-                }
-            }
-        }
-        return factoryInstance;
-    }
+    UserService userService();
 
-    public UserService userService() {
-        if (userServiceInstance == null) {
-            synchronized (CommonUserService.class) {
-                if (userServiceInstance == null) {
-                    userServiceInstance = new CommonUserService(UserManager.getInstance());
-                }
-            }
-        }
-        return userServiceInstance;
-    }
+    LotService lotService();
 
-    public LotService lotService() {
-        if (lotServiceInstance == null) {
-            synchronized (CommonLotService.class) {
-                if (lotServiceInstance == null) {
-                    lotServiceInstance = new CommonLotService(LotManager.getInstance(), ImagesManager.getInstance());
-                }
-            }
-        }
-        return lotServiceInstance;
-    }
+    ImagesService imagesService() throws IOException;
 
-    public ImagesService imagesService() throws IOException {
-        if (imagesServiceInstance == null) {
-            synchronized (CommonImagesService.class) {
-                if (imagesServiceInstance == null) {
-                    imagesServiceInstance = new CommonImagesService(ImagesManager.getInstance());
-                }
-            }
-        }
-        return imagesServiceInstance;
-    }
+    CategoryService categoryService();
 
-    public CategoryService categoryService() {
-        if (categoryServiceInstance == null) {
-            synchronized (CommonCategoryService.class) {
-                if (categoryServiceInstance == null) {
-                    categoryServiceInstance = new CommonCategoryService(CategoryManager.getInstance());
-                }
-            }
-        }
-        return categoryServiceInstance;
-    }
+    CityOrDistrictService cityOrDistrictService();
 
-    public CityOrDistrictService cityOrDistrictService() {
-        if (cityOrDistrictServiceInstance == null) {
-            synchronized (CommonCityOrDistrictService.class) {
-                if (cityOrDistrictServiceInstance == null) {
-                    cityOrDistrictServiceInstance =
-                            new CommonCityOrDistrictService(CityOrDistrictManager.getInstance());
-                }
-            }
-        }
-        return cityOrDistrictServiceInstance;
-    }
+    RegionService regionService();
 
-    public RegionService regionService() {
-        if (regionServiceInstance == null) {
-            synchronized (CommonRegionService.class) {
-                if (regionServiceInstance == null) {
-                    regionServiceInstance = new CommonRegionService(RegionManager.getInstance());
-                }
-            }
-        }
-        return regionServiceInstance;
-    }
+    AuctionParticipationService auctionParticipationService();
 
-    public AuctionParticipationService auctionParticipationService() {
-        if (auctionParticipationServiceInstance == null) {
-            synchronized (CommonAuctionParticipationService.class) {
-                if (auctionParticipationServiceInstance == null) {
-                    auctionParticipationServiceInstance =
-                            new CommonAuctionParticipationService(AuctionParticipationManager.getInstance());
-                }
-            }
-        }
-        return auctionParticipationServiceInstance;
-    }
-
-    public BidService bidService() {
-        if (bidServiceInstance == null) {
-            synchronized (CommonBidService.class) {
-                if (bidServiceInstance == null) {
-                    bidServiceInstance =
-                            new CommonBidService(BidManager.getInstance());
-                }
-            }
-        }
-        return bidServiceInstance;
-    }
+    BidService bidService();
 }

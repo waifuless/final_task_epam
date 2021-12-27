@@ -1,5 +1,6 @@
 package by.epam.finaltask.command.async_command;
 
+import by.epam.finaltask.command.AjaxCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
