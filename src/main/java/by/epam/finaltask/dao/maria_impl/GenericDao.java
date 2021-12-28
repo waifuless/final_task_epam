@@ -2,6 +2,7 @@ package by.epam.finaltask.dao.maria_impl;
 
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.dao.Dao;
+import by.epam.finaltask.exception.DaoException;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.DaoEntity;
@@ -42,7 +43,7 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
 
 
     @Override
-    public Optional<T> save(T t) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<T> save(T t) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement insertStatement = connection.prepareStatement(saveQuery);
             Statement selectIdStatement = connection.createStatement();
@@ -56,32 +57,32 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
             }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public List<T> findAll() throws SQLException, DataSourceDownException, InterruptedException {
+    public List<T> findAll() throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(findAllQuery);
             return extractAll(resultSet);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public Optional<T> find(long id) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<T> find(long id) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(findQuery);
             prepareFindStatement(statement, id);
@@ -93,48 +94,48 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
             }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public void update(T t) throws SQLException, DataSourceDownException, InterruptedException {
+    public void update(T t) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(updateQuery);
             prepareUpdateStatement(statement, t);
             statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public void delete(long id) throws SQLException, DataSourceDownException, InterruptedException {
+    public void delete(long id) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(deleteQuery);
             prepareDeleteStatement(statement, id);
             statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public long count() throws SQLException, DataSourceDownException, InterruptedException {
+    public long count() throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(countQuery);
@@ -142,11 +143,11 @@ public abstract class GenericDao<T extends DaoEntity<T>> implements Dao<T> {
             return resultSet.getLong(ROWS_COUNT_COLUMN);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 

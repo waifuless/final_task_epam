@@ -1,24 +1,23 @@
 package by.epam.finaltask.dao;
 
-import by.epam.finaltask.exception.DataSourceDownException;
+import by.epam.finaltask.exception.DaoException;
 import by.epam.finaltask.model.DaoEntity;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 public interface Dao<T extends DaoEntity<T>> {
 
-    Optional<T> save(T t) throws SQLException, DataSourceDownException, InterruptedException;
+    Optional<T> save(T t) throws DaoException;
 
-    Optional<T> find(long id) throws SQLException, DataSourceDownException, InterruptedException;
+    Optional<T> find(long id) throws DaoException;
 
-    List<T> findAll() throws SQLException, DataSourceDownException, InterruptedException;
+    List<T> findAll() throws DaoException;
 
-    void update(T t) throws SQLException, DataSourceDownException, InterruptedException;
+    void update(T t) throws DaoException;
 
-    void delete(long id) throws SQLException, DataSourceDownException, InterruptedException;
+    void delete(long id) throws DaoException;
 
-    long count() throws SQLException, DataSourceDownException, InterruptedException;
+    long count() throws DaoException;
 
 }

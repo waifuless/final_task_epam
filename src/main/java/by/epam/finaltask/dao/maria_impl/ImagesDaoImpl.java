@@ -2,6 +2,7 @@ package by.epam.finaltask.dao.maria_impl;
 
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.dao.ImagesDao;
+import by.epam.finaltask.exception.DaoException;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.model.Images;
 import org.slf4j.Logger;
@@ -47,11 +48,11 @@ public class ImagesDaoImpl implements ImagesDao {
     private static volatile ImagesDaoImpl instance;
     protected final ConnectionPool connectionPool;
 
-    private ImagesDaoImpl() throws DataSourceDownException {
+    private ImagesDaoImpl() {
         connectionPool = ConnectionPool.getInstance();
     }
 
-    public static ImagesDaoImpl getInstance() throws DataSourceDownException {
+    public static ImagesDaoImpl getInstance() {
         if (instance == null) {
             synchronized (ImagesDaoImpl.class) {
                 if (instance == null) {
@@ -63,18 +64,18 @@ public class ImagesDaoImpl implements ImagesDao {
     }
 
     @Override
-    public void saveImagePath(String path) throws SQLException, DataSourceDownException, InterruptedException {
+    public void saveImagePath(String path) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SAVE_IMAGE_PATH_QUERY);
             statement.setString(1, path);
             statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
@@ -86,7 +87,7 @@ public class ImagesDaoImpl implements ImagesDao {
     }
 
     @Override
-    public Optional<Images> save(Images images) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<Images> save(Images images) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement insertStatement = connection.prepareStatement(SAVE_IMAGE);
             PreparedStatement findLastInsertIdStatement = connection.prepareStatement(SELECT_LAST_INSERT_ID_QUERY);
@@ -113,16 +114,16 @@ public class ImagesDaoImpl implements ImagesDao {
             }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public Optional<Images> find(long id) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<Images> find(long id) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(FIND_ALL_LOT_IMAGES_QUERY);
             statement.setLong(1, id);
@@ -145,16 +146,16 @@ public class ImagesDaoImpl implements ImagesDao {
             }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public void update(Images images) throws SQLException, DataSourceDownException, InterruptedException {
+    public void update(Images images) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_IMAGE_QUERY);
             List<Image> allImages = images.getOtherImages();
@@ -167,32 +168,32 @@ public class ImagesDaoImpl implements ImagesDao {
             }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public void delete(long id) throws SQLException, DataSourceDownException, InterruptedException {
+    public void delete(long id) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_ALL_LOT_IMAGES_QUERY);
             statement.setLong(1, id);
             statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public long count() throws SQLException, DataSourceDownException, InterruptedException {
+    public long count() throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(COUNT_QUERY);
@@ -200,11 +201,11 @@ public class ImagesDaoImpl implements ImagesDao {
             return resultSet.getLong(ROWS_COUNT_COLUMN);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 }

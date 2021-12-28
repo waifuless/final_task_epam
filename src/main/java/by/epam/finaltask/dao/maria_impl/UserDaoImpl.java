@@ -2,6 +2,7 @@ package by.epam.finaltask.dao.maria_impl;
 
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.dao.UserDao;
+import by.epam.finaltask.exception.DaoException;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.*;
@@ -54,14 +55,14 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
     private final UserFactory userFactory;
     private final PasswordEncoder encoder;
 
-    private UserDaoImpl() throws DataSourceDownException {
+    private UserDaoImpl() {
         super(SAVE_USER_QUERY, FIND_ALL_USER_QUERY, FIND_USER_BY_ID_QUERY, UPDATE_USER_QUERY, DELETE_USER_QUERY,
                 TABLE_NAME, ConnectionPool.getInstance());
         userFactory = UserFactory.getInstance();
         encoder = PasswordEncoder.getInstance();
     }
 
-    public static UserDaoImpl getInstance() throws DataSourceDownException {
+    public static UserDaoImpl getInstance() {
         if (instance == null) {
             synchronized (UserDaoImpl.class) {
                 if (instance == null) {
@@ -103,7 +104,7 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
     }
 
     @Override
-    public boolean isUserExists(String email) throws SQLException, DataSourceDownException, InterruptedException {
+    public boolean isUserExists(String email) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(IS_EXIST_USER_QUERY);
             statement.setString(1, email);
@@ -112,17 +113,17 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
             return resultSet.getBoolean(USER_EXISTENCE_COLUMN);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
     public Optional<User> findUserByEmailAndPassword(String email, String password)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(FIND_USER_BY_EMAIL_QUERY);
             statement.setString(1, email);
@@ -135,18 +136,18 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
             }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
         return Optional.empty();
     }
 
     @Override
     public List<User> findByUserContext(UserContext context, long offset, long count)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             List<Pair<Object, Integer>> params = new ArrayList<>();
             PreparedStatement statement = connection.prepareStatement(FIND_ALL_USER_QUERY +
@@ -159,16 +160,16 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
             return extractAll(resultSet);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public long findUsersCount(UserContext context) throws SQLException, DataSourceDownException, InterruptedException {
+    public long findUsersCount(UserContext context) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             List<Pair<Object, Integer>> params = new ArrayList<>();
             PreparedStatement statement = connection.prepareStatement(COUNT_QUERY_WITH_JOINS +
@@ -179,11 +180,11 @@ public class UserDaoImpl extends GenericDao<User> implements UserDao {
             return resultSet.getLong(ROWS_COUNT_COLUMN);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 

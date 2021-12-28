@@ -3,6 +3,7 @@ package by.epam.finaltask.dao.maria_impl;
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.dao.LotDao;
 import by.epam.finaltask.dao.StatementPreparator;
+import by.epam.finaltask.exception.DaoException;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.*;
@@ -100,7 +101,7 @@ public class LotDaoImpl extends GenericDao<Lot> implements LotDao {
                 ConnectionPool.getInstance());
     }
 
-    public static LotDaoImpl getInstance() throws DataSourceDownException {
+    public static LotDaoImpl getInstance() {
         if (instance == null) {
             synchronized (LotDaoImpl.class) {
                 if (instance == null) {
@@ -166,7 +167,7 @@ public class LotDaoImpl extends GenericDao<Lot> implements LotDao {
     }
 
     @Override
-    public List<Lot> find(long offset, long count) throws SQLException, DataSourceDownException, InterruptedException {
+    public List<Lot> find(long offset, long count) throws DaoException {
         return findListWithPreparator(FIND_LOT_OFFSET_QUERY, statement ->
         {
             statement.setLong(1, count);
@@ -176,7 +177,7 @@ public class LotDaoImpl extends GenericDao<Lot> implements LotDao {
 
     @Override
     public List<Lot> findByLotContext(LotContext context, long offset, long count)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         List<Pair<Object, Integer>> params = new ArrayList<>();
         String findByContextQuery = FIND_ALL_LOTS_QUERY + createFilterByContextAndFillParamsList(context, params) +
                 " ORDER BY lot_id DESC LIMIT ? OFFSET ?";
@@ -193,7 +194,7 @@ public class LotDaoImpl extends GenericDao<Lot> implements LotDao {
 
     @Override
     public long findLotsCount(LotContext context)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             List<Pair<Object, Integer>> params = new ArrayList<>();
             PreparedStatement statement = connection.prepareStatement(COUNT_QUERY_WITH_JOINS +
@@ -207,17 +208,17 @@ public class LotDaoImpl extends GenericDao<Lot> implements LotDao {
             return resultSet.getLong(ROWS_COUNT_COLUMN);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
     public void executeLotsRenewAndCreateEventSchedule(Timestamp scheduleStart)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             Statement statement = connection.createStatement();
             PreparedStatement schedulePreparedStatement = connection.prepareStatement(CREATE_RENEW_SCHEDULE);
@@ -226,27 +227,27 @@ public class LotDaoImpl extends GenericDao<Lot> implements LotDao {
             schedulePreparedStatement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
     public void dropLotsRenewEventSchedule()
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             Statement statement = connection.createStatement();
             statement.execute(DROP_RENEW_SCHEDULE);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
@@ -297,7 +298,7 @@ public class LotDaoImpl extends GenericDao<Lot> implements LotDao {
     }
 
     private List<Lot> findListWithPreparator(String query, StatementPreparator preparator)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
             preparator.accept(statement);
@@ -305,11 +306,11 @@ public class LotDaoImpl extends GenericDao<Lot> implements LotDao {
             return extractAll(resultSet);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 }

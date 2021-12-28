@@ -2,6 +2,7 @@ package by.epam.finaltask.dao.maria_impl;
 
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.dao.BidDao;
+import by.epam.finaltask.exception.DaoException;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.Bid;
@@ -47,7 +48,7 @@ public class BidDaoImpl extends GenericDao<Bid> implements BidDao {
                 TABLE_NAME, ConnectionPool.getInstance());
     }
 
-    public static BidDaoImpl getInstance() throws DataSourceDownException {
+    public static BidDaoImpl getInstance() {
         if (instance == null) {
             synchronized (BidDaoImpl.class) {
                 if (instance == null) {
@@ -59,18 +60,18 @@ public class BidDaoImpl extends GenericDao<Bid> implements BidDao {
     }
 
     @Override
-    public Optional<Bid> findMaxBid(long lotId) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<Bid> findMaxBid(long lotId) throws DaoException {
         return findBestBid(lotId, FIND_MAX_BID_QUERY);
     }
 
     @Override
-    public Optional<Bid> findMinBid(long lotId) throws SQLException, DataSourceDownException, InterruptedException {
+    public Optional<Bid> findMinBid(long lotId) throws DaoException {
         return findBestBid(lotId, FIND_MIN_BID_QUERY);
     }
 
     @Override
     public void deleteByUserIdAndLotId(long userId, long lotId)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_BID_BY_LOT_ID_QUERY);
             statement.setLong(1, userId);
@@ -78,11 +79,11 @@ public class BidDaoImpl extends GenericDao<Bid> implements BidDao {
             statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
@@ -114,7 +115,7 @@ public class BidDaoImpl extends GenericDao<Bid> implements BidDao {
 
 
     private Optional<Bid> findBestBid(long lotId, String query)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setLong(1, lotId);
@@ -126,11 +127,11 @@ public class BidDaoImpl extends GenericDao<Bid> implements BidDao {
             }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 }

@@ -2,6 +2,7 @@ package by.epam.finaltask.dao.maria_impl;
 
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.dao.CityOrDistrictDao;
+import by.epam.finaltask.exception.DaoException;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.CityOrDistrict;
@@ -43,7 +44,7 @@ public class CityOrDistrictDaoImpl extends GenericDao<CityOrDistrict> implements
                 UPDATE_CITY_OR_DISTRICT_QUERY, DELETE_CITY_OR_DISTRICT_QUERY, TABLE_NAME, ConnectionPool.getInstance());
     }
 
-    public static CityOrDistrictDaoImpl getInstance() throws DataSourceDownException {
+    public static CityOrDistrictDaoImpl getInstance() {
         if (instance == null) {
             synchronized (CityOrDistrictDaoImpl.class) {
                 if (instance == null) {
@@ -56,7 +57,7 @@ public class CityOrDistrictDaoImpl extends GenericDao<CityOrDistrict> implements
 
     @Override
     public List<CityOrDistrict> findByRegion(String regionName)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(FIND_CITY_OR_DISTRICT_BY_REGION_NAME_QUERY);
             statement.setString(1, regionName);
@@ -64,11 +65,11 @@ public class CityOrDistrictDaoImpl extends GenericDao<CityOrDistrict> implements
             return extractAll(resultSet);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 

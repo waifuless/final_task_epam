@@ -33,7 +33,7 @@ public class RegionDaoImpl extends GenericDao<Region> implements RegionDao {
                 DELETE_REGION_QUERY, TABLE_NAME, ConnectionPool.getInstance());
     }
 
-    public static RegionDaoImpl getInstance() throws DataSourceDownException {
+    public static RegionDaoImpl getInstance() {
         if (instance == null) {
             synchronized (RegionDaoImpl.class) {
                 if (instance == null) {

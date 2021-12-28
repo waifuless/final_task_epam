@@ -2,6 +2,7 @@ package by.epam.finaltask.dao.maria_impl;
 
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.dao.CategoryDao;
+import by.epam.finaltask.exception.DaoException;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.Category;
@@ -41,7 +42,7 @@ public class CategoryDaoImpl extends GenericDao<Category> implements CategoryDao
                 DELETE_CATEGORY_QUERY, TABLE_NAME, ConnectionPool.getInstance());
     }
 
-    public static CategoryDaoImpl getInstance() throws DataSourceDownException {
+    public static CategoryDaoImpl getInstance() {
         if (instance == null) {
             synchronized (CategoryDaoImpl.class) {
                 if (instance == null) {
@@ -53,7 +54,7 @@ public class CategoryDaoImpl extends GenericDao<Category> implements CategoryDao
     }
 
     @Override
-    public boolean isCategoryExists(String category) throws SQLException, DataSourceDownException, InterruptedException {
+    public boolean isCategoryExists(String category) throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(IS_CATEGORY_EXISTS_QUERY);
             statement.setString(1, category);
@@ -62,11 +63,11 @@ public class CategoryDaoImpl extends GenericDao<Category> implements CategoryDao
             return resultSet.getBoolean(CATEGORY_EXISTENCE_COLUMN);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 

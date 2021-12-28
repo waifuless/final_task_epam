@@ -3,6 +3,7 @@ package by.epam.finaltask.dao.maria_impl;
 import by.epam.finaltask.connection_pool.ConnectionPool;
 import by.epam.finaltask.dao.AuctionParticipationDao;
 import by.epam.finaltask.dao.StatementPreparator;
+import by.epam.finaltask.exception.DaoException;
 import by.epam.finaltask.exception.DataSourceDownException;
 import by.epam.finaltask.exception.ExtractionException;
 import by.epam.finaltask.model.AuctionParticipation;
@@ -63,7 +64,7 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
     private AuctionParticipationDaoImpl() throws DataSourceDownException {
     }
 
-    public static AuctionParticipationDaoImpl getInstance() throws DataSourceDownException {
+    public static AuctionParticipationDaoImpl getInstance() {
         if (instance == null) {
             synchronized (AuctionParticipationDaoImpl.class) {
                 if (instance == null) {
@@ -76,7 +77,7 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
 
     @Override
     public void saveParticipation(AuctionParticipation participation)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         postParticipation(SAVE_PARTICIPATION_QUERY, (statement -> {
             statement.setLong(1, participation.getParticipantId());
             statement.setLong(2, participation.getLotId());
@@ -87,7 +88,7 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
 
     @Override
     public void updateParticipation(AuctionParticipation participation)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         postParticipation(UPDATE_PARTICIPATION_QUERY, (statement -> {
             statement.setBigDecimal(1, participation.getDeposit());
             statement.setBoolean(2, participation.isDepositIsTakenByOwner());
@@ -98,7 +99,7 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
 
     @Override
     public boolean isUserParticipateInLotAuction(long userId, long lotId)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(IS_USER_PARTICIPATE_QUERY);
             statement.setLong(1, userId);
@@ -108,17 +109,17 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
             return resultSet.getBoolean(PARTICIPATION_EXISTENCE_COLUMN);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
     public Optional<AuctionParticipation> findParticipation(long userId, long lotId)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(FIND_USER_PARTICIPATE_QUERY);
             statement.setLong(1, userId);
@@ -131,17 +132,17 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
             }
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
     public void deleteParticipation(long userId, long lotId)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_USER_PARTICIPATE_QUERY);
             statement.setLong(1, userId);
@@ -149,17 +150,17 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
             statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     @Override
     public List<AuctionParticipation> findUsersParticipations(long userId, long offset, long count)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         return findAuctionParticipations(FIND_USERS_PARTICIPATIONS_QUERY, (statement) -> {
             statement.setLong(1, userId);
             statement.setLong(2, count);
@@ -170,7 +171,7 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
     @Override
     public List<AuctionParticipation> findUsersParticipations(long userId, long offset, long count,
                                                               AuctionStatus auctionStatus)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         return findAuctionParticipations(FIND_USERS_PARTICIPATIONS_BY_AUCTION_STATUS_QUERY, (statement) -> {
             statement.setLong(1, userId);
             statement.setString(2, auctionStatus.name());
@@ -181,13 +182,13 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
 
     @Override
     public long findUsersParticipationsCount(long userId)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         return findCount(FIND_COUNT_BY_USER_ID_QUERY, (statement) -> statement.setLong(1, userId));
     }
 
     @Override
     public long findUsersParticipationsCount(long userId, AuctionStatus auctionStatus)
-            throws SQLException, DataSourceDownException, InterruptedException {
+            throws DaoException {
         return findCount(FIND_COUNT_BY_USER_ID_AND_AUCTION_STATUS_QUERY, (statement) -> {
             statement.setLong(1, userId);
             statement.setString(2, auctionStatus.name());
@@ -217,7 +218,7 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
     }
 
     private long findCount(String query, StatementPreparator preparator)
-            throws SQLException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
             preparator.accept(statement);
@@ -226,16 +227,16 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
             return resultSet.getLong(ROWS_COUNT_COLUMN);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     private List<AuctionParticipation> findAuctionParticipations(String query, StatementPreparator preparator)
-            throws SQLException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
             preparator.accept(statement);
@@ -243,27 +244,27 @@ public class AuctionParticipationDaoImpl implements AuctionParticipationDao {
             return extractAll(resultSet);
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 
     private void postParticipation(String query, StatementPreparator preparator)
-            throws SQLException, InterruptedException {
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
             preparator.accept(statement);
             statement.execute();
         } catch (SQLException | DataSourceDownException e) {
             LOG.error(e.getMessage(), e);
-            throw e;
+            throw new DaoException(e);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
-            throw e;
+            throw new DaoException(e);
         }
     }
 }
