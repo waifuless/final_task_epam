@@ -115,10 +115,10 @@ create table lot
 
 create table auction_participation
 (
-    participant_id      int            not null,
-    lot_id              int            not null,
-    deposit             decimal(20, 2) not null,
-    deposit_is_returned tinyint(1)     not null,
+    participant_id            int            not null,
+    lot_id                    int            not null,
+    deposit                   decimal(20, 2) not null,
+    deposit_is_taken_by_owner tinyint(1)     not null,
     primary key (participant_id, lot_id),
     constraint ` auction_participant_app_user_user_id_fk`
         foreign key (participant_id) references app_user (user_id),
