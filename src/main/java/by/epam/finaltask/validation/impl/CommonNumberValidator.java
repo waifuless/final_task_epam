@@ -6,7 +6,8 @@ import by.epam.finaltask.validation.NumberValidator;
 
 public class CommonNumberValidator implements NumberValidator {
 
-    CommonNumberValidator(){};
+    CommonNumberValidator() {
+    }
 
     @Override
     public void validateNumberIsPositive(long id, long... others) throws ClientErrorException {
@@ -17,7 +18,7 @@ public class CommonNumberValidator implements NumberValidator {
     }
 
     private void validateOneIdIsPositive(long id) throws ClientErrorException {
-        if (id<1) {
+        if (id < 1) {
             throw new ClientErrorException(ClientError.INVALID_ARGUMENTS);
         }
     }

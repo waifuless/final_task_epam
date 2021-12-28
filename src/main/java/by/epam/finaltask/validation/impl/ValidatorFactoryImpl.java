@@ -4,7 +4,7 @@ import by.epam.finaltask.validation.NumberValidator;
 import by.epam.finaltask.validation.StringClientParameterValidator;
 import by.epam.finaltask.validation.ValidatorFactory;
 
-public class ValidatorFactoryImpl implements ValidatorFactory{
+public class ValidatorFactoryImpl implements ValidatorFactory {
 
     private static volatile ValidatorFactory factoryInstance;
     private static volatile StringClientParameterValidator stringValidatorInstance;

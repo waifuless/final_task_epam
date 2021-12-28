@@ -52,9 +52,9 @@ public class ShowLotPageCommand implements SyncCommand {
             if (!userRole.equals(Role.NOT_AUTHORIZED)) {
                 boolean userIsParticipate = auctionParticipationService.isUserParticipateInLotAuction(userId, lotId);
                 request.setAttribute("user_is_participate", userIsParticipate);
-                if(userIsParticipate){
+                if (userIsParticipate) {
                     Optional<Bid> optionalBid = bidService.findBestBid(userId, lot.getLotId());
-                    boolean userIsWinner = optionalBid.filter(bid -> bid.getUserId()==userId).isPresent();
+                    boolean userIsWinner = optionalBid.filter(bid -> bid.getUserId() == userId).isPresent();
                     request.setAttribute("user_is_winner", userIsWinner);
                 }
             }

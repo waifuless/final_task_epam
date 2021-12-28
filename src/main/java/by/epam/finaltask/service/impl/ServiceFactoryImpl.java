@@ -5,7 +5,7 @@ import by.epam.finaltask.service.*;
 
 import java.io.IOException;
 
-public class ServiceFactoryImpl implements ServiceFactory{
+public class ServiceFactoryImpl implements ServiceFactory {
 
     private static volatile ServiceFactory factoryInstance;
     private static volatile UserService userServiceInstance;

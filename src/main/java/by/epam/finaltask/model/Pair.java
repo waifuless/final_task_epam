@@ -1,15 +1,20 @@
 package by.epam.finaltask.model;
 
-public class Pair<L,R> {
+public class Pair<L, R> {
 
     private final L l;
     private final R r;
 
-    public Pair(L l, R r){
+    public Pair(L l, R r) {
         this.l = l;
         this.r = r;
     }
 
-    public L getL(){ return l; }
-    public R getR(){ return r; }
+    public L getL() {
+        return l;
+    }
+
+    public R getR() {
+        return r;
+    }
 }
