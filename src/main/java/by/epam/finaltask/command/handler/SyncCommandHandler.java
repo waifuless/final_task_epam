@@ -19,9 +19,9 @@ import java.io.IOException;
 public class SyncCommandHandler implements CommandHandler {
 
     private final static Logger LOG = LoggerFactory.getLogger(SyncCommandHandler.class);
-    private final static String OPERATION_NOT_FOUND_MCG = "Operation %s not found";
-    private final static String SERVICE_ERROR_MCG = "An error occurred during service execution";
-    private final static String UNKNOWN_ERROR_MCG = "An unknown error occurred on server";
+    private final static String OPERATION_NOT_FOUND_MSG = "Operation %s not found";
+    private final static String SERVICE_ERROR_MSG = "An error occurred during service execution";
+    private final static String UNKNOWN_ERROR_MSG = "An unknown error occurred on server";
 
     private final SyncCommandFactory syncCommandFactory = SyncCommandFactory.getInstance();
 
@@ -37,7 +37,7 @@ public class SyncCommandHandler implements CommandHandler {
             }
             SyncCommand syncCommand = syncCommandFactory.findCommand(requestedCommand)
                     .orElseThrow(() -> new OperationNotSupportedException
-                            (String.format(OPERATION_NOT_FOUND_MCG, requestedCommand)));
+                            (String.format(OPERATION_NOT_FOUND_MSG, requestedCommand)));
             SyncCommandResponse syncCommandResponse = syncCommand.execute(new CommandRequest(request));
             if (syncCommandResponse.isRedirect()) {
                 response.sendRedirect(syncCommandResponse.getPath());
@@ -49,10 +49,10 @@ public class SyncCommandHandler implements CommandHandler {
             response.sendError(ex.getErrorStatus(), ex.getMessage());
         } catch (ServiceCanNotCompleteCommandRequest ex) {
             LOG.warn(ex.getMessage(), ex);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, SERVICE_ERROR_MCG);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, SERVICE_ERROR_MSG);
         } catch (Exception ex) {
             LOG.warn(ex.getMessage(), ex);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR_MCG);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR_MSG);
         }
     }
 }

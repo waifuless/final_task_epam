@@ -27,7 +27,7 @@ public class SignInCommand implements SyncCommand {
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.NOT_AUTHORIZED));
-    private final static String EMAIL_OR_PASSWORD_INVALID_MCG = "EMAIL_OR_PASSWORD_INVALID";
+    private final static String EMAIL_OR_PASSWORD_INVALID_MSG = "EMAIL_OR_PASSWORD_INVALID";
 
     private final UserService userService = ServiceFactory.getFactoryInstance().userService();
 
@@ -48,8 +48,8 @@ public class SignInCommand implements SyncCommand {
                 SignInUser(optionalUser.get(), request);
                 return new SyncCommandResponse(true, PagePath.START_PAGE.getPath());
             } else {
-                LOG.debug(EMAIL_OR_PASSWORD_INVALID_MCG);
-                request.setAttribute(EMAIL_OR_PASSWORD_INVALID_MCG, EMAIL_OR_PASSWORD_INVALID_MCG);
+                LOG.debug(EMAIL_OR_PASSWORD_INVALID_MSG);
+                request.setAttribute(EMAIL_OR_PASSWORD_INVALID_MSG, EMAIL_OR_PASSWORD_INVALID_MSG);
                 return new SyncCommandResponse(false, PagePath.SIGN_IN.getPath());
             }
         } catch (Exception ex) {

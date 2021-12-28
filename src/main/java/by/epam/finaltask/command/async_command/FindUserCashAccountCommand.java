@@ -21,7 +21,7 @@ import java.util.Optional;
 public class FindUserCashAccountCommand implements AjaxCommand {
 
     private final static Logger LOG = LoggerFactory.getLogger(FindUserCashAccountCommand.class);
-    private final static String USER_NOT_FOUND_MCG = "user not found";
+    private final static String USER_NOT_FOUND_MSG = "user not found";
 
     private final static List<Role> ALLOWED_ROLES = Collections.unmodifiableList(Arrays
             .asList(Role.USER, Role.ADMIN));
@@ -41,7 +41,7 @@ public class FindUserCashAccountCommand implements AjaxCommand {
         try {
             long userId = (Long) request.getSession().getAttribute(UserSessionAttribute.USER_ID.name());
             Optional<User> optionalUser = userService.findUserById(userId);
-            User user = optionalUser.orElseThrow(() -> new ServiceCanNotCompleteCommandRequest(USER_NOT_FOUND_MCG));
+            User user = optionalUser.orElseThrow(() -> new ServiceCanNotCompleteCommandRequest(USER_NOT_FOUND_MSG));
             String lotsJson = new Gson().toJson(user.getCashAccount());
             return new AjaxCommandResponse("application/json", lotsJson);
         } catch (Exception ex) {

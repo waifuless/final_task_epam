@@ -28,8 +28,8 @@ public class UserPermissionFilter implements Filter {
     private final static String BAD_REQUEST_ERROR_MESSAGE = "Unknown command received %s";
     private final static String FORBIDDEN_ERROR_MESSAGE = "Forbidden to access %s";
     private final static String BAN_ERROR_MESSAGE = "Forbidden to access anything. You got permanently banned.";
-    private final static String FORBIDDEN_LOG_MCG = "forbidden {} to access {} command";
-    private final static String BAD_REQUEST_LOG_MCG = "Command {} does not exist";
+    private final static String FORBIDDEN_LOG_MSG = "forbidden {} to access {} command";
+    private final static String BAD_REQUEST_LOG_MSG = "Command {} does not exist";
     private final SyncCommandFactory syncCommandFactory = SyncCommandFactory.getInstance();
     private final AjaxCommandFactory ajaxCommandFactory = AjaxCommandFactory.getInstance();
     private final HandlerFactory handlerFactory = HandlerFactory.getInstance();
@@ -57,12 +57,12 @@ public class UserPermissionFilter implements Filter {
         Optional<RoledCommand> roledCommand = findCommand(commandName, requestIsAjax);
 
         if (!roledCommand.isPresent()) {
-            LOG.warn(BAD_REQUEST_LOG_MCG, commandName);
+            LOG.warn(BAD_REQUEST_LOG_MSG, commandName);
             sendError(SC_BAD_REQUEST, String.format(BAD_REQUEST_ERROR_MESSAGE, commandName), requestIsAjax, response);
             return;
         }
         if (!roledCommand.get().getAllowedRoles().contains(userRole)) {
-            LOG.warn(FORBIDDEN_LOG_MCG, userRole, roledCommand.get());
+            LOG.warn(FORBIDDEN_LOG_MSG, userRole, roledCommand.get());
             sendError(SC_FORBIDDEN, String.format(FORBIDDEN_ERROR_MESSAGE, commandName), requestIsAjax, response);
             return;
         }

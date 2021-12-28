@@ -18,8 +18,8 @@ import java.io.PrintWriter;
 public class AjaxCommandHandler implements CommandHandler {
 
     private final static Logger LOG = LoggerFactory.getLogger(AjaxCommandHandler.class);
-    private final static String OPERATION_NOT_FOUND_MCG = "Operation %s not found";
-    private final static String UNKNOWN_ERROR_MCG = "An unknown error occurred on server";
+    private final static String OPERATION_NOT_FOUND_MSG = "Operation %s not found";
+    private final static String UNKNOWN_ERROR_MSG = "An unknown error occurred on server";
 
     private final AjaxCommandFactory ajaxCommandFactory = AjaxCommandFactory.getInstance();
 
@@ -32,7 +32,7 @@ public class AjaxCommandHandler implements CommandHandler {
             String requestedCommand = request.getParameter("command");
             AjaxCommand ajaxCommand = ajaxCommandFactory.findCommand(requestedCommand)
                     .orElseThrow(() -> new OperationNotSupportedException
-                            (String.format(OPERATION_NOT_FOUND_MCG, requestedCommand)));
+                            (String.format(OPERATION_NOT_FOUND_MSG, requestedCommand)));
             AjaxCommandResponse ajaxCommandResponse = ajaxCommand.execute(new CommandRequest(request));
 
             response.setContentType(ajaxCommandResponse.getResponseType());
@@ -50,7 +50,7 @@ public class AjaxCommandHandler implements CommandHandler {
             LOG.warn(ex.getMessage(), ex);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             try (PrintWriter writer = response.getWriter()) {
-                writer.print(UNKNOWN_ERROR_MCG);
+                writer.print(UNKNOWN_ERROR_MSG);
                 writer.flush();
             }
         }

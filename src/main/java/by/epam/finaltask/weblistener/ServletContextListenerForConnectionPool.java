@@ -14,8 +14,8 @@ public class ServletContextListenerForConnectionPool implements ServletContextLi
 
     private final static Logger LOG = LoggerFactory.getLogger(ServletContextListenerForConnectionPool.class);
 
-    private final static String DESTROY_EXCEPTION_MCG = "exception while destroying servlet";
-    private final static String INIT_EXCEPTION_MCG = "exception while initializing servlet";
+    private final static String DESTROY_EXCEPTION_MSG = "exception while destroying servlet";
+    private final static String INIT_EXCEPTION_MSG = "exception while initializing servlet";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -23,7 +23,7 @@ public class ServletContextListenerForConnectionPool implements ServletContextLi
             LotService lotService = ServiceFactory.getFactoryInstance().lotService();
             lotService.startLotsAuctionStatusAutoUpdate();
         } catch (Exception e) {
-            LOG.error(INIT_EXCEPTION_MCG, e);
+            LOG.error(INIT_EXCEPTION_MSG, e);
             throw new Error(e);
         }
     }
@@ -35,7 +35,7 @@ public class ServletContextListenerForConnectionPool implements ServletContextLi
             lotService.stopLotsAuctionStatusAutoUpdate();
             ConnectionPool.getInstance().close();
         } catch (Exception e) {
-            LOG.error(DESTROY_EXCEPTION_MCG, e);
+            LOG.error(DESTROY_EXCEPTION_MSG, e);
         }
     }
 }
