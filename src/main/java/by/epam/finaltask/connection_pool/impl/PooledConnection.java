@@ -1,5 +1,6 @@
-package by.epam.finaltask.connection_pool;
+package by.epam.finaltask.connection_pool.impl;
 
+import by.epam.finaltask.connection_pool.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
 public class PooledConnection implements Connection {
-
-    private final static Logger LOG = LoggerFactory.getLogger(PooledConnection.class);
 
     private final Connection connection;
     private final Set<Statement> openedStatements;

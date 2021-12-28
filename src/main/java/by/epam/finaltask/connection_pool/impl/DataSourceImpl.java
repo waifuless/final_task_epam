@@ -1,5 +1,6 @@
-package by.epam.finaltask.connection_pool;
+package by.epam.finaltask.connection_pool.impl;
 
+import by.epam.finaltask.connection_pool.DataSource;
 import by.epam.finaltask.exception.DataSourceDownException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +17,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CommonDataSource implements DataSource {
+public class DataSourceImpl implements DataSource {
 
-    private final static Logger LOG = LoggerFactory.getLogger(CommonDataSource.class);
-    private final static String DEREGISTER_DRIVER_MCG = "deregistering jdbc driver: %s";
-    private final static String ERROR_DEREGISTER_DRIVER_MCG = "Error deregistering driver %s";
-    private final static String CONNECTION_ADDED_MCG = "Connection was added to connection pool {}";
+    private final static Logger LOG = LoggerFactory.getLogger(DataSourceImpl.class);
+    private final static String DEREGISTER_DRIVER_MSG = "deregistering jdbc driver: %s";
+    private final static String ERROR_DEREGISTER_DRIVER_MSG = "Error deregistering driver %s";
+    private final static String CONNECTION_ADDED_MSG = "Connection was added to connection pool {}";
     private final static String CONNECTION_CLOSED_MSG = "Close connection {}";
 
     private final static int SIZE = 8;
@@ -34,7 +35,7 @@ public class CommonDataSource implements DataSource {
 
     private final AtomicBoolean dataSourceClosed = new AtomicBoolean(false);
 
-    public CommonDataSource(String databaseUrl, String login, String password, String driverName)
+    public DataSourceImpl(String databaseUrl, String login, String password, String driverName)
             throws DataSourceDownException {
         this.databaseUrl = databaseUrl;
         try {
@@ -88,7 +89,7 @@ public class CommonDataSource implements DataSource {
                     getConnection(databaseUrl + "?allowMultiQueries=true", login, password), this);
             allConnections.add(connection);
             availableConnections.add(connection);
-            LOG.info(CONNECTION_ADDED_MCG, connection);
+            LOG.info(CONNECTION_ADDED_MSG, connection);
         }
     }
 
@@ -101,9 +102,9 @@ public class CommonDataSource implements DataSource {
         try {
             Driver driver = DriverManager.getDriver(databaseUrl);
             DriverManager.deregisterDriver(driver);
-            LOG.info(String.format(DEREGISTER_DRIVER_MCG, databaseUrl));
+            LOG.info(String.format(DEREGISTER_DRIVER_MSG, databaseUrl));
         } catch (SQLException e) {
-            LOG.error(String.format(ERROR_DEREGISTER_DRIVER_MCG, databaseUrl), e);
+            LOG.error(String.format(ERROR_DEREGISTER_DRIVER_MSG, databaseUrl), e);
         }
     }
 

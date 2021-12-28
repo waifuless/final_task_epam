@@ -1,5 +1,7 @@
-package by.epam.finaltask.connection_pool;
+package by.epam.finaltask.connection_pool.impl;
 
+import by.epam.finaltask.connection_pool.ConnectionPool;
+import by.epam.finaltask.connection_pool.DataSource;
 import by.epam.finaltask.exception.DataSourceDownException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,9 +10,9 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.util.Properties;
 
-public class CommonConnectionPool implements ConnectionPool {
+public class ConnectionPoolImpl implements ConnectionPool {
 
-    private final static Logger LOG = LoggerFactory.getLogger(CommonConnectionPool.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ConnectionPoolImpl.class);
 
     private final static String INIT_MSG = "Connection pool successfully initialized";
     private final static String CLOSE_MSG = "Connection pool successfully closed";
@@ -20,15 +22,15 @@ public class CommonConnectionPool implements ConnectionPool {
     private final static String LOGIN_ENV_NAME = "MYSQL_RACING_SITE_USER";
     private final static String PASSWORD_ENV_NAME = "MYSQL_RACING_SITE_PASSWORD";
 
-    private volatile static CommonConnectionPool instance;
+    private volatile static ConnectionPoolImpl instance;
 
     private static DataSource dataSource;
 
-    private CommonConnectionPool() throws DataSourceDownException {
+    private ConnectionPoolImpl() throws DataSourceDownException {
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME)) {
             Properties properties = new Properties();
             properties.load(inputStream);
-            dataSource = new CommonDataSource(properties.getProperty(DB_URL_PROPERTY_NAME),
+            dataSource = new DataSourceImpl(properties.getProperty(DB_URL_PROPERTY_NAME),
                     System.getenv(LOGIN_ENV_NAME), System.getenv(PASSWORD_ENV_NAME),
                     properties.getProperty(DB_DRIVER_NAME_PROPERTY_NAME));
             LOG.info(INIT_MSG);
@@ -38,11 +40,11 @@ public class CommonConnectionPool implements ConnectionPool {
         }
     }
 
-    public static CommonConnectionPool getInstance() throws DataSourceDownException {
+    public static ConnectionPoolImpl getInstance() throws DataSourceDownException {
         if (instance == null) {
-            synchronized (CommonConnectionPool.class) {
+            synchronized (ConnectionPoolImpl.class) {
                 if (instance == null) {
-                    instance = new CommonConnectionPool();
+                    instance = new ConnectionPoolImpl();
                 }
             }
         }
