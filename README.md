@@ -1,3 +1,5 @@
+Final project for epam courses. It's a web application. Site for direct and reverse auctions.
+
 1. Tomcat and idea configuration to work with uploaded images view:
 
 Add the following new entry to Tomcat's /conf/server.xml inside <Host>:
